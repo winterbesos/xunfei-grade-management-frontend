@@ -31,10 +31,10 @@
 import { ref } from 'vue'
 import logoUrl from '@/assets/logo-white.png'
 
-// 版本信息 - 这些可以通过环境变量或构建时注入
-const version = ref(import.meta.env.VITE_APP_VERSION || 'v1.0.0')
-const commitHash = ref(import.meta.env.VITE_COMMIT_HASH || 'dev-local')
-const lastUpdate = ref(import.meta.env.VITE_BUILD_TIME || new Date().toLocaleDateString('zh-CN'))
+// 版本信息 - 在构建时自动注入
+const version = ref(__APP_VERSION__)
+const commitHash = ref(__COMMIT_HASH__)
+const lastUpdate = ref(__BUILD_TIME__)
 </script>
 
 <style scoped>
