@@ -10,11 +10,15 @@ export const authAPI = {
     if (USE_MOCK) {
       return mockAPI.loginByPassword(username, password)
     }
-    return request({
-      url: '/auth/login',
-      method: 'post',
-      data: { username, password }
-    })
+    const formData = new URLSearchParams();
+      formData.append('username', username);
+      formData.append('password', password);
+      return request({
+        url: '/api/auth/login',
+        method: 'post',
+        data: formData,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      })
   },
 
   // OAuth 登录
@@ -32,7 +36,32 @@ export const authAPI = {
   // 获取 OAuth 授权 URL
   getOAuthUrl(provider) {
     return request({
-      url: `/auth/oauth/${provider}/url`,
+      url: `/api/auth/oauth/authorize`,
+      method: 'get',
+      params: {
+        provider: provider
+      }
+    })
+  },
+
+  oauthCallback(provider, data) {
+    return request({
+      url: `/api/auth/oauth/callback`,
+      method: 'post',
+      data: {
+        ...data,
+        provider: provider
+      }
+    })
+  },
+
+  // 获取当前用户信息
+  getUserInfo() {
+    if (USE_MOCK) {
+      return mockAPI.getUserInfo()
+    }
+    return request({
+      url: '/api/auth/me',
       method: 'get'
     })
   },
@@ -42,6 +71,18 @@ export const authAPI = {
     return request({
       url: '/auth/logout',
       method: 'post'
+    })
+  },
+
+  // OAuth 认证提交
+  submitOAuth(data) {
+    if (USE_MOCK) {
+      return mockAPI.submitOAuth(data)
+    }
+    return request({
+      url: '/api/auth/oauth/submit',
+      method: 'post',
+      data
     })
   }
 }

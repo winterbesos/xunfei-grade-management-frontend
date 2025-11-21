@@ -7,7 +7,7 @@ export const useSettingsStore = defineStore('settings', () => {
     siteName: '成绩管理系统',
     enablePasswordLogin: true,
     enableOAuthLogin: true,
-    oauthProvider: '', // 可选: 'google', 'github', 'custom' 等
+    oauthProvider: 'jyyun', // 可选: 'google', 'github', 'custom' 等
     oauthClientId: '',
     oauthRedirectUri: ''
   })

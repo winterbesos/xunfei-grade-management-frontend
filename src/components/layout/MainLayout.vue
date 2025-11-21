@@ -13,10 +13,6 @@
       >
         <!-- 管理员菜单 -->
         <template v-if="authStore.userRole === 'admin'">
-          <el-menu-item index="/admin/settings">
-            <el-icon><Setting /></el-icon>
-            <span>系统设置</span>
-          </el-menu-item>
           <el-menu-item index="/admin/semesters">
             <el-icon><Calendar /></el-icon>
             <span>学期管理</span>
@@ -38,6 +34,38 @@
             <span>我的成绩</span>
           </el-menu-item>
         </template>
+
+        <!-- 维护人员菜单 -->
+        <template v-if="authStore.userRole === 'maintenance'">
+          <el-menu-item index="/maintenance/settings">
+            <el-icon><Setting /></el-icon>
+            <span>系统设置</span>
+          </el-menu-item>
+          <el-menu-item index="/maintenance/system-status">
+            <el-icon><Monitor /></el-icon>
+            <span>系统状态</span>
+          </el-menu-item>
+          <el-menu-item index="/maintenance/logs">
+            <el-icon><Document /></el-icon>
+            <span>系统日志</span>
+          </el-menu-item>
+          <el-menu-item index="/maintenance/backup">
+            <el-icon><Download /></el-icon>
+            <span>数据备份</span>
+          </el-menu-item>
+          <el-menu-item index="/maintenance/schools">
+            <el-icon><School /></el-icon>
+            <span>学校管理</span>
+          </el-menu-item>
+          <el-menu-item index="/maintenance/students">
+            <el-icon><User /></el-icon>
+            <span>学生管理</span>
+          </el-menu-item>
+          <el-menu-item index="/maintenance/semesters">
+            <el-icon><Calendar /></el-icon>
+            <span>学期管理</span>
+          </el-menu-item>
+        </template>
       </el-menu>
     </el-aside>
 
@@ -51,7 +79,7 @@
             <el-dropdown @command="handleCommand">
               <span class="user-info">
                 <el-icon><User /></el-icon>
-                {{ authStore.userName }} ({{ roleText }})
+                {{ authStore.realname }} ({{ roleText }})
                 <el-icon class="el-icon--right"><arrow-down /></el-icon>
               </span>
               <template #dropdown>
@@ -72,7 +100,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
@@ -81,10 +109,14 @@ import {
   Edit,
   Document,
   User,
-  ArrowDown
+  ArrowDown,
+  Monitor,
+  Download,
+  School
 } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { useSettingsStore } from '@/stores/settings'
+import { authAPI } from '@/api/auth'
 
 const router = useRouter()
 const route = useRoute()
@@ -97,10 +129,16 @@ const activeMenu = computed(() => route.path)
 // 页面标题
 const pageTitle = computed(() => {
   const titleMap = {
-    '/admin/settings': '系统设置',
     '/admin/semesters': '学期管理',
     '/teacher/grades': '成绩录入',
-    '/student/grades': '我的成绩'
+    '/student/grades': '我的成绩',
+    '/maintenance/settings': '系统设置',
+    '/maintenance/system-status': '系统状态',
+    '/maintenance/logs': '系统日志',
+    '/maintenance/backup': '数据备份',
+    '/maintenance/schools': '学校管理',
+    '/maintenance/students': '学生管理',
+    '/maintenance/semesters': '学期管理'
   }
   return titleMap[route.path] || '首页'
 })
@@ -110,10 +148,31 @@ const roleText = computed(() => {
   const roleMap = {
     admin: '管理员',
     teacher: '教师',
-    student: '学生'
+    student: '学生',
+    maintenance: '维护人员'
   }
   return roleMap[authStore.userRole] || ''
 })
+
+// 获取用户信息
+const fetchUserInfo = async () => {
+  if (authStore.isLoggedIn && !authStore.userInfo) {
+    try {
+      const response = await authAPI.getUserInfo()
+      if (response.code === 200) {
+        authStore.updateUserInfo(response.data)
+      } else {
+        ElMessage.error('获取用户信息失败')
+        authStore.logout()
+        router.push('/login')
+      }
+    } catch (error) {
+      ElMessage.error('获取用户信息失败')
+      authStore.logout()
+      router.push('/login')
+    }
+  }
+}
 
 // 处理下拉菜单命令
 const handleCommand = async (command) => {
@@ -133,6 +192,11 @@ const handleCommand = async (command) => {
     }
   }
 }
+
+// 组件挂载时获取用户信息
+onMounted(() => {
+  fetchUserInfo()
+})
 </script>
 
 <style scoped>

@@ -9,13 +9,26 @@ import fs from 'fs'
 function getGitInfo() {
   try {
     const commitHash = execSync('git rev-parse --short HEAD').toString().trim()
-    const commitDate = execSync('git log -1 --format=%cd --date=short').toString().trim()
-    return { commitHash, commitDate }
+    // 使用 ISO 8601 格式，包含时间
+    const commitDate = execSync('git log -1 --format=%cd --date=iso').toString().trim()
+    // 转换为更友好的格式：2024-11-10 17:45:30
+    const formattedDate = commitDate.replace(/\s[\+\-]\d{4}$/, '').substring(0, 19)
+    return { commitHash, commitDate: formattedDate }
   } catch (error) {
     console.warn('⚠️  无法获取 git 信息，使用默认值')
+    const now = new Date()
+    const formattedDate = now.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }).replace(/\//g, '-')
     return {
       commitHash: 'dev-local',
-      commitDate: new Date().toISOString().split('T')[0]
+      commitDate: formattedDate
     }
   }
 }
@@ -38,6 +51,10 @@ export default defineConfig({
   server: {
     host: '0.0.0.0', // 允许外部访问
     port: 5173,      // 可改成你想用的端口
+    https: {
+      key: fs.readFileSync('./ssl/key.pem'),
+      cert: fs.readFileSync('./ssl/cert.pem')
+    }
   },
   plugins: [
     vue(),

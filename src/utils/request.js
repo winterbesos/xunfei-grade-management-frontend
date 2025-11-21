@@ -27,35 +27,34 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   response => {
     const res = response.data
+    return response
+  },
+  error => {
+    const response = error.response
 
-    // 如果返回的状态码不是 200，则显示错误信息
-    if (res.code !== undefined && res.code !== 200) {
+    if (response.status >= 400 && response.status < 500) {
       ElMessage({
-        message: res.message || 'Error',
+        message: response.data.detail || 'Error',
         type: 'error',
         duration: 5000
       })
 
       // 401: 未授权，跳转到登录页
-      if (res.code === 401) {
+      if (response.status === 401) {
         localStorage.removeItem('token')
         localStorage.removeItem('userInfo')
         window.location.href = '/login'
       }
 
-      return Promise.reject(new Error(res.message || 'Error'))
+      return Promise.reject(new Error(response.data.detail || 'Error'))
+    } else {
+      ElMessage({
+        message: error.message || '网络错误',
+        type: 'error',
+        duration: 5000
+      })
+      return Promise.reject(error)
     }
-
-    return res
-  },
-  error => {
-    console.error('Response error:', error)
-    ElMessage({
-      message: error.message || '网络错误',
-      type: 'error',
-      duration: 5000
-    })
-    return Promise.reject(error)
   }
 )
 

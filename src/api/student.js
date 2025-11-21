@@ -1,16 +1,95 @@
 import request from '@/utils/request'
 import { mockAPI } from '@/utils/mock'
 
+// 是否使用 Mock 数据
 const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false'
 
 export const studentAPI = {
-  // 获取我的成绩
-  getMyGrades(params) {
+  // 获取学生列表
+  async getStudents(params = {}) {
     if (USE_MOCK) {
-      return mockAPI.getGrades(params)
+      return mockAPI.getStudents(params)
     }
     return request({
-      url: '/student/grades',
+      url: '/api/students',
+      method: 'get',
+      params
+    })
+  },
+
+  // 创建新学生
+  async createStudent(student) {
+    if (USE_MOCK) {
+      return mockAPI.createStudent(student)
+    }
+    return request({
+      url: '/api/students',
+      method: 'post',
+      data: student
+    })
+  },
+
+  // 更新学生信息
+  async updateStudent(id, student) {
+    if (USE_MOCK) {
+      return mockAPI.updateStudent(id, student)
+    }
+    return request({
+      url: `/api/students/${id}`,
+      method: 'put',
+      data: student
+    })
+  },
+
+  // 删除学生
+  async deleteStudent(id) {
+    if (USE_MOCK) {
+      return mockAPI.deleteStudent(id)
+    }
+    return request({
+      url: `/api/students/${id}`,
+      method: 'delete'
+    })
+  },
+
+  // 获取学校列表
+  async getSchools() {
+    if (USE_MOCK) {
+      return mockAPI.getSchools()
+    }
+    return request({
+      url: '/api/schools',
+      method: 'get'
+    })
+  },
+
+  // 获取班级列表
+  async getClasses(params = {}) {
+    if (USE_MOCK) {
+      return mockAPI.getClasses(params)
+    }
+    return request({
+      url: '/api/classes',
+      method: 'get',
+      params
+    })
+  },
+
+  // 根据学校获取班级
+  async getClassesBySchool(schoolId) {
+    if (USE_MOCK) {
+      return mockAPI.getClassesBySchool(schoolId)
+    }
+    return request({
+      url: `/api/schools/${schoolId}/classes`,
+      method: 'get'
+    })
+  },
+
+  // 获取我的成绩
+  getMyGrades(params) {
+    return request({
+      url: '/api/grades',
       method: 'get',
       params
     })

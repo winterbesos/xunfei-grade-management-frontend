@@ -8,12 +8,19 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = computed(() => !!token.value)
   const userRole = computed(() => userInfo.value?.role || '')
   const userName = computed(() => userInfo.value?.name || '')
+  const realname = computed(() => userInfo.value?.realname || '')
 
   // 登录
   function login(tokenValue, userInfoValue) {
     token.value = tokenValue
     userInfo.value = userInfoValue
     localStorage.setItem('token', tokenValue)
+    localStorage.setItem('userInfo', JSON.stringify(userInfoValue))
+  }
+
+  // 更新用户信息
+  function updateUserInfo(userInfoValue) {
+    userInfo.value = userInfoValue
     localStorage.setItem('userInfo', JSON.stringify(userInfoValue))
   }
 
@@ -36,7 +43,9 @@ export const useAuthStore = defineStore('auth', () => {
     isLoggedIn,
     userRole,
     userName,
+    realname,
     login,
+    updateUserInfo,
     logout,
     hasRole
   }

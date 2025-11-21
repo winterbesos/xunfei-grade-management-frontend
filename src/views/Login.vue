@@ -60,6 +60,7 @@
             <div>管理员: admin / admin123</div>
             <div>教师: teacher1 / teacher123</div>
             <div>学生: student1 / student123</div>
+            <div>维护人员: maintenance / maintenance123</div>
           </el-alert>
         </el-tab-pane>
 
@@ -204,13 +205,25 @@ const handlePasswordLogin = async () => {
         loginForm.value.password
       )
 
-      if (response.code === 200) {
-        authStore.login(response.data.token, response.data.userInfo)
-        ElMessage.success('登录成功')
+      if (response.status === 200 && response.data.access_token) {
+        const token = response.data.access_token
 
-        // 重定向到原来要访问的页面或默认页面
-        const redirect = route.query.redirect || getDefaultRoute()
-        router.push(redirect)
+        // 存储token
+        authStore.login(token, null)
+
+        // 获取用户信息
+        const userInfoResponse = await authAPI.getUserInfo()
+        if (userInfoResponse.status === 200) {
+          authStore.updateUserInfo(userInfoResponse.data)
+          ElMessage.success('登录成功')
+
+          const redirect = route.query.redirect || getDefaultRoute()
+          router.push(redirect)
+        } else {
+          throw new Error('获取用户信息失败')
+        }
+      } else {
+        throw new Error('登录响应无效')
       }
     } catch (error) {
       ElMessage.error(error.message || '登录失败')
@@ -224,16 +237,34 @@ const handlePasswordLogin = async () => {
 const handleOAuthLogin = async () => {
   loading.value = true
   try {
-    // 模拟 OAuth 登录
-    const response = await authAPI.loginByOAuth(oauthProvider.value, 'mock_code')
+    const response = await authAPI.getOAuthUrl(oauthProvider.value)
 
-    if (response.code === 200) {
-      authStore.login(response.data.token, response.data.userInfo)
-      ElMessage.success('OAuth 登录成功')
-
-      const redirect = route.query.redirect || getDefaultRoute()
-      router.push(redirect)
+    if (response.status === 200 && response.data.authorization_url) {
+      console.log('重定向到 OAuth 提供者登录页：', response.data.authorization_url)
+      window.location.href = response.data.authorization_url
     }
+
+
+    // // 模拟 OAuth 登录
+    // const response = await authAPI.loginByOAuth(oauthProvider.value, 'mock_code')
+    // if (response.code === 200) {
+    //   const token = response.data.token
+
+    //   // 存储token
+    //   authStore.login(token, null)
+
+    //   // 获取用户信息
+    //   const userInfoResponse = await authAPI.getUserInfo()
+    //   if (userInfoResponse.code === 200) {
+    //     authStore.updateUserInfo(userInfoResponse.data)
+    //     ElMessage.success('OAuth 登录成功')
+
+    //     const redirect = route.query.redirect || getDefaultRoute()
+    //     router.push(redirect)
+    //   } else {
+    //     throw new Error('获取用户信息失败')
+    //   }
+    // }
   } catch (error) {
     ElMessage.error(error.message || 'OAuth 登录失败')
   } finally {
@@ -247,7 +278,8 @@ const getDefaultRoute = () => {
   const routeMap = {
     admin: '/admin/settings',
     teacher: '/teacher/grades',
-    student: '/student/grades'
+    student: '/student/grades',
+    maintenance: '/maintenance/system-status'
   }
   return routeMap[role] || '/dashboard'
 }

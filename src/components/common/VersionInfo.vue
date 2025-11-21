@@ -87,6 +87,7 @@ const lastUpdate = ref(__BUILD_TIME__)
   justify-content: space-between;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .label {
@@ -99,6 +100,10 @@ const lastUpdate = ref(__BUILD_TIME__)
   color: rgba(255, 255, 255, 0.95);
   font-weight: 600;
   text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
 }
 
 .value.commit {
@@ -108,6 +113,10 @@ const lastUpdate = ref(__BUILD_TIME__)
   padding: 1px 4px;
   border-radius: 3px;
   color: rgba(255, 255, 255, 0.9);
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* 响应式 */

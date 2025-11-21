@@ -8,9 +8,12 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:https": "vite --https",
+    "dev:http": "HTTPS=false vite",
     "build": "node scripts/generate-version.js && vite build",
     "build:simple": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview:https": "vite preview --https"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",

@@ -87,8 +87,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { adminAPI } from '@/api/admin'
 import { studentAPI } from '@/api/student'
+import { semesterAPI } from '@/api/semester'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
@@ -123,7 +123,7 @@ const statistics = computed(() => {
 // 加载学期列表
 const loadSemesters = async () => {
   try {
-    const response = await adminAPI.getSemesters()
+    const response = await semesterAPI.getSemesters()
     if (response.code === 200) {
       semesters.value = response.data
     }

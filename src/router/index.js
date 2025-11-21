@@ -20,15 +20,9 @@ const routes = [
     children: [
       // 管理员路由
       {
-        path: '/admin/settings',
-        name: 'AdminSettings',
-        component: () => import('@/views/admin/SystemSettings.vue'),
-        meta: { requiresAuth: true, roles: ['admin'] }
-      },
-      {
         path: '/admin/semesters',
         name: 'AdminSemesters',
-        component: () => import('@/views/admin/SemesterManagement.vue'),
+        component: () => import('@/views/admin/SemesterManagementWithSchool.vue'),
         meta: { requiresAuth: true, roles: ['admin'] }
       },
 
@@ -46,8 +40,58 @@ const routes = [
         name: 'StudentGrades',
         component: () => import('@/views/student/GradeView.vue'),
         meta: { requiresAuth: true, roles: ['student'] }
+      },
+
+      // 维护人员路由
+      {
+        path: '/maintenance/settings',
+        name: 'maintenanceSettings',
+        component: () => import('@/views/admin/SystemSettings.vue'),
+        meta: { requiresAuth: true, roles: ['maintenance'] }
+      },
+      {
+        path: '/maintenance/system-status',
+        name: 'maintenanceSystemStatus',
+        component: () => import('@/views/maintenance/SystemStatus.vue'),
+        meta: { requiresAuth: true, roles: ['maintenance'] }
+      },
+      {
+        path: '/maintenance/logs',
+        name: 'maintenanceLogs',
+        component: () => import('@/views/maintenance/SystemLogs.vue'),
+        meta: { requiresAuth: true, roles: ['maintenance'] }
+      },
+      {
+        path: '/maintenance/backup',
+        name: 'maintenanceBackup',
+        component: () => import('@/views/maintenance/DataBackup.vue'),
+        meta: { requiresAuth: true, roles: ['maintenance'] }
+      },
+      {
+        path: '/maintenance/schools',
+        name: 'maintenanceSchools',
+        component: () => import('@/views/maintenance/SchoolManagement.vue'),
+        meta: { requiresAuth: true, roles: ['maintenance'] }
+      },
+      {
+        path: '/maintenance/students',
+        name: 'maintenanceStudents',
+        component: () => import('@/views/maintenance/StudentManagement.vue'),
+        meta: { requiresAuth: true, roles: ['maintenance'] }
+      },
+      {
+        path: '/maintenance/semesters',
+        name: 'maintenanceSemesters',
+        component: () => import('@/views/maintenance/SemesterManagement.vue'),
+        meta: { requiresAuth: true, roles: ['maintenance'] }
       }
     ]
+  },
+  {
+    path: '/callback/university',
+    name: 'OAuthCallback',
+    component: () => import('@/views/OAuthCallback.vue'),
+    meta: { requiresAuth: false }
   },
   {
     path: '/:pathMatch(.*)*',
@@ -75,9 +119,10 @@ router.beforeEach((to, from, next) => {
   if (to.meta.roles && !to.meta.roles.includes(authStore.userRole)) {
     // 根据用户角色重定向到相应的首页
     const redirectMap = {
-      admin: '/admin/settings',
+      admin: '/admin/semesters',
       teacher: '/teacher/grades',
-      student: '/student/grades'
+      student: '/student/grades',
+      maintenance: '/maintenance/settings'
     }
     next(redirectMap[authStore.userRole] || '/login')
     return
@@ -86,9 +131,10 @@ router.beforeEach((to, from, next) => {
   // 如果已登录访问登录页，重定向到首页
   if (to.name === 'Login' && authStore.isLoggedIn) {
     const redirectMap = {
-      admin: '/admin/settings',
+      admin: '/admin/semesters',
       teacher: '/teacher/grades',
-      student: '/student/grades'
+      student: '/student/grades',
+      maintenance: '/maintenance/settings'
     }
     next(redirectMap[authStore.userRole] || '/dashboard')
     return
