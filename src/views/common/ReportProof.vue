@@ -1,7 +1,7 @@
 <template>
   <div class="page-wrapper">
     <!-- 打印操作栏 -->
-    <div class="action-bar">
+    <div class="action-bar no-print">
       <button @click="handlePrint">🖨️ 打印证明单</button>
     </div>
 
@@ -11,15 +11,16 @@
       <h1 class="main-title">成绩证明单</h1>
 
       <!-- 2. 证明正文 -->
-      <div class="intro-text">
+      <div class="intro-text" v-if="gradeProofData">
         <p>
-          兹证明学生{{ student.name }}，性别{{ student.gender }}，出生于
-          {{ student.birthday }}。该生于
-          {{ student.admissionDate }} 进入我校就读，现为我校{{
-            student.currentClass
+          兹证明学生 {{ studentInfo.name }}，出生于
+          {{ studentInfo.birth }}。该生于
+          {{ studentInfo.enrollment_date }} 进入我校就读，现为我校{{
+            studentInfo.class_name
           }}学生。该生在校成绩如下：
         </p>
       </div>
+      <div v-else>加载中...</div>
 
       <!-- 3. 成绩表格 -->
       <table class="score-table">
@@ -61,8 +62,8 @@
       <div class="footer-section">
         <div class="note">注：学校科目均为百分制。</div>
         <div class="signature">
-          <div class="school-name">上海音乐学院虹口区北虹高级中学教导处</div>
-          <div class="date">{{ currentDate }}</div>
+          <div class="school-name">{{ gradeProofData?.signature }}</div>
+          <div class="date">{{ gradeProofData?.date }}</div>
         </div>
       </div>
     </div>
@@ -70,130 +71,161 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
 
-// --- 数据定义 (完全复刻图片内容) ---
-const student = ref({
-  name: "王艺诺",
-  gender: "女",
-  birthday: "2007 年 3 月 30 日",
-  admissionDate: "2022 年 9 月",
-  currentClass: "高三 5 班",
+// --- 数据定义 ---
+
+// 后端返回的数据模型
+const gradeProofData = ref(null);
+
+// 模拟从API获取数据
+onMounted(() => {
+  const route = useRoute();
+  const studentId = route.params.id; // 假设学生ID从路由中获取
+  // TODO: 调用API获取真实数据
+  // import { getStudentGradeProof } from '@/api/student';
+  // getStudentGradeProof(studentId).then(response => {
+  //   gradeProofData.value = response.data;
+  // });
+
+  // 使用模拟数据
+  gradeProofData.value = {
+    student_id: "12345",
+    student_name: "王艺诺",
+    student_birth: "2007 年 3 月 30 日",
+    student_enrollment_date: "2022 年 9 月",
+    student_class_name: "高三 5 班",
+    signature: "上海音乐学院虹口区北虹高级中学教导处",
+    date: "2025 年 4 月 29 日",
+
+    politics: {
+      level1: { first_semester_score: "90", second_semester_score: "85" },
+      level2: { first_semester_score: "78", second_semester_score: "73" },
+      level3: { first_semester_score: "88", second_semester_score: "86" },
+    },
+    chinese: {
+      level1: { first_semester_score: "84", second_semester_score: "82" },
+      level2: { first_semester_score: "84", second_semester_score: "91" },
+      level3: { first_semester_score: "82", second_semester_score: "82" },
+    },
+    math: {
+      level1: { first_semester_score: "86", second_semester_score: "87" },
+      level2: { first_semester_score: "84", second_semester_score: "80" },
+      level3: { first_semester_score: "72", second_semester_score: "73" },
+    },
+    english: {
+      level1: { first_semester_score: "87", second_semester_score: "87" },
+      level2: { first_semester_score: "88", second_semester_score: "87" },
+      level3: { first_semester_score: "88", second_semester_score: "81" },
+    },
+    physics: {
+      level1: { first_semester_score: "77", second_semester_score: "77" },
+      level2: { first_semester_score: "77", second_semester_score: "72" },
+      level3: { first_semester_score: null, second_semester_score: null },
+    },
+    chemistry: {
+      level1: { first_semester_score: "85", second_semester_score: "77" },
+      level2: { first_semester_score: "80", second_semester_score: "75" },
+      level3: { first_semester_score: null, second_semester_score: null },
+    },
+    history: {
+      level1: { first_semester_score: "94", second_semester_score: "89" },
+      level2: { first_semester_score: "86", second_semester_score: "88" },
+      level3: { first_semester_score: "96", second_semester_score: "87" },
+    },
+    geography: {
+      level1: { first_semester_score: null, second_semester_score: null },
+      level2: { first_semester_score: "86", second_semester_score: "73" },
+      level3: { first_semester_score: "96", second_semester_score: "83" },
+    },
+    biology: {
+      level1: { first_semester_score: null, second_semester_score: null },
+      level2: { first_semester_score: "80", second_semester_score: "79" },
+      level3: { first_semester_score: null, second_semester_score: null },
+    },
+    information_technology: {
+      level1: { first_semester_score: "82", second_semester_score: "81" },
+      level2: { first_semester_score: null, second_semester_score: null },
+      level3: { first_semester_score: null, second_semester_score: null },
+    },
+    pe: {
+      level1: { first_semester_score: "优", second_semester_score: "优" },
+      level2: { first_semester_score: "优", second_semester_score: "优" },
+      level3: { first_semester_score: "优", second_semester_score: "优" },
+    },
+    art: {
+      level1: { first_semester_score: "良", second_semester_score: "良" },
+      level2: { first_semester_score: "良", second_semester_score: "良" },
+      level3: { first_semester_score: null, second_semester_score: null },
+    },
+  };
 });
 
-const currentDate = ref("2025 年 4 月 29 日");
+const studentInfo = computed(() => {
+  if (!gradeProofData.value) {
+    return { name: "", birth: "", enrollment_date: "", class_name: "" };
+  }
+  return {
+    name: gradeProofData.value.student_name,
+    birth: gradeProofData.value.student_birth,
+    enrollment_date: gradeProofData.value.student_enrollment_date,
+    class_name: gradeProofData.value.student_class_name,
+  };
+});
 
-// 成绩数据
-const scores = ref([
-  {
-    subject: "政治",
-    g1_1: "90",
-    g1_2: "85",
-    g2_1: "78",
-    g2_2: "73",
-    g3_1: "88",
-    g3_2: "86",
-  },
-  {
-    subject: "语文",
-    g1_1: "84",
-    g1_2: "82",
-    g2_1: "84",
-    g2_2: "91",
-    g3_1: "82",
-    g3_2: "82",
-  },
-  {
-    subject: "数学",
-    g1_1: "86",
-    g1_2: "87",
-    g2_1: "84",
-    g2_2: "80",
-    g3_1: "72",
-    g3_2: "73",
-  },
-  {
-    subject: "英语",
-    g1_1: "87",
-    g1_2: "87",
-    g2_1: "88",
-    g2_2: "87",
-    g3_1: "88",
-    g3_2: "81",
-  },
-  {
-    subject: "物理",
-    g1_1: "77",
-    g1_2: "77",
-    g2_1: "77",
-    g2_2: "72",
-    g3_1: "—",
-    g3_2: "—",
-  },
-  {
-    subject: "化学",
-    g1_1: "85",
-    g1_2: "77",
-    g2_1: "80",
-    g2_2: "75",
-    g3_1: "—",
-    g3_2: "—",
-  },
-  {
-    subject: "历史",
-    g1_1: "94",
-    g1_2: "89",
-    g2_1: "86",
-    g2_2: "88",
-    g3_1: "96",
-    g3_2: "87",
-  },
-  {
-    subject: "地理",
-    g1_1: "—",
-    g1_2: "—",
-    g2_1: "86",
-    g2_2: "73",
-    g3_1: "96",
-    g3_2: "83",
-  },
-  {
-    subject: "生物",
-    g1_1: "—",
-    g1_2: "—",
-    g2_1: "80",
-    g2_2: "79",
-    g3_1: "—",
-    g3_2: "—",
-  },
-  {
-    subject: "信息科技",
-    g1_1: "82",
-    g1_2: "81",
-    g2_1: "—",
-    g2_2: "—",
-    g3_1: "—",
-    g3_2: "—",
-  },
-  {
-    subject: "体育",
-    g1_1: "优",
-    g1_2: "优",
-    g2_1: "优",
-    g2_2: "优",
-    g3_1: "优",
-    g3_2: "优",
-  },
-  {
-    subject: "艺术",
-    g1_1: "良",
-    g1_2: "良",
-    g2_1: "良",
-    g2_2: "良",
-    g3_1: "—",
-    g3_2: "—",
-  },
-]);
+// 科目名称映射
+const subjectMap = {
+  politics: "政治",
+  chinese: "语文",
+  math: "数学",
+  english: "英语",
+  physics: "物理",
+  chemistry: "化学",
+  history: "历史",
+  geography: "地理",
+  biology: "生物",
+  information_technology: "信息科技",
+  pe: "体育",
+  art: "艺术",
+};
+
+// 将后端数据转换为表格所需的格式
+const scores = computed(() => {
+  if (!gradeProofData.value) return [];
+
+  const subjectOrder = [
+    "politics",
+    "chinese",
+    "math",
+    "english",
+    "physics",
+    "chemistry",
+    "history",
+    "geography",
+    "biology",
+    "information_technology",
+    "pe",
+    "art",
+  ];
+
+  return subjectOrder
+    .map((key) => {
+      const subjectData = gradeProofData.value[key];
+      if (!subjectData) return null;
+
+      return {
+        subject: subjectMap[key],
+        g1_1: subjectData.level1?.first_semester_score ?? "—",
+        g1_2: subjectData.level1?.second_semester_score ?? "—",
+        g2_1: subjectData.level2?.first_semester_score ?? "—",
+        g2_2: subjectData.level2?.second_semester_score ?? "—",
+        g3_1: subjectData.level3?.first_semester_score ?? "—",
+        g3_2: subjectData.level3?.second_semester_score ?? "—",
+      };
+    })
+    .filter(Boolean);
+});
 
 const handlePrint = () => {
   window.print();
@@ -330,6 +362,9 @@ button {
 
 /* --- 打印专用样式 --- */
 @media print {
+  .no-print {
+    display: none;
+  }
   @page {
     size: A4;
     margin: 0;

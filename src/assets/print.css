@@ -1,0 +1,95 @@
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm; /* A reasonable margin for the printer */
+  }
+
+  /* Basic reset for printing */
+  html,
+  body {
+    height: 100% !important;
+    overflow: hidden !important;
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide all non-essential UI */
+  .el-aside,
+  .el-header,
+  .version-info,
+  .action-bar,
+  #vite-plugin-vue-devtools-container {
+    display: none !important;
+  }
+
+  /* Force the main content containers to occupy the full page height */
+  #app,
+  .main-container,
+  .el-main {
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 100% !important;
+    overflow: visible !important;
+  }
+
+  /* Use flexbox on the page wrapper to control the main layout */
+  .page-wrapper {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: white;
+  }
+
+  /* The A4 container should act as the main content area */
+  .a4-container {
+    box-shadow: none !important;
+    border: none !important;
+    width: 100%;
+    height: 100%; /* Fill the available height of the flex container */
+    padding: 10mm; /* Internal padding for the content */
+    page-break-after: auto;
+
+    /* Use flexbox to distribute space within the report */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Push the footer to the bottom of the page */
+  .footer-section {
+    margin-top: auto;
+  }
+
+  /* Make sure the chart container is flexible */
+  .chart-container {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Previous compaction styles can be kept if content is large */
+  .title {
+    font-size: 16pt;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  .section-title {
+    font-size: 11pt;
+    margin: 8px 0;
+  }
+  table {
+    font-size: 10pt;
+  }
+  th,
+  td {
+    height: 22px;
+    padding: 3px 2px;
+  }
+  .footer-section {
+    height: 220px;
+    flex-shrink: 0; /* Prevent the footer from shrinking */
+  }
+}
