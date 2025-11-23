@@ -13,13 +13,26 @@
           <el-statistic title="总课程数" :value="statistics.totalCourses" />
         </el-col>
         <el-col :span="6">
-          <el-statistic title="平均分" :value="statistics.averageScore" :precision="2" />
+          <el-statistic
+            title="平均分"
+            :value="statistics.averageScore"
+            :precision="2"
+          />
         </el-col>
         <el-col :span="6">
-          <el-statistic title="及格率" :value="statistics.passRate" suffix="%" :precision="1" />
+          <el-statistic
+            title="及格率"
+            :value="statistics.passRate"
+            suffix="%"
+            :precision="1"
+          />
         </el-col>
         <el-col :span="6">
-          <el-statistic title="总学分" :value="statistics.totalCredits" :precision="1" />
+          <el-statistic
+            title="总学分"
+            :value="statistics.totalCredits"
+            :precision="1"
+          />
         </el-col>
       </el-row>
 
@@ -64,8 +77,10 @@
         </el-table-column>
         <el-table-column prop="score" label="成绩" width="100" align="center">
           <template #default="{ row }">
-            <span :style="{ color: getScoreColor(row.score), fontWeight: 'bold' }">
-              {{ row.score !== null ? row.score : '-' }}
+            <span
+              :style="{ color: getScoreColor(row.score), fontWeight: 'bold' }"
+            >
+              {{ row.score !== null ? row.score : "-" }}
             </span>
           </template>
         </el-table-column>
@@ -79,127 +94,132 @@
         <el-table-column prop="teacherName" label="任课教师" width="120" />
       </el-table>
 
-      <el-empty v-if="!loading && grades.length === 0" description="暂无成绩数据" />
+      <el-empty
+        v-if="!loading && grades.length === 0"
+        description="暂无成绩数据"
+      />
     </el-card>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import { studentAPI } from '@/api/student'
-import { semesterAPI } from '@/api/semester'
-import { useAuthStore } from '@/stores/auth'
+import { ref, computed, onMounted } from "vue";
+import { ElMessage } from "element-plus";
+import { studentAPI } from "@/api/student";
+import { semesterAPI } from "@/api/semester";
+import { useAuthStore } from "@/stores/auth";
 
-const authStore = useAuthStore()
-const loading = ref(false)
-const semesters = ref([])
-const grades = ref([])
+const authStore = useAuthStore();
+const loading = ref(false);
+const semesters = ref([]);
+const grades = ref([]);
 
 const queryForm = ref({
-  semesterId: null
-})
+  semesterId: null,
+});
 
 // 统计信息
 const statistics = computed(() => {
-  const totalCourses = grades.value.length
-  const validGrades = grades.value.filter(g => g.score !== null)
-  const totalScore = validGrades.reduce((sum, g) => sum + g.score, 0)
-  const averageScore = validGrades.length > 0 ? totalScore / validGrades.length : 0
-  const passedCourses = validGrades.filter(g => g.score >= 60).length
-  const passRate = validGrades.length > 0 ? (passedCourses / validGrades.length) * 100 : 0
+  const totalCourses = grades.value.length;
+  const validGrades = grades.value.filter((g) => g.score !== null);
+  const totalScore = validGrades.reduce((sum, g) => sum + g.score, 0);
+  const averageScore =
+    validGrades.length > 0 ? totalScore / validGrades.length : 0;
+  const passedCourses = validGrades.filter((g) => g.score >= 60).length;
+  const passRate =
+    validGrades.length > 0 ? (passedCourses / validGrades.length) * 100 : 0;
 
   // 假设每门课程 3 学分
-  const totalCredits = totalCourses * 3
+  const totalCredits = totalCourses * 3;
 
   return {
     totalCourses,
     averageScore,
     passRate,
-    totalCredits
-  }
-})
+    totalCredits,
+  };
+});
 
 // 加载学期列表
 const loadSemesters = async () => {
   try {
-    const response = await semesterAPI.getSemesters()
+    const response = await semesterAPI.getSemesters();
     if (response.code === 200) {
-      semesters.value = response.data
+      semesters.value = response.data;
     }
   } catch (error) {
-    ElMessage.error('加载学期列表失败')
+    ElMessage.error("加载学期列表失败");
   }
-}
+};
 
 // 查询成绩
 const handleQuery = async () => {
-  loading.value = true
+  loading.value = true;
   try {
     const params = {
-      studentId: authStore.userInfo.id
-    }
+      studentId: authStore.userInfo.id,
+    };
     if (queryForm.value.semesterId) {
-      params.semesterId = queryForm.value.semesterId
+      params.semesterId = queryForm.value.semesterId;
     }
 
-    const response = await studentAPI.getMyGrades(params)
+    const response = await studentAPI.getMyGrades(params);
     if (response.code === 200) {
-      grades.value = response.data
+      grades.value = response.data;
     }
   } catch (error) {
-    ElMessage.error('查询失败')
+    ElMessage.error("查询失败");
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 // 导出成绩单
 const handleExport = () => {
-  ElMessage.info('导出功能开发中')
+  ElMessage.info("导出功能开发中");
   // TODO: 实现导出功能
-}
+};
 
 // 获取学期名称
 const getSemesterName = (semesterId) => {
-  const semester = semesters.value.find(s => s.id === semesterId)
-  return semester ? semester.name : '-'
-}
+  const semester = semesters.value.find((s) => s.id === semesterId);
+  return semester ? semester.name : "-";
+};
 
 // 获取成绩颜色
 const getScoreColor = (score) => {
-  if (score === null || score === undefined) return '#909399'
-  if (score >= 90) return '#67C23A'
-  if (score >= 80) return '#409EFF'
-  if (score >= 70) return '#E6A23C'
-  if (score >= 60) return '#F56C6C'
-  return '#F56C6C'
-}
+  if (score === null || score === undefined) return "#909399";
+  if (score >= 90) return "#67C23A";
+  if (score >= 80) return "#409EFF";
+  if (score >= 70) return "#E6A23C";
+  if (score >= 60) return "#F56C6C";
+  return "#F56C6C";
+};
 
 // 获取成绩等级
 const getGradeLevel = (score) => {
-  if (score === null || score === undefined) return '未录入'
-  if (score >= 90) return '优秀'
-  if (score >= 80) return '良好'
-  if (score >= 70) return '中等'
-  if (score >= 60) return '及格'
-  return '不及格'
-}
+  if (score === null || score === undefined) return "未录入";
+  if (score >= 90) return "优秀";
+  if (score >= 80) return "良好";
+  if (score >= 70) return "中等";
+  if (score >= 60) return "及格";
+  return "不及格";
+};
 
 // 获取成绩等级标签类型
 const getGradeType = (score) => {
-  if (score === null || score === undefined) return 'info'
-  if (score >= 90) return 'success'
-  if (score >= 80) return ''
-  if (score >= 70) return 'warning'
-  if (score >= 60) return 'warning'
-  return 'danger'
-}
+  if (score === null || score === undefined) return "info";
+  if (score >= 90) return "success";
+  if (score >= 80) return "";
+  if (score >= 70) return "warning";
+  if (score >= 60) return "warning";
+  return "danger";
+};
 
 onMounted(async () => {
-  await loadSemesters()
-  await handleQuery()
-})
+  await loadSemesters();
+  await handleQuery();
+});
 </script>
 
 <style scoped>

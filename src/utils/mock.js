@@ -40,6 +40,8 @@ export const mockSemesters = [
     startDate: '2024-02-01',
     endDate: '2024-06-30',
     status: 'active',
+    canGrade: true,
+    courseCount: 4,
     remark: '春季学期正常进行'
   },
   {
@@ -50,6 +52,8 @@ export const mockSemesters = [
     startDate: '2024-09-01',
     endDate: '2025-01-31',
     status: 'upcoming',
+    canGrade: false,
+    courseCount: 5,
     remark: '秋季学期准备中'
   },
   {
@@ -60,6 +64,8 @@ export const mockSemesters = [
     startDate: '2024-02-15',
     endDate: '2024-07-15',
     status: 'active',
+    canGrade: true,
+    courseCount: 3,
     remark: '北大春季学期'
   },
   {
@@ -70,6 +76,8 @@ export const mockSemesters = [
     startDate: '2023-09-01',
     endDate: '2024-01-15',
     status: 'finished',
+    canGrade: false,
+    courseCount: 4,
     remark: '已结束学期'
   }
 ]
@@ -376,6 +384,192 @@ export const mockAPI = {
     return {
       code: 401,
       message: '用户未登录'
+    }
+  },
+
+  // 教师专用：获取可打分的学期列表
+  async getAvailableSemesters(params = {}) {
+    await delay()
+    let semesters = mockSemesters.filter(s => s.status === 'active' && s.canGrade)
+
+    // 按学期名称搜索
+    if (params.name) {
+      semesters = semesters.filter(s =>
+        s.name.toLowerCase().includes(params.name.toLowerCase())
+      )
+    }
+
+    // 按状态筛选
+    if (params.status) {
+      semesters = semesters.filter(s => s.status === params.status)
+    }
+
+    // 分页处理
+    const total = semesters.length
+    if (params.page && params.pageSize) {
+      const start = (params.page - 1) * params.pageSize
+      const end = start + params.pageSize
+      semesters = semesters.slice(start, end)
+    }
+
+    return {
+      code: 200,
+      data: {
+        list: semesters,
+        total: total
+      }
+    }
+  },
+
+  // 教师专用：根据学期获取班级列表
+  async getClassesBySemester(params = {}) {
+    await delay()
+
+    // 模拟班级数据
+    let classes = [
+      {
+        id: 'class_001',
+        name: '计算机科学1班',
+        major: '计算机科学',
+        studentCount: 45,
+        gradedCount: 32,
+        semesterId: params.semesterId
+      },
+      {
+        id: 'class_002',
+        name: '计算机科学2班',
+        major: '计算机科学',
+        studentCount: 42,
+        gradedCount: 28,
+        semesterId: params.semesterId
+      },
+      {
+        id: 'class_003',
+        name: '软件工程1班',
+        major: '软件工程',
+        studentCount: 38,
+        gradedCount: 15,
+        semesterId: params.semesterId
+      },
+      {
+        id: 'class_004',
+        name: '软件工程2班',
+        major: '软件工程',
+        studentCount: 40,
+        gradedCount: 40,
+        semesterId: params.semesterId
+      },
+      {
+        id: 'class_005',
+        name: '数学1班',
+        major: '数学',
+        studentCount: 35,
+        gradedCount: 0,
+        semesterId: params.semesterId
+      }
+    ]
+
+    // 按专业筛选
+    if (params.major) {
+      classes = classes.filter(c => c.major === params.major)
+    }
+
+    // 按班级名称搜索
+    if (params.className) {
+      classes = classes.filter(c =>
+        c.name.toLowerCase().includes(params.className.toLowerCase())
+      )
+    }
+
+    // 按完成状态筛选
+    if (params.completionStatus) {
+      classes = classes.filter(c => {
+        const rate = c.studentCount > 0 ? (c.gradedCount / c.studentCount) * 100 : 0
+        switch (params.completionStatus) {
+          case 'completed':
+            return rate === 100
+          case 'inprogress':
+            return rate > 0 && rate < 100
+          case 'notstarted':
+            return rate === 0
+          default:
+            return true
+        }
+      })
+    }
+
+    // 分页处理
+    const total = classes.length
+    if (params.page && params.pageSize) {
+      const start = (params.page - 1) * params.pageSize
+      const end = start + params.pageSize
+      classes = classes.slice(start, end)
+    }
+
+    return {
+      code: 200,
+      data: {
+        list: classes,
+        total: total
+      }
+    }
+  },
+
+  // 教师专用：根据班级获取学生列表
+  async getStudentsByClass(params = {}) {
+    await delay()
+
+    // 模拟学生数据
+    let students = []
+    for (let i = 1; i <= 50; i++) {
+      students.push({
+        id: i,
+        studentId: `202400${String(i).padStart(3, '0')}`,
+        name: `学生${i}`,
+        gender: i % 2 === 0 ? 'male' : 'female',
+        major: '计算机科学',
+        score: Math.random() > 0.6 ? Math.round(Math.random() * 40 + 60) : null,
+        comment: '',
+        modified: false
+      })
+    }
+
+    // 分页处理
+    const total = students.length
+    if (params.page && params.pageSize) {
+      const start = (params.page - 1) * params.pageSize
+      const end = start + params.pageSize
+      students = students.slice(start, end)
+    }
+
+    return {
+      code: 200,
+      data: {
+        list: students,
+        total: total
+      }
+    }
+  },
+
+  // 教师专用：保存单个学生成绩
+  async saveStudentGrade(data) {
+    await delay()
+    console.log('保存单个学生成绩:', data)
+    return {
+      code: 200,
+      data: data,
+      message: '成绩保存成功'
+    }
+  },
+
+  // 教师专用：批量保存学生成绩
+  async batchSaveGrades(data) {
+    await delay()
+    console.log('批量保存学生成绩:', data)
+    return {
+      code: 200,
+      data: data,
+      message: '批量保存成功'
     }
   },
 

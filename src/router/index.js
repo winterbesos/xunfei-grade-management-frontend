@@ -28,9 +28,39 @@ const routes = [
 
       // 教师路由
       {
-        path: '/teacher/grades',
-        name: 'TeacherGrades',
-        component: () => import('@/views/teacher/GradeEntry.vue'),
+        path: '/teacher/grade-management',
+        name: 'TeacherGradeManagement',
+        component: () => import('@/views/teacher/GradeManagement.vue'),
+        meta: { requiresAuth: true, roles: ['teacher'] }
+      },
+      {
+        path: '/teacher/grade-management/semesters',
+        name: 'TeacherGradeSemesters',
+        component: () => import('@/views/teacher/GradeManagement.vue'),
+        meta: { requiresAuth: true, roles: ['teacher'] }
+      },
+      {
+        path: '/teacher/grade-management/classes/:semesterId',
+        name: 'TeacherGradeClasses',
+        component: () => import('@/views/teacher/GradeClasses.vue'),
+        meta: { requiresAuth: true, roles: ['teacher'] }
+      },
+      {
+        path: '/teacher/grade-management/students/:semesterId/:classId',
+        name: 'TeacherGradeStudents',
+        component: () => import('@/views/teacher/GradeStudents.vue'),
+        meta: { requiresAuth: true, roles: ['teacher'] }
+      },
+      {
+        path: '/teacher/grade-management/report/:semesterId',
+        name: 'TeacherGradeReport',
+        component: () => import('@/views/common/Report.vue'),
+        meta: { requiresAuth: true, roles: ['teacher'] }
+      },
+      {
+        path: '/teacher/grade-management/proof',
+        name: 'TeacherGradeProof',
+        component: () => import('@/views/common/ReportProof.vue'),
         meta: { requiresAuth: true, roles: ['teacher'] }
       },
 
@@ -120,7 +150,7 @@ router.beforeEach((to, from, next) => {
     // 根据用户角色重定向到相应的首页
     const redirectMap = {
       admin: '/admin/semesters',
-      teacher: '/teacher/grades',
+      teacher: '/teacher/grade-management',
       student: '/student/grades',
       maintenance: '/maintenance/settings'
     }
@@ -132,7 +162,7 @@ router.beforeEach((to, from, next) => {
   if (to.name === 'Login' && authStore.isLoggedIn) {
     const redirectMap = {
       admin: '/admin/semesters',
-      teacher: '/teacher/grades',
+      teacher: '/teacher/grade-management',
       student: '/student/grades',
       maintenance: '/maintenance/settings'
     }

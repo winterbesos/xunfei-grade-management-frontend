@@ -22,7 +22,7 @@ const authStore = useAuthStore()
 const goHome = () => {
   const roleMap = {
     admin: '/admin/settings',
-    teacher: '/teacher/grades',
+    teacher: '/teacher/grade-management',
     student: '/student/grades'
   }
   router.push(roleMap[authStore.userRole] || '/login')

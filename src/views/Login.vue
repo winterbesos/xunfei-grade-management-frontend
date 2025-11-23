@@ -276,8 +276,8 @@ const handleOAuthLogin = async () => {
 const getDefaultRoute = () => {
   const role = authStore.userRole
   const routeMap = {
-    admin: '/admin/settings',
-    teacher: '/teacher/grades',
+    admin: '/admin/semesters',
+    teacher: '/teacher/grade-management',
     student: '/student/grades',
     maintenance: '/maintenance/system-status'
   }

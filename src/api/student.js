@@ -54,9 +54,6 @@ export const studentAPI = {
 
   // 获取学校列表
   async getSchools() {
-    if (USE_MOCK) {
-      return mockAPI.getSchools()
-    }
     return request({
       url: '/api/schools',
       method: 'get'

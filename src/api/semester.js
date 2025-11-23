@@ -56,5 +56,14 @@ export const semesterAPI = {
       url: `/api/semesters/${semesterId}/toggle-events`,
       method: 'post'
     })
+  },
+
+  // 获取可打分的学期列表（教师专用）
+  getAvailableSemesters(params) {
+    return request({
+      url: '/api/semesters/available',
+      method: 'get',
+      params
+    })
   }
 }

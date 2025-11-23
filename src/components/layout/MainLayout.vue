@@ -21,9 +21,9 @@
 
         <!-- 教师菜单 -->
         <template v-if="authStore.userRole === 'teacher'">
-          <el-menu-item index="/teacher/grades">
-            <el-icon><Edit /></el-icon>
-            <span>成绩录入</span>
+          <el-menu-item index="/teacher/grade-management">
+            <el-icon><Document /></el-icon>
+            <span>成绩管理</span>
           </el-menu-item>
         </template>
 
@@ -130,7 +130,10 @@ const activeMenu = computed(() => route.path)
 const pageTitle = computed(() => {
   const titleMap = {
     '/admin/semesters': '学期管理',
-    '/teacher/grades': '成绩录入',
+    '/teacher/grade-management': '成绩管理',
+    '/teacher/grade-management/semesters': '可打分学期',
+    '/teacher/grade-management/classes': '班级列表',
+    '/teacher/grade-management/students': '学生列表',
     '/student/grades': '我的成绩',
     '/maintenance/settings': '系统设置',
     '/maintenance/system-status': '系统状态',

@@ -7,9 +7,6 @@ const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false'
 export const schoolAPI = {
   // 获取学校列表
   async getSchools(params = {}) {
-    if (USE_MOCK) {
-      return mockAPI.getSchools(params)
-    }
     return request({
       url: '/api/schools',
       method: 'get',

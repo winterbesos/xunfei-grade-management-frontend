@@ -72,7 +72,7 @@ const handleOAuthCallback = async () => {
         const role = userInfoResponse.data.role
         const routeMap = {
           admin: '/admin/settings',
-          teacher: '/teacher/grades',
+          teacher: '/teacher/grade-management',
           student: '/student/grades',
           maintenance: '/maintenance/system-status'
         }
