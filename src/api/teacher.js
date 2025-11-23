@@ -64,6 +64,17 @@ export const teacherAPI = {
     })
   },
 
+  // 获取教师的班级列表
+  getTeacherClasses() {
+    if (USE_MOCK) {
+      return mockAPI.getTeacherClasses()
+    }
+    return request({
+      url: '/api/teacher/classes',
+      method: 'get',
+    })
+  },
+
   // 根据班级获取学生列表（包含成绩信息）
   getStudentsByClass(classId) {
     return request({

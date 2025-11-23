@@ -551,6 +551,75 @@ export const mockAPI = {
     }
   },
 
+  // 教师专用：获取班级列表 (不区分学期)
+  async getTeacherClasses(params = {}) {
+    await delay()
+    let classes = [
+      {
+        id: 'class_001',
+        name: '计算机科学1班',
+        major: '计算机科学',
+        studentCount: 45,
+        gradedCount: 32,
+        semesterId: 1, // Assign a default semester ID for mock consistency
+        semesterName: '2024年春季学期'
+      },
+      {
+        id: 'class_002',
+        name: '计算机科学2班',
+        major: '计算机科学',
+        studentCount: 42,
+        gradedCount: 28,
+        semesterId: 1,
+        semesterName: '2024年春季学期'
+      },
+      {
+        id: 'class_003',
+        name: '软件工程1班',
+        major: '软件工程',
+        studentCount: 38,
+        gradedCount: 15,
+        semesterId: 2, // Different semester
+        semesterName: '2024年秋季学期'
+      },
+      {
+        id: 'class_004',
+        name: '软件工程2班',
+        major: '软件工程',
+        studentCount: 40,
+        gradedCount: 40,
+        semesterId: 2,
+        semesterName: '2024年秋季学期'
+      },
+      {
+        id: 'class_005',
+        name: '数学1班',
+        major: '数学',
+        studentCount: 35,
+        gradedCount: 0,
+        semesterId: 1,
+        semesterName: '2024年春季学期'
+      }
+    ]
+
+    // Apply filtering and pagination if needed (similar to getClassesBySemester)
+    // For simplicity, returning all mock classes for now.
+    const total = classes.length
+    if (params.page && params.pageSize) {
+      const start = (params.page - 1) * params.pageSize
+      const end = start + params.pageSize
+      classes = classes.slice(start, end)
+    }
+
+    return {
+      code: 200,
+      data: {
+        list: classes,
+        total: total
+      }
+    }
+  },
+
   // 教师专用：保存单个学生成绩
   async saveStudentGrade(data) {
     await delay()

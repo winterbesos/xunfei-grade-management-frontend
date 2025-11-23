@@ -1,0 +1,50 @@
+@media print {
+  /* When this class is on the body, activate special print styles */
+  body.printing-from-dialog {
+    background-color: white !important;
+  }
+
+  /* Hide every element on the page that is NOT part of the dialog's content */
+  body.printing-from-dialog > :not(.el-overlay),
+  .el-dialog__header,
+  .el-dialog__footer {
+    display: none !important;
+  }
+
+  /*
+    Reset the styles of the dialog's container and content wrappers
+    to ensure they are visible and take up the full printable area.
+  */
+  body.printing-from-dialog .el-overlay,
+  body.printing-from-dialog .el-dialog,
+  body.printing-from-dialog .el-dialog__body,
+  body.printing-from-dialog .dialog-content-wrapper {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    background-color: white !important;
+    border: none !important;
+  }
+
+  /* Ensure the actual printable content inside the components is visible */
+  body.printing-from-dialog .print-area,
+  body.printing-from-dialog .a4-container {
+    display: block !important;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* The .page and .a4-container elements are designed to be the size of paper.
+     Make sure they scale correctly. */
+  body.printing-from-dialog .page,
+  body.printing-from-dialog .a4-container {
+    box-shadow: none !important;
+    margin: 0 !important;
+  }
+}

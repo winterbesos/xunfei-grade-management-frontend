@@ -1,14 +1,5 @@
 <template>
-  <div class="main-wrapper">
-    <!-- 操作栏 -->
-    <div class="action-bar no-print">
-      <button @click="printPage">🖨️ 打印学籍卡 (A4双面)</button>
-      <div class="tips">
-        提示：打印时请在设置中勾选“背景图形”，并选择A4纸张。
-      </div>
-    </div>
-
-    <!-- 打印区域容器 -->
+  <div>
     <div class="print-area">
       <!-- ================= 第一页：基本信息与成绩 ================= -->
       <div class="page page-front">
@@ -333,7 +324,25 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, defineProps, watch, defineExpose } from "vue";
+
+// --- 组件Props ---
+const props = defineProps({
+  studentId: {
+    type: [String, Number],
+    required: true,
+  },
+});
+
+const fetchData = (id) => {
+  console.log("Fetching status card data for studentId:", id);
+  // 在这里，你可以根据id从API获取学生数据并更新下面的ref
+  // 例如:
+  // const studentData = await studentAPI.getStudentDetails(id);
+  // info.value = studentData.info;
+  // family.value = studentData.family;
+  // ...等等
+};
 
 // --- 数据定义 ---
 const info = ref({
@@ -458,28 +467,76 @@ const comments = ref({
 });
 
 const printPage = () => {
+  // Create a style element
+  const style = document.createElement('style');
+  style.id = 'printing-style';
+
+  // Define the print-specific CSS
+  style.innerHTML = `
+    @media print {
+      /* Hide everything in the body by default */
+      body > * {
+        display: none !important;
+      }
+      /* Show the overlay and its content */
+      .el-overlay {
+        display: block !important;
+      }
+      .el-overlay,
+      .el-dialog,
+      .el-dialog__body,
+      .dialog-content-wrapper {
+        position: static !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        background-color: white !important;
+      }
+      .el-dialog__header, .el-dialog__footer {
+        display: none !important;
+      }
+    }
+  `;
+
+  // Append the style to the head
+  document.head.appendChild(style);
+
+  // Trigger the print dialog
   window.print();
+
+  // Remove the style element after printing
+  document.head.removeChild(style);
 };
+
+onMounted(() => {
+  fetchData(props.studentId);
+});
+
+watch(
+  () => props.studentId,
+  (newId) => {
+    if (newId) {
+      fetchData(newId);
+    }
+  }
+);
+
+defineExpose({
+  printPage,
+});
 </script>
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap"); /* 模拟手写字体 */
 
-.main-wrapper {
-  background-color: #555;
-  min-height: 100vh;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: "SimSun", "Songti SC", "Noto Serif SC", serif;
-}
-
 .action-bar {
   margin-bottom: 20px;
   text-align: center;
-  color: white;
+  color: black;
 }
 
 button {
@@ -495,7 +552,7 @@ button {
 .tips {
   margin-top: 5px;
   font-size: 12px;
-  color: #ccc;
+  color: #666;
 }
 
 /* A4 纸张设定 */
@@ -510,6 +567,19 @@ button {
   position: relative;
   overflow: hidden;
   color: #000;
+}
+
+@media print {
+  .page {
+    overflow: visible !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    height: auto;
+    page-break-after: always;
+  }
+  .page:last-of-type {
+    page-break-after: auto;
+  }
 }
 
 /* 表格通用样式 */
@@ -786,41 +856,5 @@ th {
   justify-content: center;
   border-right: 1px solid #d45d79;
   writing-mode: vertical-lr;
-}
-
-/* ================== 打印专用 ================== */
-@media print {
-  @page {
-    size: A4;
-    margin: 0;
-  }
-
-  body,
-  .main-wrapper {
-    background: white;
-    padding: 0;
-    margin: 0;
-    display: block;
-  }
-
-  .no-print {
-    display: none !important;
-  }
-
-  .print-area {
-    width: 100%;
-  }
-
-  .page {
-    width: 210mm;
-    height: 297mm;
-    margin: 0;
-    page-break-after: always; /* 强制分页 */
-    box-shadow: none;
-    border: none;
-    /* 打印时保持背景色需要浏览器开启 'Background graphics' */
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
 }
 </style>

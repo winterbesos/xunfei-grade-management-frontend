@@ -64,6 +64,32 @@ const routes = [
         meta: { requiresAuth: true, roles: ['teacher'] }
       },
 
+      // 班级管理
+      {
+        path: '/teacher/classes',
+        name: 'TeacherClasses',
+        component: () => import('@/views/teacher/ClassManagement.vue'),
+        meta: { requiresAuth: true, roles: ['teacher'] }
+      },
+      {
+        path: '/teacher/classes/:classId/students',
+        name: 'TeacherClassStudents',
+        component: () => import('@/views/teacher/ClassStudents.vue'),
+        meta: { requiresAuth: true, roles: ['teacher'] }
+      },
+      {
+        path: '/teacher/report-proof/:studentId',
+        name: 'TeacherReportProof',
+        component: () => import('@/views/common/ReportProof.vue'),
+        meta: { requiresAuth: true, roles: ['teacher'] }
+      },
+      {
+        path: '/teacher/status-card/:studentId',
+        name: 'TeacherStatusCard',
+        component: () => import('@/views/common/StatusCard.vue'),
+        meta: { requiresAuth: true, roles: ['teacher'] }
+      },
+
       // 学生路由
       {
         path: '/student/grades',

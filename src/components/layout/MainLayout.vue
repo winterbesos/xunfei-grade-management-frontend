@@ -25,6 +25,10 @@
             <el-icon><Document /></el-icon>
             <span>成绩管理</span>
           </el-menu-item>
+          <el-menu-item index="/teacher/classes">
+            <el-icon><User /></el-icon>
+            <span>学生管理</span>
+          </el-menu-item>
         </template>
 
         <!-- 学生菜单 -->
@@ -100,9 +104,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { ElMessage, ElMessageBox } from "element-plus";
 import {
   Setting,
   Calendar,
@@ -112,94 +116,98 @@ import {
   ArrowDown,
   Monitor,
   Download,
-  School
-} from '@element-plus/icons-vue'
-import { useAuthStore } from '@/stores/auth'
-import { useSettingsStore } from '@/stores/settings'
-import { authAPI } from '@/api/auth'
+  School,
+} from "@element-plus/icons-vue";
+import { useAuthStore } from "@/stores/auth";
+import { useSettingsStore } from "@/stores/settings";
+import { authAPI } from "@/api/auth";
 
-const router = useRouter()
-const route = useRoute()
-const authStore = useAuthStore()
-const settingsStore = useSettingsStore()
+const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
+const settingsStore = useSettingsStore();
 
 // 当前激活的菜单
-const activeMenu = computed(() => route.path)
+const activeMenu = computed(() => route.path);
 
 // 页面标题
 const pageTitle = computed(() => {
   const titleMap = {
-    '/admin/semesters': '学期管理',
-    '/teacher/grade-management': '成绩管理',
-    '/teacher/grade-management/semesters': '可打分学期',
-    '/teacher/grade-management/classes': '班级列表',
-    '/teacher/grade-management/students': '学生列表',
-    '/student/grades': '我的成绩',
-    '/maintenance/settings': '系统设置',
-    '/maintenance/system-status': '系统状态',
-    '/maintenance/logs': '系统日志',
-    '/maintenance/backup': '数据备份',
-    '/maintenance/schools': '学校管理',
-    '/maintenance/students': '学生管理',
-    '/maintenance/semesters': '学期管理'
-  }
-  return titleMap[route.path] || '首页'
-})
+    AdminSemesters: "学期管理",
+    TeacherGradeManagement: "成绩管理",
+    TeacherGradeSemesters: "可打分学期",
+    TeacherGradeClasses: "班级列表",
+    TeacherGradeStudents: "学生列表",
+    TeacherClasses: "学生管理",
+    TeacherClassStudents: "学生列表",
+    TeacherReportProof: "成绩证明单",
+    TeacherStatusCard: "学籍卡",
+    StudentGrades: "我的成绩",
+    maintenanceSettings: "系统设置",
+    maintenanceSystemStatus: "系统状态",
+    maintenanceLogs: "系统日志",
+    maintenanceBackup: "数据备份",
+    maintenanceSchools: "学校管理",
+    maintenanceStudents: "学生管理",
+    maintenanceSemesters: "学期管理",
+  };
+  return titleMap[route.name] || "首页";
+});
 
 // 角色文本
 const roleText = computed(() => {
   const roleMap = {
-    admin: '管理员',
-    teacher: '教师',
-    student: '学生',
-    maintenance: '维护人员'
-  }
-  return roleMap[authStore.userRole] || ''
-})
+    admin: "管理员",
+    teacher: "教师",
+    student: "学生",
+    maintenance: "维护人员",
+  };
+  return roleMap[authStore.userRole] || "";
+});
 
 // 获取用户信息
 const fetchUserInfo = async () => {
   if (authStore.isLoggedIn && !authStore.userInfo) {
     try {
-      const response = await authAPI.getUserInfo()
+      const response = await authAPI.getUserInfo();
       if (response.code === 200) {
-        authStore.updateUserInfo(response.data)
+        authStore.updateUserInfo(response.data);
       } else {
-        ElMessage.error('获取用户信息失败')
-        authStore.logout()
-        router.push('/login')
+        ElMessage.error("获取用户信息失败");
+        authStore.logout();
+        router.push("/login");
       }
     } catch (error) {
-      ElMessage.error('获取用户信息失败')
-      authStore.logout()
-      router.push('/login')
+      ElMessage.error("获取用户信息失败");
+      authStore.logout();
+      router.push("/login");
     }
   }
-}
+};
 
 // 处理下拉菜单命令
 const handleCommand = async (command) => {
-  if (command === 'logout') {
+  if (command === "logout") {
     try {
-      await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
+      await ElMessageBox.confirm("确定要退出登录吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      });
 
-      authStore.logout()
-      ElMessage.success('已退出登录')
-      router.push('/login')
+      authStore.logout();
+      ElMessage.success("已退出登录");
+      router.push("/login");
     } catch {
       // 用户取消
     }
   }
-}
+};
 
 // 组件挂载时获取用户信息
 onMounted(() => {
-  fetchUserInfo()
-})
+  fetchUserInfo();
+});
 </script>
 
 <style scoped>

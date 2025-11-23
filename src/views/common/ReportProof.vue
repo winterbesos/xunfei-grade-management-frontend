@@ -1,10 +1,5 @@
 <template>
-  <div class="page-wrapper">
-    <!-- 打印操作栏 -->
-    <div class="action-bar no-print">
-      <button @click="handlePrint">🖨️ 打印证明单</button>
-    </div>
-
+  <div>
     <!-- A4 纸张容器 -->
     <div class="a4-container">
       <!-- 1. 标题 -->
@@ -71,27 +66,40 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import {
+  ref,
+  computed,
+  onMounted,
+  defineProps,
+  watch,
+  defineExpose,
+} from "vue";
+
+// --- 组件Props ---
+const props = defineProps({
+  studentId: {
+    type: [String, Number],
+    required: true,
+  },
+});
 
 // --- 数据定义 ---
 
 // 后端返回的数据模型
 const gradeProofData = ref(null);
 
-// 模拟从API获取数据
-onMounted(() => {
-  const route = useRoute();
-  const studentId = route.params.id; // 假设学生ID从路由中获取
+// 获取数据的函数
+const fetchData = (id) => {
   // TODO: 调用API获取真实数据
   // import { getStudentGradeProof } from '@/api/student';
-  // getStudentGradeProof(studentId).then(response => {
+  // getStudentGradeProof(id).then(response => {
   //   gradeProofData.value = response.data;
   // });
+  console.log("Fetching data for studentId:", id);
 
   // 使用模拟数据
   gradeProofData.value = {
-    student_id: "12345",
+    student_id: id, // 使用传入的ID
     student_name: "王艺诺",
     student_birth: "2007 年 3 月 30 日",
     student_enrollment_date: "2022 年 9 月",
@@ -160,7 +168,22 @@ onMounted(() => {
       level3: { first_semester_score: null, second_semester_score: null },
     },
   };
+};
+
+// 模拟从API获取数据
+onMounted(() => {
+  fetchData(props.studentId);
 });
+
+// 监听 prop 变化，以便在 Dialog 复用时能重新加载数据
+watch(
+  () => props.studentId,
+  (newId) => {
+    if (newId) {
+      fetchData(newId);
+    }
+  },
+);
 
 const studentInfo = computed(() => {
   if (!gradeProofData.value) {
@@ -228,24 +251,58 @@ const scores = computed(() => {
 });
 
 const handlePrint = () => {
+  // Create a style element
+  const style = document.createElement("style");
+  style.id = "printing-style";
+
+  // Define the print-specific CSS
+  style.innerHTML = `
+    @media print {
+      /* Hide everything in the body by default */
+      body > * {
+        display: none !important;
+      }
+      /* Show the overlay and its content */
+      .el-overlay {
+        display: block !important;
+      }
+      .el-overlay,
+      .el-dialog,
+      .el-dialog__body,
+      .dialog-content-wrapper {
+        position: static !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        background-color: white !important;
+      }
+      .el-dialog__header, .el-dialog__footer {
+        display: none !important;
+      }
+    }
+  `;
+
+  // Append the style to the head
+  document.head.appendChild(style);
+
+  // Trigger the print dialog
   window.print();
+
+  // Remove the style element after printing
+  document.head.removeChild(style);
 };
+
+defineExpose({
+  handlePrint,
+});
 </script>
 
 <style scoped>
 /* 引入宋体/衬线体，模拟正式文件 */
 @import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap");
-
-.page-wrapper {
-  background-color: #f0f0f0;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  font-family: "SimSun", "Songti SC", "Noto Serif SC", serif;
-  color: #000;
-}
 
 .action-bar {
   margin-bottom: 20px;
@@ -372,16 +429,6 @@ button {
 
   body {
     margin: 0;
-  }
-
-  .page-wrapper {
-    padding: 0;
-    background: transparent;
-    display: block;
-  }
-
-  .action-bar {
-    display: none;
   }
 
   .a4-container {
