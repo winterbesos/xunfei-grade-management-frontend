@@ -1,0 +1,45 @@
+/* 打印专用样式 - 隐藏所有非内容元素 */
+@media print {
+  /* 强制隐藏所有可能的菜单和装饰 */
+  .no-print,
+  .action-bar,
+  .page-wrapper > *:not(.a4-container),
+  .el-container, /* Added to ensure the overall layout container doesn't interfere */
+  .el-header,
+  .el-aside,
+  .el-footer,
+  .el-menu,
+  .sidebar,
+  .header,
+  .nav,
+  .toolbar,
+  [class*="menu"],
+  [class*="nav"],
+  [class*="header"],
+  [class*="sidebar"] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* 确保页面容器正确显示 */
+  body, html {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  .page-wrapper {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white !important;
+  }
+
+  /* 优化内容容器 */
+  .a4-container {
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 10mm !important;
+    width: 100% !important;
+    border: none !important;
+  }
+}
