@@ -17,202 +17,345 @@
         <!-- 基本信息表 -->
         <table class="base-table">
           <colgroup>
-            <col style="width: 80px" />
-            <col style="width: 120px" />
-            <col style="width: 50px" />
-            <col style="width: 50px" />
-            <col style="width: 50px" />
+            <col style="width: 30px" />
+            <col style="width: 40px" />
+            <col style="width: 40px" />
+            <col style="width: 40px" />
             <col style="width: 60px" />
             <col style="width: 50px" />
-            <col style="width: 80px" />
-            <col style="width: 100px" />
+            <col style="width: 70px" />
+            <col style="width: 50px" />
+            <col style="width: 35px" />
+            <col style="width: 35px" />
+            <col style="width: 90px" />
+
+            <col style="width: 30px" />
+            <col style="width: 45px" />
+
+            <col style="width: 70px" />
             <!-- 照片列 -->
           </colgroup>
           <tbody>
             <tr>
-              <td class="label">姓名</td>
+              <td colspan="2" class="label">姓名</td>
               <td colspan="2">{{ info.name }}</td>
               <td class="label">性别</td>
               <td>{{ info.gender }}</td>
               <td class="label">民族</td>
               <td>{{ info.nation }}</td>
-              <td class="label">籍贯</td>
+              <td colspan="2" class="label">籍贯</td>
               <td>{{ info.nativePlace }}</td>
+              <td colspan="2" rowspan="4" class="photo-cell">
+                <div class="photo-box">
+                  <img :src="info.photo" alt="照片" />
+                </div>
+              </td>
               <td rowspan="4" class="photo-cell">
                 <div class="photo-box">
-                  <img v-if="info.photo" :src="info.photo" alt="照片" />
-                  <span v-else>照片<br />(离校时贴)</span>
+                  <span>照片<br />(离校时贴)</span>
                 </div>
               </td>
             </tr>
             <tr>
-              <td class="label">证件类型</td>
+              <td colspan="2" class="label">证件类型</td>
               <td colspan="2">居民身份证</td>
               <td class="label">证件号码</td>
               <td colspan="3">{{ info.idCard }}</td>
-              <td class="label">出生日期</td>
+              <td colspan="2" class="label">出生日期</td>
               <td>{{ info.birthday }}</td>
             </tr>
             <tr>
-              <td class="label">全国学籍号</td>
+              <td colspan="3" class="label">全国学籍号</td>
               <td colspan="3">{{ info.nationalCode }}</td>
               <td colspan="2" class="label">上海市学籍号</td>
-              <td colspan="2">{{ info.shanghaiCode }}</td>
+              <td colspan="3">{{ info.shanghaiCode }}</td>
             </tr>
             <tr>
-              <td class="label">原毕业学校</td>
+              <td colspan="3" class="label">原毕业学校</td>
               <td colspan="3">{{ info.middleSchool }}</td>
-              <td colspan="2" class="label">健康状况</td>
+              <td colspan="1" class="label">健康状况</td>
               <td>{{ info.health }}</td>
-              <td class="label">入团(党)<br />时间</td>
+              <td colspan="2" class="s-label">入团(党)<br />时间</td>
             </tr>
             <tr>
-              <td class="label">户籍地址</td>
+              <td colspan="3" class="label">户籍地址</td>
               <td colspan="4">{{ info.hukouAddress }}</td>
-              <td class="label">街道居委</td>
+              <td colspan="2" class="label">街道居委</td>
               <td colspan="2">{{ info.hukouStreet }}</td>
-              <td rowspan="2" class="label">学籍变更情况</td>
+              <td rowspan="1" colspan="3" class="label">学籍变更情况</td>
             </tr>
             <tr>
-              <td class="label">现住地址</td>
+              <td colspan="3" class="label">现住地址</td>
               <td colspan="4">{{ info.currentAddress }}</td>
-              <td class="label">街道居委</td>
+              <td colspan="2" class="label">街道居委</td>
               <td colspan="2">{{ info.currentStreet }}</td>
+              <td rowspan="5">入本校日期</td>
+              <td rowspan="5" colspan="2" class="label"></td>
+            </tr>
+
+            <tr>
+              <td rowspan="4">家庭主要成员</td>
+              <td class="label">称谓</td>
+              <td colspan="2" class="label">姓名</td>
+              <td class="label">政治面貌</td>
+              <td colspan="5" class="label">工作单位</td>
+              <td class="label">联系电话</td>
+            </tr>
+
+            <tr>
+              <td></td>
+              <td colspan="2"></td>
+              <td colspan="1"></td>
+              <td colspan="5"></td>
+              <td></td>
+            </tr>
+
+            <tr>
+              <td></td>
+              <td colspan="2"></td>
+              <td colspan="1"></td>
+              <td colspan="5"></td>
+              <td></td>
+            </tr>
+
+            <tr>
+              <td></td>
+              <td colspan="2"></td>
+              <td colspan="1"></td>
+              <td colspan="5"></td>
+              <td></td>
             </tr>
           </tbody>
         </table>
-
-        <!-- 家庭成员与转学信息 -->
-        <div class="middle-section">
-          <!-- 左侧：家庭成员 -->
-          <table class="family-table">
-            <colgroup>
-              <col style="width: 30px" />
-              <col style="width: 40px" />
-              <col style="width: 60px" />
-              <col style="width: 60px" />
-              <col />
-              <col style="width: 100px" />
-            </colgroup>
-            <tbody>
-              <tr>
-                <td rowspan="3" class="vertical-text">家庭主要成员</td>
-                <td class="label">称谓</td>
-                <td class="label">姓名</td>
-                <td class="label">政治面貌</td>
-                <td class="label">工作单位</td>
-                <td class="label">联系电话</td>
-              </tr>
-              <tr v-for="member in family" :key="member.relation">
-                <td>{{ member.relation }}</td>
-                <td>{{ member.name }}</td>
-                <td>{{ member.face }}</td>
-                <td>{{ member.job }}</td>
-                <td>{{ member.phone }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <!-- 右侧：入本校日期 -->
-          <div class="entry-date-box">
-            <div class="vertical-text-box">入本校日期</div>
-            <div class="date-val">{{ info.entryDate }}</div>
-          </div>
-        </div>
 
         <!-- 学业成绩表 -->
         <table class="grade-table">
-          <thead>
-            <tr>
-              <th colspan="2">学业成绩</th>
-              <th v-for="sub in subjects" :key="sub">{{ sub }}</th>
-              <th rowspan="17" class="vertical-text narrow-col">
-                转入本校日期及原因
-              </th>
-            </tr>
-          </thead>
+          <colgroup>
+            <!-- 685px -->
+            <col style="width: 25px" />
+            <col style="width: 25px" />
+            <col style="width: 25px" />
+
+            <col style="width: 29px" />
+            <col style="width: 29px" />
+            <col style="width: 29px" />
+            <col style="width: 29px" />
+            <col style="width: 29px" />
+            <col style="width: 29px" />
+            <col style="width: 29px" />
+            <col style="width: 29px" />
+            <col style="width: 29px" />
+            <col style="width: 29px" />
+            <col style="width: 29px" />
+            <col style="width: 29px" />
+            <col style="width: 29px" />
+            <col style="width: 29px" />
+            <col style="width: 29px" />
+            <col style="width: 29px" />
+
+            <col style="width: 30px" />
+            <col style="width: 45px" />
+
+            <col style="width: 70px" />
+          </colgroup>
+
           <tbody>
-            <!-- 高一 -->
-            <template v-for="(grade, gIndex) in grades" :key="gIndex">
-              <tr>
-                <td rowspan="4" class="vertical-text label-bg">
-                  {{ grade.name }}
-                </td>
-                <td class="label">上学期</td>
-                <td v-for="(sub, sIndex) in subjects" :key="sIndex">
-                  {{ getScore(gIndex, 0, sub) }}
-                </td>
-              </tr>
-              <tr>
-                <td class="label">下学期</td>
-                <td v-for="(sub, sIndex) in subjects" :key="sIndex">
-                  {{ getScore(gIndex, 1, sub) }}
-                </td>
-              </tr>
-              <tr>
-                <td class="label">总评</td>
-                <td v-for="(sub, sIndex) in subjects" :key="sIndex">
-                  {{ getScore(gIndex, 2, sub) }}
-                </td>
-              </tr>
-              <tr>
-                <td class="label">补考</td>
-                <td v-for="(sub, sIndex) in subjects" :key="sIndex"></td>
-              </tr>
-            </template>
+            <tr>
+              <td colspan="3">学业成绩</td>
+              <td>思想政治</td>
+              <td>语文</td>
+              <td>数学</td>
+              <td>外语</td>
+              <td>物理</td>
+              <td>化学</td>
+              <td>生命科学</td>
+              <td>历史</td>
+              <td>地理</td>
+              <td>艺术</td>
+              <td>体育与健身</td>
+              <td>劳动技术</td>
+              <td>信息科技</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td rowspan="4">转入本校日期及原因</td>
+              <td rowspan="4" colspan="2"></td>
+            </tr>
+            <tr>
+              <td rowspan="4" class="vertical-text label-bg">高一年级</td>
+              <td colspan="2" class="label">上学期</td>
+              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
+                {{ getScore(gIndex, 0, sub) }}
+              </td>
+
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="label">下学期</td>
+              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
+                {{ getScore(gIndex, 1, sub) }}
+              </td>
+
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="label">总评</td>
+              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
+                {{ getScore(gIndex, 2, sub) }}
+              </td>
+
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="label">补考</td>
+              <td v-for="(sub, sIndex) in subjects" :key="sIndex"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td rowspan="7">转出本校日期及原因</td>
+              <td rowspan="7" colspan="2"></td>
+            </tr>
+
+            <tr>
+              <td rowspan="4" class="vertical-text label-bg">高二年级</td>
+              <td colspan="2" class="label">上学期</td>
+              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
+                {{ getScore(gIndex, 0, sub) }}
+              </td>
+
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="label">下学期</td>
+              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
+                {{ getScore(gIndex, 1, sub) }}
+              </td>
+
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="label">总评</td>
+              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
+                {{ getScore(gIndex, 2, sub) }}
+              </td>
+
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="label">补考</td>
+              <td v-for="(sub, sIndex) in subjects" :key="sIndex"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+
+            <tr>
+              <td rowspan="4" class="vertical-text label-bg">高三年级</td>
+              <td colspan="2" class="label">上学期</td>
+              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
+                {{ getScore(gIndex, 0, sub) }}
+              </td>
+
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="label">下学期</td>
+              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
+                {{ getScore(gIndex, 1, sub) }}
+              </td>
+
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="label">总评</td>
+              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
+                {{ getScore(gIndex, 2, sub) }}
+              </td>
+
+              <td></td>
+              <td></td>
+              <td></td>
+
+              <td colspan="2" rowspan="3">毕业日期及证书编号</td>
+              <td rowspan="3"></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="label">补考</td>
+              <td v-for="(sub, sIndex) in subjects" :key="sIndex"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
 
             <!-- 学业水平考试 -->
             <tr>
-              <td rowspan="2" class="vertical-text label-bg">
-                学业水平<br />考试
-              </td>
-              <td class="label">成绩</td>
-              <td :colspan="subjects.length"></td>
+              <td rowspan="2" class="zysp">学业水平考试</td>
+              <td colspan="2" class="label">成绩</td>
+              <td v-for="(sub, sIndex) in subjects" :key="sIndex"></td>
+              <td></td>
+              <td></td>
+              <td></td>
             </tr>
             <tr>
-              <td class="label">补考</td>
-              <td :colspan="subjects.length"></td>
+              <td colspan="2" class="label">补考</td>
+              <td v-for="(sub, sIndex) in subjects" :key="sIndex"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+
+              <td colspan="2" rowspan="1">毕业后去向</td>
+              <td rowspan="1"></td>
             </tr>
           </tbody>
         </table>
 
-        <!-- 侧边栏：转出日期/毕业信息 (利用 absolute 定位模拟表格右侧合并效果) -->
-        <div class="side-info-overlay">
-          <!-- 这里的布局比较特殊，为了简化HTML结构，通常用 CSS Grid 或者 absolute 覆盖 -->
-          <!-- 实际上面的 table 结构中最后一列已经占位，这里不需要额外写，直接在表格里处理 -->
-        </div>
+        <table class="base-table">
+          <colgroup>
+            <!-- 685px -->
+            <col style="width: 120px" />
+            <col style="width: 200px" />
+            <col style="width: 110px" />
+            <col style="width: 110px" />
 
-        <!-- 底部变动栏 -->
-        <table class="footer-table">
-          <tr>
-            <td class="vertical-text" rowspan="5" style="width: 30px">
-              转出本校日期及原因
-            </td>
-            <!-- 这里为了对齐图片，其实是跟上面的表格并列的，但在HTML里为了方便打印，分开写 -->
-          </tr>
+            <col style="width: 25px" />
+            <col style="width: 120px" />
+          </colgroup>
+          <tbody>
+            <tr>
+              <td class="label">休学日期及原因</td>
+              <td></td>
+              <td class="label">复学日期</td>
+              <td></td>
+
+              <td rowspan="2" class="qtxjbgqk">其他学籍变更情况</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td class="label">退学日期及原因</td>
+              <td></td>
+              <td class="label">退学后去向</td>
+              <td></td>
+
+              <td></td>
+            </tr>
+          </tbody>
         </table>
-
-        <!-- 修正布局：为了完美对齐图片，我们使用一个新的底部结构 -->
-        <div class="bottom-layout">
-          <div class="left-bottom">
-            <div class="row">
-              <span class="label">休学日期及原因</span>
-              <span class="val"></span>
-              <span class="label">复学日期</span>
-              <span class="val"></span>
-            </div>
-            <div class="row">
-              <span class="label">退学日期及原因</span>
-              <span class="val">{{ info.dropoutInfo }}</span>
-              <span class="label">退学后去向</span>
-              <span class="val">{{ info.dropoutDest }}</span>
-            </div>
-          </div>
-          <div class="right-bottom">
-            <div class="vertical-col">其他学籍变更情况</div>
-            <div class="vertical-col">毕业日期及证书编号</div>
-            <div class="vertical-col">毕业后去向</div>
-          </div>
-        </div>
 
         <div class="footer-sign">上海市教育委员会基础教育处制</div>
       </div>
@@ -267,10 +410,6 @@
               <div class="term-header">第一学期品德测评成绩</div>
               <div class="term-row">品德总评等第：</div>
               <div class="term-label">评语：</div>
-              <div class="comment-text handwriting check-mark">
-                <!-- 模拟那个大大的对钩 -->
-                ✓
-              </div>
               <div class="sign-box">
                 班主任（签名）
                 <span class="date">年 月 日</span>
@@ -280,7 +419,6 @@
               <div class="term-header">第二学期品德测评成绩</div>
               <div class="term-row">品德总评等第：</div>
               <div class="term-label">评语：</div>
-              <div class="comment-text handwriting check-mark">✓</div>
               <div class="sign-box">
                 班主任（签名）
                 <span class="date">年 月 日</span>
@@ -295,7 +433,6 @@
               <div class="term-header">第一学期品德测评成绩</div>
               <div class="term-row">品德总评等第：</div>
               <div class="term-label">评语：</div>
-              <div class="comment-text handwriting check-mark">✓</div>
               <div class="sign-box">
                 班主任（签名）
                 <span class="date">年 月 日</span>
@@ -305,7 +442,6 @@
               <div class="term-header">第二学期品德测评成绩</div>
               <div class="term-row">品德总评等第：</div>
               <div class="term-label">评语：</div>
-              <div class="comment-text handwriting check-mark">✓</div>
               <div class="sign-box">
                 班主任（签名）
                 <span class="date">年 月 日</span>
@@ -358,7 +494,7 @@ const info = ref({
   nationalCode: "G310109200706152017",
   shanghaiCode: "3101093003320220155",
   middleSchool: "上海民办沪东外国语学校",
-  health: "健康或良好",
+  health: "良好",
   hukouAddress: "四平路780弄4号2404室",
   hukouStreet: "嘉兴路街道",
   currentAddress: "四平路780弄4号2404室",
@@ -468,8 +604,8 @@ const comments = ref({
 
 const printPage = () => {
   // Create a style element
-  const style = document.createElement('style');
-  style.id = 'printing-style';
+  const style = document.createElement("style");
+  style.id = "printing-style";
 
   // Define the print-specific CSS
   style.innerHTML = `
@@ -521,7 +657,7 @@ watch(
     if (newId) {
       fetchData(newId);
     }
-  }
+  },
 );
 
 defineExpose({
@@ -559,7 +695,6 @@ button {
 .page {
   width: 210mm;
   height: 297mm;
-  background-color: #ffdae0; /* 粉色底 */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   margin-bottom: 20px;
   padding: 15mm 10mm;
@@ -584,15 +719,16 @@ button {
 
 /* 表格通用样式 */
 table {
+  table-layout: fixed;
   width: 100%;
   border-collapse: collapse;
-  border: 1px solid #d45d79; /* 深红边框 */
+  border: 1px solid #333; /* 深红边框 */
   font-size: 10pt;
 }
 
 td,
 th {
-  border: 1px solid #d45d79;
+  border: 1px solid #333;
   padding: 2px 4px;
   text-align: center;
   vertical-align: middle;
@@ -601,6 +737,11 @@ th {
 .label {
   color: #333;
   font-weight: normal;
+}
+
+.s-label {
+  font-size: 7pt;
+  line-height: 1.2;
 }
 
 .label-bg {
@@ -653,9 +794,7 @@ th {
 /* 中间区域：家庭与日期 */
 .middle-section {
   display: flex;
-  border-left: 1px solid #d45d79;
-  border-right: 1px solid #d45d79;
-  border-bottom: 1px solid #d45d79;
+  border-right: 1px solid #333;
 }
 
 .family-table {
@@ -665,7 +804,7 @@ th {
 .family-table td {
   border-top: none;
   border-bottom: none;
-  border-right: 1px solid #d45d79;
+  border-right: 1px solid #333;
 }
 
 .entry-date-box {
@@ -682,7 +821,7 @@ th {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid #d45d79;
+  border-bottom: 1px solid #333;
 }
 .date-val {
   height: 40px;
@@ -721,7 +860,7 @@ th {
 
 /* 底部布局修正 */
 .bottom-layout {
-  border: 1px solid #d45d79;
+  border: 1px solid #333;
   border-top: none;
   display: flex;
   height: 80px;
@@ -735,7 +874,7 @@ th {
 .left-bottom .row {
   flex: 1;
   display: flex;
-  border-bottom: 1px solid #d45d79;
+  border-bottom: 1px solid #333;
 }
 .left-bottom .row:last-child {
   border-bottom: none;
@@ -745,16 +884,15 @@ th {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid #d45d79;
+  border-right: 1px solid #333;
   background-color: rgba(255, 255, 255, 0.1);
 }
 .left-bottom .val {
   flex: 1;
-  border-right: 1px solid #d45d79;
+  border-right: 1px solid #333;
   display: flex;
   align-items: center;
   padding-left: 10px;
-  font-family: "Ma Shan Zheng", cursive;
   font-size: 12pt;
 }
 
@@ -769,7 +907,7 @@ th {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid #d45d79;
+  border-bottom: 1px solid #333;
   font-size: 9pt;
   padding: 2px;
 }
@@ -803,7 +941,7 @@ th {
 }
 
 .term-header {
-  border-bottom: 1px solid #d45d79;
+  border-bottom: 1px solid #333;
   margin: -5px -5px 5px -5px;
   padding: 5px;
   text-align: center;
@@ -837,7 +975,7 @@ th {
   bottom: 5px;
   left: 5px;
   right: 5px;
-  border-top: 1px solid #d45d79;
+  border-top: 1px solid #333;
   padding-top: 5px;
   display: flex;
   justify-content: space-between;
@@ -845,7 +983,7 @@ th {
 
 .remarks-box {
   margin-top: -1px; /* 合并边框 */
-  border: 1px solid #d45d79;
+  border: 1px solid #333;
   height: 50px;
   display: flex;
 }
@@ -854,7 +992,14 @@ th {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid #d45d79;
+  border-right: 1px solid #333;
   writing-mode: vertical-lr;
+}
+
+.zysp {
+  font-size: 6pt;
+}
+.qtxjbgqk {
+  font-size: 7pt;
 }
 </style>

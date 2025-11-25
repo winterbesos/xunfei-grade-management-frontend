@@ -29,44 +29,26 @@
     </el-card>
 
     <!-- 学籍卡 Dialog -->
-    <el-dialog v-model="statusCardVisible" width="80%" :destroy-on-close="true">
-      <template #header="{ titleId, titleClass }">
-        <div class="dialog-header">
-          <h4 :id="titleId" :class="titleClass">学籍卡</h4>
-          <el-button type="primary" @click="handlePrintStatusCard"
-            >🖨️ 打印</el-button
-          >
-        </div>
-      </template>
+    <el-dialog
+      title="学籍卡"
+      v-model="statusCardVisible"
+      width="80%"
+      :destroy-on-close="true"
+    >
       <div class="dialog-content-wrapper">
-        <StatusCard
-          ref="statusCardRef"
-          v-if="selectedStudentId"
-          :student-id="selectedStudentId"
-        />
+        <StatusCard v-if="selectedStudentId" :student-id="selectedStudentId" />
       </div>
     </el-dialog>
 
     <!-- 成绩证明 Dialog -->
     <el-dialog
+      title="成绩证明"
       v-model="reportProofVisible"
       width="80%"
       :destroy-on-close="true"
     >
-      <template #header="{ titleId, titleClass }">
-        <div class="dialog-header">
-          <h4 :id="titleId" :class="titleClass">成绩证明</h4>
-          <el-button type="primary" @click="handlePrintReportProof"
-            >🖨️ 打印</el-button
-          >
-        </div>
-      </template>
       <div class="dialog-content-wrapper">
-        <ReportProof
-          ref="reportProofRef"
-          v-if="selectedStudentId"
-          :student-id="selectedStudentId"
-        />
+        <ReportProof v-if="selectedStudentId" :student-id="selectedStudentId" />
       </div>
     </el-dialog>
   </div>
@@ -88,9 +70,6 @@ const classId = ref(route.params.classId);
 const statusCardVisible = ref(false);
 const reportProofVisible = ref(false);
 const selectedStudentId = ref(null);
-
-const statusCardRef = ref(null);
-const reportProofRef = ref(null);
 
 const fetchStudents = async () => {
   if (!classId.value) return;
@@ -118,14 +97,6 @@ const viewReportProof = (studentId) => {
   reportProofVisible.value = true;
 };
 
-const handlePrintStatusCard = () => {
-  statusCardRef.value?.printPage();
-};
-
-const handlePrintReportProof = () => {
-  reportProofRef.value?.handlePrint();
-};
-
 onMounted(() => {
   fetchStudents();
 });
@@ -136,24 +107,16 @@ onMounted(() => {
   min-height: 400px;
 }
 
-.dialog-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .dialog-content-wrapper {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  overflow-y: auto;
   padding: 20px;
   background-color: #f0f2f5;
 }
 
 @media print {
   .dialog-content-wrapper {
-    overflow-y: visible !important;
     display: block !important;
     padding: 0 !important;
     background-color: transparent !important;

@@ -5,10 +5,12 @@
         <div class="card-header">
           <div class="header-left">
             <el-button @click="handleBack" :icon="ArrowLeft" circle />
-            <span style="margin-left: 10px;">班级列表 - {{ semesterName }}</span>
+            <span style="margin-left: 10px">班级列表 - {{ semesterName }}</span>
           </div>
           <div class="header-right">
             <span class="semester-info">学期: {{ semesterName }}</span>
+            &nbsp;&nbsp; &nbsp;&nbsp;
+            <span class="semester-info">科目: {{ subjectName }}</span>
           </div>
         </div>
       </template>
@@ -25,7 +27,12 @@
           <el-statistic title="已录入成绩" :value="statistics.gradedStudents" />
         </el-col>
         <el-col :span="6">
-          <el-statistic title="完成率" :value="statistics.completionRate" suffix="%" :precision="1" />
+          <el-statistic
+            title="完成率"
+            :value="statistics.completionRate"
+            suffix="%"
+            :precision="1"
+          />
         </el-col>
       </el-row>
 
@@ -36,10 +43,25 @@
         stripe
         style="width: 100%; margin-top: 20px"
       >
-        <el-table-column prop="class_id" label="班级ID" width="150" show-overflow-tooltip />
+        <el-table-column
+          prop="class_id"
+          label="班级ID"
+          width="150"
+          show-overflow-tooltip
+        />
         <el-table-column prop="class_name" label="班级名称" min-width="150" />
-        <el-table-column prop="student_count" label="学生数" width="80" align="center" />
-        <el-table-column prop="graded_count" label="已评分" width="80" align="center" />
+        <el-table-column
+          prop="student_count"
+          label="学生数"
+          width="80"
+          align="center"
+        />
+        <el-table-column
+          prop="graded_count"
+          label="已评分"
+          width="80"
+          align="center"
+        />
         <el-table-column label="完成率" width="100" align="center">
           <template #default="{ row }">
             <el-progress
@@ -51,7 +73,9 @@
         </el-table-column>
         <el-table-column label="状态" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="getClassStatusType(row.gradedCount, row.studentCount)">
+            <el-tag
+              :type="getClassStatusType(row.gradedCount, row.studentCount)"
+            >
               {{ getClassStatusText(row.gradedCount, row.studentCount) }}
             </el-tag>
           </template>
@@ -70,27 +94,46 @@
         </el-table-column>
       </el-table>
 
-      <el-empty v-if="!loading && classes.length === 0" description="暂无班级数据" />
+      <el-empty
+        v-if="!loading && classes.length === 0"
+        description="暂无班级数据"
+      />
     </el-card>
 
     <!-- 进度详情对话框 -->
-    <el-dialog
-      v-model="dialogVisible"
-      title="班级成绩录入进度"
-      width="500px"
-    >
+    <el-dialog v-model="dialogVisible" title="班级成绩录入进度" width="500px">
       <div v-if="currentClass">
         <el-descriptions :column="1" border>
-          <el-descriptions-item label="班级名称">{{ currentClass.name }}</el-descriptions-item>
-          <el-descriptions-item label="专业">{{ currentClass.major }}</el-descriptions-item>
-          <el-descriptions-item label="学生总数">{{ currentClass.studentCount }}</el-descriptions-item>
-          <el-descriptions-item label="已评分">{{ currentClass.gradedCount }}</el-descriptions-item>
-          <el-descriptions-item label="未评分">{{ currentClass.studentCount - currentClass.gradedCount }}</el-descriptions-item>
+          <el-descriptions-item label="班级名称">{{
+            currentClass.name
+          }}</el-descriptions-item>
+          <el-descriptions-item label="专业">{{
+            currentClass.major
+          }}</el-descriptions-item>
+          <el-descriptions-item label="学生总数">{{
+            currentClass.studentCount
+          }}</el-descriptions-item>
+          <el-descriptions-item label="已评分">{{
+            currentClass.gradedCount
+          }}</el-descriptions-item>
+          <el-descriptions-item label="未评分">{{
+            currentClass.studentCount - currentClass.gradedCount
+          }}</el-descriptions-item>
           <el-descriptions-item label="完成率">
             <el-progress
-              :percentage="getCompletionRate(currentClass.gradedCount, currentClass.studentCount)"
+              :percentage="
+                getCompletionRate(
+                  currentClass.gradedCount,
+                  currentClass.studentCount,
+                )
+              "
               :stroke-width="8"
-              :color="getProgressColor(currentClass.gradedCount, currentClass.studentCount)"
+              :color="
+                getProgressColor(
+                  currentClass.gradedCount,
+                  currentClass.studentCount,
+                )
+              "
             />
           </el-descriptions-item>
         </el-descriptions>
@@ -104,171 +147,167 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import { ArrowLeft } from '@element-plus/icons-vue'
-import { useRoute, useRouter } from 'vue-router'
-import { teacherAPI } from '@/api/teacher'
+import { ref, reactive, computed, onMounted } from "vue";
+import { ElMessage } from "element-plus";
+import { ArrowLeft } from "@element-plus/icons-vue";
+import { useRoute, useRouter } from "vue-router";
+import { teacherAPI } from "@/api/teacher";
 
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
-const semesterId = route.params.semesterId
-const semesterName = route.query.semesterName || '未知学期'
+const semesterId = route.params.semesterId;
+const subjectCode = route.params.subjectCode;
+const semesterName = route.query.semesterName || "未知学期";
+const subjectName = route.query.subjectName || "未知科目";
 
-const loading = ref(false)
-const classes = ref([])
-const dialogVisible = ref(false)
-const currentClass = ref({})
+const loading = ref(false);
+const classes = ref([]);
+const dialogVisible = ref(false);
+const currentClass = ref({});
 
 // 查询表单
 const queryForm = reactive({
-  className: '',
+  className: "",
   major: null,
-  completionStatus: null
-})
+  completionStatus: null,
+});
 
 // 分页配置
 const pagination = reactive({
   currentPage: 1,
   pageSize: 10,
-  total: 0
-})
-
-// 专业列表
-const majors = ref(['计算机科学', '软件工程', '数学', '物理', '英语', '中文'])
+  total: 0,
+});
 
 // 统计信息
 const statistics = computed(() => {
-  const allClasses = classes.value
-  const totalStudents = allClasses.reduce((sum, c) => sum + (c.studentCount || 0), 0)
-  const gradedStudents = allClasses.reduce((sum, c) => sum + (c.gradedCount || 0), 0)
+  const allClasses = classes.value;
+  const totalStudents = allClasses.reduce(
+    (sum, c) => sum + (c.studentCount || 0),
+    0,
+  );
+  const gradedStudents = allClasses.reduce(
+    (sum, c) => sum + (c.gradedCount || 0),
+    0,
+  );
 
   return {
     totalClasses: allClasses.length,
     totalStudents: totalStudents,
     gradedStudents: gradedStudents,
-    completionRate: totalStudents > 0 ? (gradedStudents / totalStudents) * 100 : 0
-  }
-})
+    completionRate:
+      totalStudents > 0 ? (gradedStudents / totalStudents) * 100 : 0,
+  };
+});
 
 // 获取完成率
 const getCompletionRate = (graded, total) => {
-  return total > 0 ? Math.round((graded / total) * 100) : 0
-}
+  return total > 0 ? Math.round((graded / total) * 100) : 0;
+};
 
 // 获取进度条颜色
 const getProgressColor = (graded, total) => {
-  const rate = getCompletionRate(graded, total)
-  if (rate === 100) return '#67C23A'
-  if (rate >= 80) return '#409EFF'
-  if (rate >= 50) return '#E6A23C'
-  return '#F56C6C'
-}
+  const rate = getCompletionRate(graded, total);
+  if (rate === 100) return "#67C23A";
+  if (rate >= 80) return "#409EFF";
+  if (rate >= 50) return "#E6A23C";
+  return "#F56C6C";
+};
 
 // 获取班级状态类型
 const getClassStatusType = (graded, total) => {
-  const rate = getCompletionRate(graded, total)
-  if (rate === 100) return 'success'
-  if (rate >= 80) return ''
-  if (rate >= 50) return 'warning'
-  return 'danger'
-}
+  const rate = getCompletionRate(graded, total);
+  if (rate === 100) return "success";
+  if (rate >= 80) return "";
+  if (rate >= 50) return "warning";
+  return "danger";
+};
 
 // 获取班级状态文本
 const getClassStatusText = (graded, total) => {
-  const rate = getCompletionRate(graded, total)
-  if (rate === 100) return '已完成'
-  if (rate > 0) return '进行中'
-  return '未开始'
-}
+  const rate = getCompletionRate(graded, total);
+  if (rate === 100) return "已完成";
+  if (rate > 0) return "进行中";
+  return "未开始";
+};
 
 // 返回上级
 const handleBack = () => {
-  router.push('/teacher/grade-management')
-}
+  router.push("/teacher/grade-management");
+};
 
 // 加载班级列表
 const loadClasses = async () => {
-  loading.value = true
+  loading.value = true;
   try {
-    const params = {
+    const response = await teacherAPI.getTeacherClasses({
       semester_id: semesterId,
-      teacherId: 2, // TODO: 从authStore获取当前教师ID
-      page: pagination.currentPage,
-      pageSize: pagination.pageSize,
-      ...queryForm
-    }
-
-    // 移除空值参数
-    Object.keys(params).forEach(key => {
-      if (params[key] === null || params[key] === '') {
-        delete params[key]
-      }
-    })
-
-    const response = await teacherAPI.getClassesBySemester(semesterId)
+      subject_code: subjectCode,
+    });
     if (response.status === 200) {
-      classes.value = response.data
-      pagination.total = response.data.length
+      classes.value = response.data;
+      pagination.total = response.data.length;
     }
   } catch (error) {
-    ElMessage.error('加载班级列表失败')
+    ElMessage.error("加载班级列表失败");
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 // 查询
 const handleQuery = () => {
-  pagination.currentPage = 1
-  loadClasses()
-}
+  pagination.currentPage = 1;
+  loadClasses();
+};
 
 // 重置查询条件
 const handleReset = () => {
-  queryForm.className = ''
-  queryForm.major = null
-  queryForm.completionStatus = null
-  handleQuery()
-}
+  queryForm.className = "";
+  queryForm.major = null;
+  queryForm.completionStatus = null;
+  handleQuery();
+};
 
 // 分页大小改变
 const handleSizeChange = (size) => {
-  pagination.pageSize = size
-  loadClasses()
-}
+  pagination.pageSize = size;
+  loadClasses();
+};
 
 // 当前页改变
 const handleCurrentChange = (page) => {
-  pagination.currentPage = page
-  loadClasses()
-}
+  pagination.currentPage = page;
+  loadClasses();
+};
 
 // 进入班级录入成绩
 const handleEnterClass = (row) => {
   router.push({
-    name: 'TeacherGradeStudents',
+    name: "TeacherGradeStudents",
     params: {
       semesterId: semesterId,
-      classId: row.class_id
+      subjectCode: subjectCode,
+      classId: row.class_id,
     },
     query: {
+      subjectName: subjectName,
       semesterName: semesterName,
-      className: row.class_name
-    }
-  })
-}
+      className: row.class_name,
+    },
+  });
+};
 
 // 查看进度
 const handleViewProgress = (row) => {
-  currentClass.value = { ...row }
-  dialogVisible.value = true
-}
+  currentClass.value = { ...row };
+  dialogVisible.value = true;
+};
 
 onMounted(() => {
-  loadClasses()
-})
+  loadClasses();
+});
 </script>
 
 <style scoped>
