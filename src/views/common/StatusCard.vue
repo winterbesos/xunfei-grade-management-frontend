@@ -378,15 +378,18 @@
             <td class="cell-content">
               <div class="term-header">第一学期品德测评成绩</div>
               <div class="term-row">
-                品德总评等第：<span class="handwriting">优秀</span>
+                品德总评等第：<span class="handwriting"></span>
               </div>
               <div class="term-label">评语：</div>
               <div class="comment-text handwriting">
                 {{ comments.g1.t1 }}
               </div>
               <div class="sign-box">
-                班主任（签名）<span class="handwriting">邢怡</span>
-                <span class="date">23 年 1 月 13 日</span>
+                班主任（签名）<span class="handwriting"></span>
+                <span class="date"
+                  >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span
+                >
               </div>
             </td>
             <td class="cell-content">
@@ -398,7 +401,10 @@
               </div>
               <div class="sign-box">
                 班主任（签名）
-                <span class="date">2023 年 6 月 25 日</span>
+                <span class="date"
+                  >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span
+                >
               </div>
             </td>
           </tr>
@@ -412,7 +418,10 @@
               <div class="term-label">评语：</div>
               <div class="sign-box">
                 班主任（签名）
-                <span class="date">年 月 日</span>
+                <span class="date"
+                  >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span
+                >
               </div>
             </td>
             <td class="cell-content">
@@ -421,7 +430,10 @@
               <div class="term-label">评语：</div>
               <div class="sign-box">
                 班主任（签名）
-                <span class="date">年 月 日</span>
+                <span class="date"
+                  >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span
+                >
               </div>
             </td>
           </tr>
@@ -597,8 +609,8 @@ const getScore = (gradeIdx, termIdx, subject) => {
 
 const comments = ref({
   g1: {
-    t1: `你是一个积极向上，有信心的孩子。学习有计划，有目标，能够合理安排自己的时间，学习状态稳定。心态平和，关心帮助同学，关心班集体，积极参加班级、学校组织的各项活动，具有较强的劳动观念，积极参加体育活动，尊敬师长。希望你再接再厉，争取做得更好！`,
-    t2: `该生性格踏实稳重，在班级同学中具有很强的号召力。对于学习，一直都能够做到心无旁骛，成绩又稳又好。道德品质高尚，具有很强的进取心，乐于助人，能够将老师布置的任务落实下去，培养了自己的各方面能力，在德智体美劳方面全面发展，堪称表率。\n综合等第：优秀`,
+    t1: ``,
+    t2: ``,
   },
 });
 

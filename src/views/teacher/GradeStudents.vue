@@ -13,7 +13,23 @@
             <el-tag type="info">{{ subjectName }}</el-tag>
           </div>
           <div class="header-right">
+            <el-button @click="handleExport">
+              <el-icon><Download /></el-icon>
+              导出
+            </el-button>
+            <el-button @click="triggerImport">
+              <el-icon><Upload /></el-icon>
+              导入
+            </el-button>
+            <input
+              type="file"
+              ref="fileInput"
+              style="display: none"
+              accept=".csv,.xlsx,.xls"
+              @change="handleImport"
+            />
             <el-button
+              class="save"
               type="success"
               @click="handleBatchSave"
               :loading="saveLoading"
@@ -78,14 +94,6 @@
           >
         </el-col>
         <el-col :span="8" style="text-align: right">
-          <el-button
-            type="success"
-            @click="handleViewProof"
-            style="margin-right: 10px"
-          >
-            <el-icon><Document /></el-icon>
-            成绩证明
-          </el-button>
           <el-select
             v-model="filterScore"
             placeholder="筛选状态"
@@ -109,10 +117,10 @@
       >
         <el-table-column type="selection" width="55" />
         <el-table-column type="index" label="序号" width="60" />
-        <el-table-column prop="user_name" label="姓名" width="100" />
+        <el-table-column prop="user_name" label="姓名" />
         <el-table-column prop="midterm_score" label="期中成绩" width="120" />
         <el-table-column prop="final_score" label="期末成绩" width="120" />
-        <el-table-column label="平时成绩" width="200">
+        <el-table-column label="平时成绩" width="130">
           <template #default="{ row }">
             <div class="grade-input-group">
               <el-input-number
@@ -122,17 +130,17 @@
                 :precision="1"
                 :step="0.5"
                 controls-position="right"
-                style="width: 120px"
+                style="width: 100px"
                 @change="handleScoreChange(row)"
               />
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="学时" width="150">
+        <el-table-column label="学时" width="110">
           <template #default="{ row }">
             <div class="grade-input-group">
               <el-input-number
-                v-model="row.credit_hours"
+                v-model="row.credits_hours"
                 :min="0"
                 :precision="1"
                 :step="0.5"
@@ -146,7 +154,7 @@
         <el-table-column label="学时学分" width="100" align="center">
           <template #default="{ row }">
             <span>{{
-              row.credit_hours ? (row.credit_hours / 18).toFixed(1) : "0.0"
+              row.credits_hours ? (row.credits_hours / 18).toFixed(1) : "0.0"
             }}</span>
           </template>
         </el-table-column>
@@ -163,17 +171,6 @@
             <el-tag :type="getGradeTagType(row.score)">
               {{ getGradeLevel(row.score) }}
             </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="评语" min-width="200">
-          <template #default="{ row }">
-            <el-input
-              v-model="row.remarks"
-              placeholder="输入评语(可选)"
-              size="small"
-              clearable
-              @change="row.modified = true"
-            />
           </template>
         </el-table-column>
         <el-table-column label="状态" width="80" align="center">
@@ -193,14 +190,6 @@
               :disabled="row.modified !== true"
             >
               保存
-            </el-button>
-            <el-button
-              type="info"
-              size="small"
-              link
-              @click="handleViewHistory(row)"
-            >
-              历史
             </el-button>
             <el-button
               type="info"
@@ -242,7 +231,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from "vue";
 import { ElMessage } from "element-plus";
-import { ArrowLeft, Check } from "@element-plus/icons-vue";
+import { ArrowLeft, Check, Download, Upload } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
 import { teacherAPI } from "@/api/teacher";
 
@@ -263,11 +252,136 @@ const students = ref([]);
 const selectedStudents = ref([]);
 const historyDialogVisible = ref(false);
 const gradeHistory = ref([]);
+const fileInput = ref(null);
 
 // 快速设置
 const quickScore = ref("");
 const quickCreditHours = ref("");
 const filterScore = ref("all");
+
+// ... (rest of the code)
+
+// 导出 Excel (CSV)
+const handleExport = () => {
+  if (students.value.length === 0) {
+    ElMessage.warning("没有数据可导出");
+    return;
+  }
+
+  // CSV Header
+  const headers = [
+    "学生ID",
+    "姓名",
+    "期中成绩",
+    "期末成绩",
+    "平时成绩",
+    "学时",
+  ];
+  const keys = [
+    "user_id",
+    "user_name",
+    "midterm_score",
+    "final_score",
+    "usual_score",
+    "credits_hours",
+  ];
+
+  // Generate CSV content
+  let csvContent = headers.join(",") + "\n";
+
+  students.value.forEach((student) => {
+    const row = keys.map((key) => {
+      const val = student[key];
+      return val === null || val === undefined ? "" : val;
+    });
+    csvContent += row.join(",") + "\n";
+  });
+
+  // Add BOM for Excel UTF-8 compatibility
+  const blob = new Blob(["\uFEFF" + csvContent], {
+    type: "text/csv;charset=utf-8;",
+  });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.setAttribute("href", url);
+  link.setAttribute("download", `${className}_${subjectName}_成绩表.csv`);
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+// 触发导入
+const triggerImport = () => {
+  fileInput.value.click();
+};
+
+// 处理导入
+const handleImport = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const content = e.target.result;
+    const lines = content.split(/\r\n|\n/);
+    let updatedCount = 0;
+
+    // Skip header
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+
+      const [studentId, name, midterm, final, usualScoreStr, creditHoursStr] =
+        line.split(",");
+
+      if (!studentId) continue;
+
+      const student = students.value.find(
+        (s) => String(s.user_id) === String(studentId),
+      );
+
+      if (student) {
+        let changed = false;
+
+        // Update Usual Score
+        if (usualScoreStr && !isNaN(parseFloat(usualScoreStr))) {
+          const newScore = parseFloat(usualScoreStr);
+          if (student.usual_score !== newScore) {
+            student.usual_score = newScore;
+            changed = true;
+          }
+        }
+
+        // Update Credit Hours
+        if (creditHoursStr && !isNaN(parseFloat(creditHoursStr))) {
+          const newCredit = parseFloat(creditHoursStr);
+          if (student.credits_hours !== newCredit) {
+            student.credits_hours = newCredit;
+            changed = true;
+          }
+        }
+
+        if (changed) {
+          student.modified = true;
+          handleScoreChange(student); // Recalculate total score
+          updatedCount++;
+        }
+      }
+    }
+
+    if (updatedCount > 0) {
+      ElMessage.success(`成功更新 ${updatedCount} 条记录`);
+    } else {
+      ElMessage.info("没有数据变更");
+    }
+
+    // Reset file input
+    event.target.value = "";
+  };
+
+  reader.readAsText(file);
+};
 
 // 分页配置
 const pagination = reactive({
@@ -358,7 +472,7 @@ const loadStudents = async () => {
     if (response.status === 200) {
       students.value = response.data.map((student) => ({
         ...student,
-        credit_hours: student.credit_hours || 0,
+        credits_hours: student.credits_hours || 0,
         modified: false,
         score:
           student.usual_score !== null
@@ -413,7 +527,7 @@ const handleQuickSetCreditHours = () => {
     selectedStudents.value.length > 0 ? selectedStudents.value : students.value;
 
   targetStudents.forEach((student) => {
-    student.credit_hours = parseFloat(quickCreditHours.value);
+    student.credits_hours = parseFloat(quickCreditHours.value);
     student.modified = true;
   });
 
@@ -460,7 +574,7 @@ const handleSaveSingle = async (row) => {
           {
             student_id: row.user_id,
             usual_score: row.usual_score,
-            credit_hours: row.credit_hours,
+            credits_hours: row.credits_hours,
             remarks: row.remarks || "",
           },
         ],
@@ -492,16 +606,21 @@ const handleBatchSave = async () => {
     const grades = modifiedStudents.map((student) => ({
       student_id: student.user_id,
       usual_score: student.usual_score,
-      credit_hours: student.credit_hours,
+      credits_hours: student.credits_hours,
       remarks: student.remarks || "",
     }));
 
-    const response = await teacherAPI.saveStudentGrade({
-      semester_id: semesterId,
-      class_id: classId,
-      subject_code: subjectCode,
-      grades: grades,
-    });
+    const response = await teacherAPI.saveStudentGrade(
+      semesterId,
+      classId,
+      subjectCode,
+      {
+        semester_id: semesterId,
+        class_id: classId,
+        subject_code: subjectCode,
+        grades: grades,
+      },
+    );
     if (response.status === 200) {
       ElMessage.success(`成功保存${modifiedStudents.length}个学生的成绩`);
       modifiedStudents.forEach((s) => (s.modified = false));
@@ -590,5 +709,9 @@ onMounted(() => {
 
 :deep(.el-input-number .el-input__inner) {
   text-align: center;
+}
+
+.save {
+  margin-left: 30px;
 }
 </style>
