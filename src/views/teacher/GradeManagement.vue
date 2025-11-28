@@ -51,6 +51,7 @@
           label="学期名称"
           min-width="150"
         />
+        <el-table-column prop="year.year_name" label="年级" min-width="150" />
         <el-table-column
           prop="subject.subject_name"
           label="科目"
@@ -200,6 +201,7 @@ const loadAvailableSemesters = async () => {
     if (response.status === 200) {
       semesters.value = response.data.map((item) => {
         item.semester.subject = item.subject;
+        item.semester.year = item.year;
         return item.semester;
       });
       pagination.total = response.data.length;

@@ -1,5 +1,10 @@
 <template>
-  <div>
+  <div class="page-wrapper">
+    <!-- 打印操作栏 -->
+    <div class="action-bar no-print">
+      <button @click="handlePrint">🖨️ 打印证明单</button>
+    </div>
+
     <!-- A4 纸张容器 -->
     <div class="a4-container">
       <!-- 1. 标题 -->
@@ -58,7 +63,7 @@
         <div class="note">注：学校科目均为百分制。</div>
         <div class="signature">
           <div class="school-name">{{ gradeProofData?.signature }}</div>
-          <div class="date">{{ gradeProofData?.date }}</div>
+          <div class="date">{{ gradeProofData?.signature_date }}</div>
         </div>
       </div>
     </div>
@@ -66,14 +71,10 @@
 </template>
 
 <script setup>
-import {
-  ref,
-  computed,
-  onMounted,
-  defineProps,
-  watch,
-  defineExpose,
-} from "vue";
+import { ref, computed, onMounted, defineProps, watch } from "vue";
+import { printElement } from "@/utils/print";
+import { teacherAPI } from "@/api/teacher";
+import { ElMessage } from "element-plus";
 
 // --- 组件Props ---
 const props = defineProps({
@@ -89,215 +90,217 @@ const props = defineProps({
 const gradeProofData = ref(null);
 
 // 获取数据的函数
+
 const fetchData = (id) => {
-  // TODO: 调用API获取真实数据
-  // import { getStudentGradeProof } from '@/api/student';
-  // getStudentGradeProof(id).then(response => {
-  //   gradeProofData.value = response.data;
-  // });
+
   console.log("Fetching data for studentId:", id);
 
-  // 使用模拟数据
-  gradeProofData.value = {
-    student_id: id, // 使用传入的ID
-    student_name: "王艺诺",
-    student_birth: "2007 年 3 月 30 日",
-    student_enrollment_date: "2022 年 9 月",
-    student_class_name: "高三 5 班",
-    signature: "上海音乐学院虹口区北虹高级中学教导处",
-    date: "2025 年 4 月 29 日",
 
-    politics: {
-      level1: { first_semester_score: "90", second_semester_score: "85" },
-      level2: { first_semester_score: "78", second_semester_score: "73" },
-      level3: { first_semester_score: "88", second_semester_score: "86" },
-    },
-    chinese: {
-      level1: { first_semester_score: "84", second_semester_score: "82" },
-      level2: { first_semester_score: "84", second_semester_score: "91" },
-      level3: { first_semester_score: "82", second_semester_score: "82" },
-    },
-    math: {
-      level1: { first_semester_score: "86", second_semester_score: "87" },
-      level2: { first_semester_score: "84", second_semester_score: "80" },
-      level3: { first_semester_score: "72", second_semester_score: "73" },
-    },
-    english: {
-      level1: { first_semester_score: "87", second_semester_score: "87" },
-      level2: { first_semester_score: "88", second_semester_score: "87" },
-      level3: { first_semester_score: "88", second_semester_score: "81" },
-    },
-    physics: {
-      level1: { first_semester_score: "77", second_semester_score: "77" },
-      level2: { first_semester_score: "77", second_semester_score: "72" },
-      level3: { first_semester_score: null, second_semester_score: null },
-    },
-    chemistry: {
-      level1: { first_semester_score: "85", second_semester_score: "77" },
-      level2: { first_semester_score: "80", second_semester_score: "75" },
-      level3: { first_semester_score: null, second_semester_score: null },
-    },
-    history: {
-      level1: { first_semester_score: "94", second_semester_score: "89" },
-      level2: { first_semester_score: "86", second_semester_score: "88" },
-      level3: { first_semester_score: "96", second_semester_score: "87" },
-    },
-    geography: {
-      level1: { first_semester_score: null, second_semester_score: null },
-      level2: { first_semester_score: "86", second_semester_score: "73" },
-      level3: { first_semester_score: "96", second_semester_score: "83" },
-    },
-    biology: {
-      level1: { first_semester_score: null, second_semester_score: null },
-      level2: { first_semester_score: "80", second_semester_score: "79" },
-      level3: { first_semester_score: null, second_semester_score: null },
-    },
-    information_technology: {
-      level1: { first_semester_score: "82", second_semester_score: "81" },
-      level2: { first_semester_score: null, second_semester_score: null },
-      level3: { first_semester_score: null, second_semester_score: null },
-    },
-    pe: {
-      level1: { first_semester_score: "优", second_semester_score: "优" },
-      level2: { first_semester_score: "优", second_semester_score: "优" },
-      level3: { first_semester_score: "优", second_semester_score: "优" },
-    },
-    art: {
-      level1: { first_semester_score: "良", second_semester_score: "良" },
-      level2: { first_semester_score: "良", second_semester_score: "良" },
-      level3: { first_semester_score: null, second_semester_score: null },
-    },
-  };
+
+  teacherAPI
+
+    .getStudentGradeProof(id)
+
+    .then((response) => {
+
+      if (response.status !== 200) {
+
+        ElMessage.error("加载学生列表失败");
+
+        return;
+
+      }
+
+      gradeProofData.value = response.data;
+
+    })
+
+    .catch((error) => {
+
+      console.error("获取成绩报告失败:", error);
+
+    });
+
+
+
+  // 使用模拟数据，符合 StudentReportProofResponse 结构
+
+  // gradeProofData.value = {
+
+  //   student: {
+
+  //     user_id: id,
+
+  //     user_name: "王艺诺",
+
+  //     birth_date: "2007 年 3 月 30 日",
+
+  //     enrollment_date: "2022 年 9 月",
+
+  //     year_name: "2022级",
+
+  //     class_name: "高三 5 班"
+
+  //   },
+
+  //   signature: "上海音乐学院虹口区北虹高级中学教导处",
+
+  //   signature_date: "2025 年 4 月 29 日",
+
+  //   subject_grades: [
+
+  //     {
+
+  //       subject_name: "政治",
+
+  //       year_grades: [
+
+  //         { year_name: "高一", term_grades: [{ term_name: "第一学期", score: "90" }, { term_name: "第二学期", score: "85" }] },
+
+  //         { year_name: "高二", term_grades: [{ term_name: "第一学期", score: "78" }, { term_name: "第二学期", score: "73" }] },
+
+  //         { year_name: "高三", term_grades: [{ term_name: "第一学期", score: "88" }, { term_name: "第二学期", score: "86" }] }
+
+  //       ]
+
+  //     },
+
+  //     // ... other subjects
+
+  //   ]
+
+  // };
+
 };
+
+
 
 // 模拟从API获取数据
+
 onMounted(() => {
+
   fetchData(props.studentId);
+
 });
+
+
 
 // 监听 prop 变化，以便在 Dialog 复用时能重新加载数据
+
 watch(
+
   () => props.studentId,
+
   (newId) => {
+
     if (newId) {
+
       fetchData(newId);
+
     }
+
   },
+
 );
 
+
+
 const studentInfo = computed(() => {
+
   if (!gradeProofData.value) {
+
     return { name: "", birth: "", enrollment_date: "", class_name: "" };
+
   }
+
   return {
-    name: gradeProofData.value.student_name,
-    birth: gradeProofData.value.student_birth,
-    enrollment_date: gradeProofData.value.student_enrollment_date,
-    class_name: gradeProofData.value.student_class_name,
+
+    name: gradeProofData.value.student.user_name,
+
+    birth: gradeProofData.value.student.birth_date,
+
+    enrollment_date: gradeProofData.value.student.enrollment_date,
+
+    class_name: gradeProofData.value.student.class_name,
+
   };
+
 });
 
-// 科目名称映射
-const subjectMap = {
-  politics: "政治",
-  chinese: "语文",
-  math: "数学",
-  english: "英语",
-  physics: "物理",
-  chemistry: "化学",
-  history: "历史",
-  geography: "地理",
-  biology: "生物",
-  information_technology: "信息科技",
-  pe: "体育",
-  art: "艺术",
-};
+
 
 // 将后端数据转换为表格所需的格式
+
 const scores = computed(() => {
-  if (!gradeProofData.value) return [];
 
-  const subjectOrder = [
-    "politics",
-    "chinese",
-    "math",
-    "english",
-    "physics",
-    "chemistry",
-    "history",
-    "geography",
-    "biology",
-    "information_technology",
-    "pe",
-    "art",
-  ];
+  if (!gradeProofData.value || !gradeProofData.value.subject_grades) return [];
 
-  return subjectOrder
-    .map((key) => {
-      const subjectData = gradeProofData.value[key];
-      if (!subjectData) return null;
 
-      return {
-        subject: subjectMap[key],
-        g1_1: subjectData.level1?.first_semester_score ?? "—",
-        g1_2: subjectData.level1?.second_semester_score ?? "—",
-        g2_1: subjectData.level2?.first_semester_score ?? "—",
-        g2_2: subjectData.level2?.second_semester_score ?? "—",
-        g3_1: subjectData.level3?.first_semester_score ?? "—",
-        g3_2: subjectData.level3?.second_semester_score ?? "—",
-      };
-    })
-    .filter(Boolean);
+
+  return gradeProofData.value.subject_grades.map((subjectItem) => {
+
+    const row = {
+
+      subject: subjectItem.subject_name,
+
+      g1_1: "—",
+
+      g1_2: "—",
+
+      g2_1: "—",
+
+      g2_2: "—",
+
+      g3_1: "—",
+
+      g3_2: "—",
+
+    };
+
+
+
+    // 假设 year_grades 顺序为 高一, 高二, 高三
+
+    // 假设 term_grades 顺序为 第一学期, 第二学期
+
+    if (subjectItem.year_grades) {
+
+      subjectItem.year_grades.forEach((yearItem, yearIndex) => {
+
+        if (yearIndex < 3 && yearItem.term_grades) {
+
+          yearItem.term_grades.forEach((termItem, termIndex) => {
+
+            if (termIndex < 2) {
+
+              const key = `g${yearIndex + 1}_${termIndex + 1}`;
+
+              row[key] = termItem.score || "—";
+
+            }
+
+          });
+
+        }
+
+      });
+
+    }
+
+
+
+    return row;
+
+  });
+
 });
 
 const handlePrint = () => {
-  // Create a style element
-  const style = document.createElement("style");
-  style.id = "printing-style";
-
-  // Define the print-specific CSS
-  style.innerHTML = `
-    @media print {
-      /* Hide everything in the body by default */
-      body > * {
-        display: none !important;
-      }
-      /* Show the overlay and its content */
-      .el-overlay {
-        display: block !important;
-      }
-      .el-overlay,
-      .el-dialog,
-      .el-dialog__body,
-      .dialog-content-wrapper {
-        position: static !important;
-        overflow: visible !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        box-shadow: none !important;
-        background-color: white !important;
-      }
-      .el-dialog__header, .el-dialog__footer {
-        display: none !important;
-      }
-    }
-  `;
-
-  // Append the style to the head
-  document.head.appendChild(style);
-
-  // Trigger the print dialog
-  window.print();
-
-  // Remove the style element after printing
-  document.head.removeChild(style);
+  const container = document.querySelector(".a4-container");
+  if (container) {
+    printElement(container);
+  }
 };
-
-defineExpose({
-  handlePrint,
-});
 </script>
 
 <style scoped>
@@ -414,7 +417,6 @@ button {
 }
 
 .date {
-  margin-right: 20px; /* 日期稍微靠左一点 */
 }
 
 /* --- 打印专用样式 --- */
@@ -429,6 +431,16 @@ button {
 
   body {
     margin: 0;
+  }
+
+  .page-wrapper {
+    padding: 0;
+    background: transparent;
+    display: block;
+  }
+
+  .action-bar {
+    display: none;
   }
 
   .a4-container {

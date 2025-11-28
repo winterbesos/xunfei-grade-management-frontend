@@ -128,7 +128,7 @@ export const mockAPI = {
     if (user) {
       const { password, ...userInfo } = user
       return {
-        code: 200,
+        status: 200,
         data: {
           token: `mock_token_${user.id}_${Date.now()}`,
           userInfo
@@ -136,7 +136,7 @@ export const mockAPI = {
       }
     }
     return {
-      code: 401,
+      status: 401,
       message: '用户名或密码错误'
     }
   },
@@ -148,7 +148,7 @@ export const mockAPI = {
     const user = mockUsers[0] // 默认返回管理员
     const { password, ...userInfo } = user
     return {
-      code: 200,
+      status: 200,
       data: {
         token: `oauth_token_${user.id}_${Date.now()}`,
         userInfo
@@ -187,7 +187,7 @@ export const mockAPI = {
     }
 
     return {
-      code: 200,
+      status: 200,
       data: {
         list: semesters,
         total: total
@@ -204,7 +204,7 @@ export const mockAPI = {
     }
     mockSemesters.push(newSemester)
     return {
-      code: 200,
+      status: 200,
       data: newSemester
     }
   },
@@ -215,12 +215,12 @@ export const mockAPI = {
     const semester = mockSemesters.find(s => s.id === parseInt(id))
     if (semester) {
       return {
-        code: 200,
+        status: 200,
         data: semester
       }
     }
     return {
-      code: 404,
+      status: 404,
       message: '学期不存在'
     }
   },
@@ -232,12 +232,12 @@ export const mockAPI = {
     if (index !== -1) {
       mockSemesters[index] = { ...mockSemesters[index], ...semester }
       return {
-        code: 200,
+        status: 200,
         data: mockSemesters[index]
       }
     }
     return {
-      code: 404,
+      status: 404,
       message: '学期不存在'
     }
   },
@@ -249,12 +249,12 @@ export const mockAPI = {
     if (index !== -1) {
       mockSemesters.splice(index, 1)
       return {
-        code: 200,
+        status: 200,
         message: '学期删除成功'
       }
     }
     return {
-      code: 404,
+      status: 404,
       message: '学期不存在'
     }
   },
@@ -299,10 +299,131 @@ export const mockAPI = {
     }
 
     return {
-      code: 200,
+      status: 200,
       data: {
         list: semesters,
         total: total
+      }
+    }
+  },
+
+  // 管理员专用：获取所有班级列表
+  async getAdminClasses(params = {}) {
+    await delay()
+    let classes = [
+      {
+        id: 'class_001',
+        name: '计算机科学1班',
+        major: '计算机科学',
+        studentCount: 45,
+        schoolId: 'school_001',
+        semesterId: 1
+      },
+      {
+        id: 'class_002',
+        name: '计算机科学2班',
+        major: '计算机科学',
+        studentCount: 42,
+        schoolId: 'school_001',
+        semesterId: 1
+      },
+      {
+        id: 'class_003',
+        name: '软件工程1班',
+        major: '软件工程',
+        studentCount: 38,
+        schoolId: 'school_002',
+        semesterId: 2
+      },
+      {
+        id: 'class_004',
+        name: '软件工程2班',
+        major: '软件工程',
+        studentCount: 40,
+        schoolId: 'school_002',
+        semesterId: 2
+      },
+      {
+        id: 'class_005',
+        name: '数学1班',
+        major: '数学',
+        studentCount: 35,
+        schoolId: 'school_003',
+        semesterId: 1
+      }
+    ]
+
+    // 按学校筛选
+    if (params.schoolId) {
+      classes = classes.filter(c => c.schoolId === params.schoolId)
+    }
+
+    // 按班级名称搜索
+    if (params.keyword) {
+      classes = classes.filter(c =>
+        c.name.toLowerCase().includes(params.keyword.toLowerCase())
+      )
+    }
+
+    // 分页处理
+    const total = classes.length
+    if (params.page && params.pageSize) {
+      const start = (params.page - 1) * params.pageSize
+      const end = start + params.pageSize
+      classes = classes.slice(start, end)
+    }
+
+    return {
+      status: 200,
+      data: {
+        list: classes,
+        total: total
+      }
+    }
+  },
+
+  // 管理员专用：获取班级详情
+  async getAdminClassDetail(id) {
+    await delay()
+    const classInfo = {
+      id: id,
+      name: '计算机科学1班',
+      major: '计算机科学',
+      studentCount: 45,
+      schoolId: 'school_001',
+      semesterId: 1,
+      description: '这是一个优秀的班级',
+      createdAt: '2024-01-15'
+    }
+
+    // 模拟班级学生列表
+    const students = []
+    for (let i = 1; i <= 45; i++) {
+      students.push({
+        id: i,
+        studentId: `2024${String(i).padStart(3, '0')}`,
+        name: `学生${i}`,
+        gender: i % 2 === 0 ? '男' : '女',
+        status: '在读'
+      })
+    }
+
+    // 模拟科目老师列表
+    const teachers = [
+      { subject: ['语文', '历史'], name: '张老师', id: 't1' },
+      { subject: ['数学'], name: '李老师', id: 't2' },
+      { subject: ['英语'], name: '王老师', id: 't3' },
+      { subject: ['物理'], name: '赵老师', id: 't4' },
+      { subject: ['化学', '生物'], name: '钱老师', id: 't5' },
+      { subject: ['生物'], name: '孙老师', id: 't6' }
+    ]
+
+    return {
+      status: 200,
+      data: {
+        ...classInfo,
+        students: students,
+        teachers: teachers
       }
     }
   },
@@ -311,7 +432,7 @@ export const mockAPI = {
   async getCourses() {
     await delay()
     return {
-      code: 200,
+      status: 200,
       data: mockCourses
     }
   },
@@ -332,7 +453,7 @@ export const mockAPI = {
     }
 
     return {
-      code: 200,
+      status: 200,
       data: result
     }
   },
@@ -349,7 +470,7 @@ export const mockAPI = {
     if (existingIndex !== -1) {
       mockGrades[existingIndex] = { ...mockGrades[existingIndex], ...grade }
       return {
-        code: 200,
+        status: 200,
         data: mockGrades[existingIndex]
       }
     } else {
@@ -359,7 +480,7 @@ export const mockAPI = {
       }
       mockGrades.push(newGrade)
       return {
-        code: 200,
+        status: 200,
         data: newGrade
       }
     }
@@ -376,13 +497,13 @@ export const mockAPI = {
     if (user) {
       const { password, ...userInfo } = user
       return {
-        code: 200,
+        status: 200,
         data: userInfo
       }
     }
 
     return {
-      code: 401,
+      status: 401,
       message: '用户未登录'
     }
   },
@@ -413,7 +534,7 @@ export const mockAPI = {
     }
 
     return {
-      code: 200,
+      status: 200,
       data: {
         list: semesters,
         total: total
@@ -433,7 +554,8 @@ export const mockAPI = {
         major: '计算机科学',
         studentCount: 45,
         gradedCount: 32,
-        semesterId: params.semesterId
+        semesterId: params.semesterId,
+        is_header: true
       },
       {
         id: 'class_002',
@@ -441,7 +563,8 @@ export const mockAPI = {
         major: '计算机科学',
         studentCount: 42,
         gradedCount: 28,
-        semesterId: params.semesterId
+        semesterId: params.semesterId,
+        is_header: false
       },
       {
         id: 'class_003',
@@ -449,7 +572,8 @@ export const mockAPI = {
         major: '软件工程',
         studentCount: 38,
         gradedCount: 15,
-        semesterId: params.semesterId
+        semesterId: params.semesterId,
+        is_header: true
       },
       {
         id: 'class_004',
@@ -457,7 +581,8 @@ export const mockAPI = {
         major: '软件工程',
         studentCount: 40,
         gradedCount: 40,
-        semesterId: params.semesterId
+        semesterId: params.semesterId,
+        is_header: false
       },
       {
         id: 'class_005',
@@ -465,7 +590,8 @@ export const mockAPI = {
         major: '数学',
         studentCount: 35,
         gradedCount: 0,
-        semesterId: params.semesterId
+        semesterId: params.semesterId,
+        is_header: true
       }
     ]
 
@@ -507,7 +633,7 @@ export const mockAPI = {
     }
 
     return {
-      code: 200,
+      status: 200,
       data: {
         list: classes,
         total: total
@@ -543,7 +669,7 @@ export const mockAPI = {
     }
 
     return {
-      code: 200,
+      status: 200,
       data: {
         list: students,
         total: total
@@ -612,7 +738,7 @@ export const mockAPI = {
     }
 
     return {
-      code: 200,
+      status: 200,
       data: {
         list: classes,
         total: total
@@ -625,7 +751,7 @@ export const mockAPI = {
     await delay()
     console.log('保存单个学生成绩:', data)
     return {
-      code: 200,
+      status: 200,
       data: data,
       message: '成绩保存成功'
     }
@@ -636,7 +762,7 @@ export const mockAPI = {
     await delay()
     console.log('批量保存学生成绩:', data)
     return {
-      code: 200,
+      status: 200,
       data: data,
       message: '批量保存成功'
     }
@@ -696,7 +822,7 @@ export const mockAPI = {
     const paginatedSchools = schools.slice(start, end)
 
     return {
-      code: 200,
+      status: 200,
       data: {
         schools: paginatedSchools,
         total: schools.length
@@ -714,7 +840,7 @@ export const mockAPI = {
       createdAt: new Date().toLocaleString('zh-CN')
     }
     return {
-      code: 200,
+      status: 200,
       data: newSchool
     }
   },
@@ -722,7 +848,7 @@ export const mockAPI = {
   async updateSchool(id, school) {
     await delay()
     return {
-      code: 200,
+      status: 200,
       data: { id, ...school }
     }
   },
@@ -730,7 +856,7 @@ export const mockAPI = {
   async deleteSchool(id) {
     await delay()
     return {
-      code: 200,
+      status: 200,
       message: '学校删除成功'
     }
   },
@@ -738,7 +864,7 @@ export const mockAPI = {
   async getAvailableAdmins() {
     await delay()
     return {
-      code: 200,
+      status: 200,
       data: [
         { id: 1, name: '张管理员', email: 'admin@thu.edu.cn' },
         { id: 2, name: '李管理员', email: 'admin@pku.edu.cn' },
@@ -756,7 +882,7 @@ export const mockAPI = {
 
     // 模拟成功响应
     return {
-      code: 200,
+      status: 200,
       data: {
         access_token: `oauth_token_${Date.now()}`,
         token_type: 'bearer',
@@ -860,7 +986,7 @@ export const mockAPI = {
     const paginatedStudents = students.slice(start, end)
 
     return {
-      code: 200,
+      status: 200,
       data: {
         students: paginatedStudents,
         total: students.length
@@ -876,7 +1002,7 @@ export const mockAPI = {
       createdAt: new Date().toLocaleString('zh-CN')
     }
     return {
-      code: 200,
+      status: 200,
       data: newStudent
     }
   },
@@ -884,7 +1010,7 @@ export const mockAPI = {
   async updateStudent(id, student) {
     await delay()
     return {
-      code: 200,
+      status: 200,
       data: { id, ...student }
     }
   },
@@ -892,8 +1018,78 @@ export const mockAPI = {
   async deleteStudent(id) {
     await delay()
     return {
-      code: 200,
+      status: 200,
       message: '学生删除成功'
+    }
+  },
+
+  // 教师专用：根据班级获取学生列表
+  // Added getTeacherClasses to mock for previous task
+  async getTeacherClasses(params = {}) {
+    await delay()
+    let classes = [
+      {
+        id: 'class_001',
+        name: '计算机科学1班',
+        major: '计算机科学',
+        studentCount: 45,
+        gradedCount: 32,
+        semesterId: 1, // Assign a default semester ID for mock consistency
+        semesterName: '2024年春季学期'
+      },
+      {
+        id: 'class_002',
+        name: '计算机科学2班',
+        major: '计算机科学',
+        studentCount: 42,
+        gradedCount: 28,
+        semesterId: 1,
+        semesterName: '2024年春季学期'
+      },
+      {
+        id: 'class_003',
+        name: '软件工程1班',
+        major: '软件工程',
+        studentCount: 38,
+        gradedCount: 15,
+        semesterId: 2, // Different semester
+        semesterName: '2024年秋季学期'
+      },
+      {
+        id: 'class_004',
+        name: '软件工程2班',
+        major: '软件工程',
+        studentCount: 40,
+        gradedCount: 40,
+        semesterId: 2,
+        semesterName: '2024年秋季学期'
+      },
+      {
+        id: 'class_005',
+        name: '数学1班',
+        major: '数学',
+        studentCount: 35,
+        gradedCount: 0,
+        semesterId: 1,
+        semesterName: '2024年春季学期'
+      }
+    ]
+
+    // Apply filtering and pagination if needed (similar to getClassesBySemester)
+    // For simplicity, returning all mock classes for now.
+    const total = classes.length
+    if (params.page && params.pageSize) {
+      const start = (params.page - 1) * params.pageSize
+      const end = start + params.pageSize
+      classes = classes.slice(start, end)
+    }
+
+    return {
+      status: 200,
+      data: {
+        list: classes,
+        total: total
+      }
     }
   }
 }

@@ -144,7 +144,7 @@ const statistics = computed(() => {
 const loadSemesters = async () => {
   try {
     const response = await semesterAPI.getSemesters();
-    if (response.code === 200) {
+    if (response.status === 200) {
       semesters.value = response.data;
     }
   } catch (error) {
@@ -164,7 +164,7 @@ const handleQuery = async () => {
     }
 
     const response = await studentAPI.getMyGrades(params);
-    if (response.code === 200) {
+    if (response.status === 200) {
       grades.value = response.data;
     }
   } catch (error) {

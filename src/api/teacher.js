@@ -64,21 +64,20 @@ export const teacherAPI = {
     });
   },
 
-  getClassesBySemester(semesterId) {
+  getClassesBySemester(semesterId, params) {
     return request({
       url: `/api/teacher/semesters/${semesterId}/classes`,
       method: "get",
+      params,
     });
   },
 
   // 获取教师的班级列表
-  getTeacherClasses() {
-    if (USE_MOCK) {
-      return mockAPI.getTeacherClasses();
-    }
+  getTeacherClasses(params) {
     return request({
       url: "/api/teacher/classes",
       method: "get",
+      params,
     });
   },
 
@@ -110,6 +109,22 @@ export const teacherAPI = {
     });
   },
 
+  // 保存学生品格评语
+  saveCharacterComment(semesterId, classId, data) {
+    return request({
+      url: `/api/teacher/semesters/${semesterId}/classes/${classId}/comments`,
+      method: "post",
+      data,
+    });
+  },
+
+  getCharacterComments(semesterId, classId) {
+    return request({
+      url: `/api/teacher/semesters/${semesterId}/classes/${classId}/comments`,
+      method: "get",
+    });
+  },
+
   // 批量保存学生成绩
   batchSaveGrades(data) {
     if (USE_MOCK) {
@@ -125,6 +140,20 @@ export const teacherAPI = {
   getClassSemesterSubjectGrades(classId, semesterId, subjectCode) {
     return request({
       url: `/api/teacher/semesters/${semesterId}/classes/${classId}/subjects/${subjectCode}/grades`,
+      method: "get",
+    });
+  },
+
+  getStudentSemesterReport(studentId, semesterId) {
+    return request({
+      url: `/api/teacher/students/${studentId}/semesters/${semesterId}/grades`,
+      method: "get",
+    });
+  },
+
+  getStudentGradeProof(studentId) {
+    return request({
+      url: `/api/teacher/students/${studentId}/report-proof`,
       method: "get",
     });
   },

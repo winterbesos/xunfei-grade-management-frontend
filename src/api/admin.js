@@ -1,60 +1,83 @@
-import request from '@/utils/request'
-import { mockAPI } from '@/utils/mock'
+import request from "@/utils/request";
+import { mockAPI } from "@/utils/mock";
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false'
+const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
 
 export const adminAPI = {
   // 获取学期列表
   getSemesters() {
     if (USE_MOCK) {
-      return mockAPI.getSemesters()
+      return mockAPI.getSemesters();
     }
     return request({
-      url: '/admin/semesters',
-      method: 'get'
-    })
+      url: "/admin/semesters",
+      method: "get",
+    });
   },
 
   // 创建学期
   createSemester(data) {
     if (USE_MOCK) {
-      return mockAPI.createSemester(data)
+      return mockAPI.createSemester(data);
     }
     return request({
-      url: '/admin/semesters',
-      method: 'post',
-      data
-    })
+      url: "/admin/semesters",
+      method: "post",
+      data,
+    });
   },
 
   // 更新学期
   updateSemester(id, data) {
     if (USE_MOCK) {
-      return mockAPI.updateSemester(id, data)
+      return mockAPI.updateSemester(id, data);
     }
     return request({
       url: `/admin/semesters/${id}`,
-      method: 'put',
-      data
-    })
+      method: "put",
+      data,
+    });
   },
 
   // 删除学期
   deleteSemester(id) {
     return request({
       url: `/admin/semesters/${id}`,
-      method: 'delete'
-    })
+      method: "delete",
+    });
   },
 
   // 获取课程列表
   getCourses() {
     if (USE_MOCK) {
-      return mockAPI.getCourses()
+      return mockAPI.getCourses();
     }
     return request({
-      url: '/admin/courses',
-      method: 'get'
-    })
-  }
-}
+      url: "/admin/courses",
+      method: "get",
+    });
+  },
+
+  // 获取班级列表
+  getClasses(params) {
+    if (USE_MOCK) {
+      return mockAPI.getAdminClasses(params);
+    }
+    return request({
+      url: "/api/admin/classes",
+      method: "get",
+      params,
+    });
+  },
+
+  // 获取班级详情
+  getClassDetail(classId) {
+    if (USE_MOCK) {
+      return mockAPI.getAdminClassDetail(classId);
+    }
+    return request({
+      url: `/api/admin/classes/${classId}`,
+      method: "get",
+    });
+  },
+};

@@ -26,6 +26,18 @@ const routes = [
           import("@/views/admin/SemesterManagementWithSchool.vue"),
         meta: { requiresAuth: true, roles: ["admin"] },
       },
+      {
+        path: "/admin/classes",
+        name: "AdminClasses",
+        component: () => import("@/views/admin/ClassManagement.vue"),
+        meta: { requiresAuth: true, roles: ["admin"] },
+      },
+      {
+        path: "/admin/classes/:id",
+        name: "AdminClassDetail",
+        component: () => import("@/views/admin/ClassDetail.vue"),
+        meta: { requiresAuth: true, roles: ["admin"] },
+      },
 
       // 教师路由
       {
@@ -88,6 +100,12 @@ const routes = [
         path: "/teacher/status-card/:studentId",
         name: "TeacherStatusCard",
         component: () => import("@/views/common/StatusCard.vue"),
+        meta: { requiresAuth: true, roles: ["teacher"] },
+      },
+      {
+        path: "/teacher/classes/:semesterId/:classId/character-comments",
+        name: "TeacherCharacterComments",
+        component: () => import("@/views/teacher/CharacterComments.vue"),
         meta: { requiresAuth: true, roles: ["teacher"] },
       },
 

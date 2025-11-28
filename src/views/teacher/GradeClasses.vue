@@ -49,7 +49,11 @@
           width="150"
           show-overflow-tooltip
         />
-        <el-table-column prop="class_name" label="班级名称" min-width="150" />
+        <el-table-column
+          prop="class_full_name"
+          label="班级名称"
+          min-width="150"
+        />
         <el-table-column
           prop="student_count"
           label="学生数"
@@ -80,7 +84,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button
               type="primary"
@@ -89,6 +93,15 @@
               @click="handleEnterClass(row)"
             >
               录入成绩
+            </el-button>
+            <el-button
+              v-if="row.is_header"
+              type="success"
+              size="small"
+              link
+              @click="handleCharacterComment(row)"
+            >
+              品格评语
             </el-button>
           </template>
         </el-table-column>
@@ -147,7 +160,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { ArrowLeft } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
@@ -165,20 +178,6 @@ const loading = ref(false);
 const classes = ref([]);
 const dialogVisible = ref(false);
 const currentClass = ref({});
-
-// 查询表单
-const queryForm = reactive({
-  className: "",
-  major: null,
-  completionStatus: null,
-});
-
-// 分页配置
-const pagination = reactive({
-  currentPage: 1,
-  pageSize: 10,
-  total: 0,
-});
 
 // 统计信息
 const statistics = computed(() => {
@@ -241,45 +240,17 @@ const handleBack = () => {
 const loadClasses = async () => {
   loading.value = true;
   try {
-    const response = await teacherAPI.getTeacherClasses({
-      semester_id: semesterId,
+    const response = await teacherAPI.getClassesBySemester(semesterId, {
       subject_code: subjectCode,
     });
     if (response.status === 200) {
       classes.value = response.data;
-      pagination.total = response.data.length;
     }
   } catch (error) {
     ElMessage.error("加载班级列表失败");
   } finally {
     loading.value = false;
   }
-};
-
-// 查询
-const handleQuery = () => {
-  pagination.currentPage = 1;
-  loadClasses();
-};
-
-// 重置查询条件
-const handleReset = () => {
-  queryForm.className = "";
-  queryForm.major = null;
-  queryForm.completionStatus = null;
-  handleQuery();
-};
-
-// 分页大小改变
-const handleSizeChange = (size) => {
-  pagination.pageSize = size;
-  loadClasses();
-};
-
-// 当前页改变
-const handleCurrentChange = (page) => {
-  pagination.currentPage = page;
-  loadClasses();
 };
 
 // 进入班级录入成绩
@@ -295,6 +266,17 @@ const handleEnterClass = (row) => {
       subjectName: subjectName,
       semesterName: semesterName,
       className: row.class_name,
+    },
+  });
+};
+
+// 进入品格评语
+const handleCharacterComment = (row) => {
+  router.push({
+    name: "TeacherCharacterComments",
+    params: {
+      semesterId: semesterId,
+      classId: row.class_id,
     },
   });
 };

@@ -185,7 +185,7 @@ const getStatusText = (status) => {
 const loadSchools = async () => {
   try {
     const response = await schoolAPI.getSchools()
-    if (response.code === 200) {
+    if (response.status === 200) {
       schools.value = response.data.schools || response.data
     }
   } catch (error) {

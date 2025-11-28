@@ -219,7 +219,7 @@ const handleDelete = async (row) => {
     })
 
     const response = await semesterAPI.deleteSemester(row.id)
-    if (response.code === 200) {
+    if (response.status === 200) {
       ElMessage.success('删除成功')
       await loadSemesters()
     }
@@ -248,7 +248,7 @@ const handleSubmit = async () => {
         response = await semesterAPI.createSemester(form.value)
       }
 
-      if (response.code === 200) {
+      if (response.status === 200) {
         ElMessage.success(form.value.id ? '更新成功' : '添加成功')
         dialogVisible.value = false
         await loadSemesters()

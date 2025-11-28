@@ -148,8 +148,8 @@ const loadSemesters = async () => {
   loading.value = true
   try {
     const response = await adminAPI.getSemesters()
-    if (response.code === 200) {
-      semesters.value = response.data
+    if (response.status === 200) {
+      semesters.value = response.data.list
     }
   } catch (error) {
     ElMessage.error('加载学期列表失败')
@@ -207,13 +207,13 @@ const handleSubmit = async () => {
       if (form.value.id) {
         // 编辑
         const response = await adminAPI.updateSemester(form.value.id, form.value)
-        if (response.code === 200) {
+        if (response.status === 200) {
           ElMessage.success('更新成功')
         }
       } else {
         // 添加
         const response = await adminAPI.createSemester(form.value)
-        if (response.code === 200) {
+        if (response.status === 200) {
           ElMessage.success('添加成功')
         }
       }

@@ -1,0 +1,177 @@
+<template>
+  <div class="class-detail">
+    <el-card>
+      <template #header>
+        <div class="card-header">
+          <div class="header-left">
+            <el-button link @click="$router.back()">
+              <el-icon><ArrowLeft /></el-icon> 返回
+            </el-button>
+            <span class="title">班级详情</span>
+          </div>
+        </div>
+      </template>
+
+      <div v-loading="loading">
+        <!-- 班级基本信息 -->
+        <el-descriptions title="基本信息" border :column="2" class="mb-4">
+          <el-descriptions-item label="班级名称">
+            <span class="ellipsis-id">{{ classInfo.class_name }}</span>
+          </el-descriptions-item>
+          <el-descriptions-item label="班级ID">
+            <span class="ellipsis-id">{{ classInfo.class_id }}</span>
+          </el-descriptions-item>
+          <el-descriptions-item label="班主任">
+            <span class="ellipsis-id">{{ classInfo.header_teacher_name }}</span>
+          </el-descriptions-item>
+          <el-descriptions-item label="班主任ID">
+            <span class="ellipsis-id">{{ classInfo.header_teacher_id }}</span>
+          </el-descriptions-item>
+          <el-descriptions-item label="学生人数">{{
+            classInfo.student_count
+          }}</el-descriptions-item>
+          <el-descriptions-item label="所属学期">
+            <span class="ellipsis-id">{{ classInfo.teaching_cycle_name }}</span>
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <!-- 科目老师列表 -->
+        <div class="teacher-list-section mt-4 mb-4">
+          <div class="section-header">
+            <h3>任课教师</h3>
+          </div>
+          <el-table
+            :data="classInfo.subject_teachers"
+            stripe
+            style="width: 100%"
+            border
+          >
+            <el-table-column label="科目" width="250">
+              <template #default="{ row }">
+                <el-tag
+                  v-for="sub in row.subjects"
+                  :key="sub"
+                  class="mr-2"
+                  style="margin-right: 5px"
+                >
+                  {{ sub.subject_name }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="teacher_name" label="教师姓名" />
+            <el-table-column
+              prop="teacher_id"
+              label="教师ID"
+              width="360"
+              show-overflow-tooltip
+            />
+          </el-table>
+        </div>
+
+        <!-- 学生列表 -->
+        <div class="student-list-section mt-4">
+          <div class="section-header">
+            <h3>学生列表</h3>
+          </div>
+          <el-table :data="classInfo.students" stripe style="width: 100%">
+            <el-table-column
+              prop="user_id"
+              label="学号"
+              width="150"
+              show-overflow-tooltip
+            />
+            <el-table-column prop="user_name" label="姓名" width="150" />
+            <el-table-column prop="gender" label="性别" />
+          </el-table>
+        </div>
+      </div>
+    </el-card>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { adminAPI } from "@/api/admin";
+import { ElMessage } from "element-plus";
+import { ArrowLeft } from "@element-plus/icons-vue";
+
+const route = useRoute();
+const router = useRouter();
+const loading = ref(false);
+const classInfo = ref({
+  students: [],
+});
+
+const fetchClassDetail = async () => {
+  const id = route.params.id;
+  if (!id) return;
+
+  loading.value = true;
+  try {
+    const res = await adminAPI.getClassDetail(id);
+    if (res.status === 200) {
+      classInfo.value = res.data;
+    }
+  } catch (error) {
+    console.error("Failed to fetch class detail:", error);
+    ElMessage.error("获取班级详情失败");
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchClassDetail();
+});
+</script>
+
+<style scoped>
+.class-detail {
+  padding: 20px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.mb-4 {
+  margin-bottom: 20px;
+}
+
+.mt-4 {
+  margin-top: 20px;
+}
+
+.section-header {
+  margin-bottom: 15px;
+  padding-left: 10px;
+  border-left: 4px solid #409eff;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #303133;
+}
+
+.ellipsis-id {
+  display: inline-block;
+  width: 150px; /* 👈 控制宽度 */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+</style>

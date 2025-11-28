@@ -52,7 +52,7 @@
 
       <!-- 快速操作 -->
       <el-row :gutter="10" style="margin-bottom: 20px">
-        <el-col :span="12">
+        <el-col :span="16">
           <el-input
             v-model="quickScore"
             placeholder="快速设置分数"
@@ -63,11 +63,21 @@
               <el-button @click="handleQuickSet">应用</el-button>
             </template>
           </el-input>
+          <el-input
+            v-model="quickCreditHours"
+            placeholder="快速设置学时"
+            style="width: 150px; margin-left: 10px"
+            @keyup.enter="handleQuickSetCreditHours"
+          >
+            <template #append>
+              <el-button @click="handleQuickSetCreditHours">应用</el-button>
+            </template>
+          </el-input>
           <el-button @click="handleSetAllPass" style="margin-left: 10px"
             >全部及格</el-button
           >
         </el-col>
-        <el-col :span="12" style="text-align: right">
+        <el-col :span="8" style="text-align: right">
           <el-button
             type="success"
             @click="handleViewProof"
@@ -118,6 +128,28 @@
             </div>
           </template>
         </el-table-column>
+        <el-table-column label="学时" width="150">
+          <template #default="{ row }">
+            <div class="grade-input-group">
+              <el-input-number
+                v-model="row.credit_hours"
+                :min="0"
+                :precision="1"
+                :step="0.5"
+                controls-position="right"
+                style="width: 100px"
+                @change="row.modified = true"
+              />
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="学时学分" width="100" align="center">
+          <template #default="{ row }">
+            <span>{{
+              row.credit_hours ? (row.credit_hours / 18).toFixed(1) : "0.0"
+            }}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="学期总评" width="100" align="center">
           <template #default="{ row }">
             <span v-if="row.score !== null" class="current-score"
@@ -151,7 +183,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="120" fixed="right">
+        <el-table-column label="操作" width="180" fixed="right">
           <template #default="{ row }">
             <el-button
               type="primary"
@@ -169,6 +201,14 @@
               @click="handleViewHistory(row)"
             >
               历史
+            </el-button>
+            <el-button
+              type="info"
+              size="small"
+              link
+              @click="handleViewReport(row)"
+            >
+              成绩单
             </el-button>
           </template>
         </el-table-column>
@@ -226,6 +266,7 @@ const gradeHistory = ref([]);
 
 // 快速设置
 const quickScore = ref("");
+const quickCreditHours = ref("");
 const filterScore = ref("all");
 
 // 分页配置
@@ -290,21 +331,19 @@ const handleViewProof = () => {
 // 获取成绩标签类型
 const getGradeTagType = (score) => {
   if (score === null || score === undefined) return "info";
-  if (score >= 90) return "success";
-  if (score >= 80) return "";
-  if (score >= 70) return "warning";
-  if (score >= 60) return "warning";
-  return "danger";
+  if (score >= 80) return "success"; // A & B
+  if (score >= 60) return "warning"; // C & D
+  return "danger"; // E
 };
 
 // 获取成绩等级
 const getGradeLevel = (score) => {
   if (score === null || score === undefined) return "未录入";
-  if (score >= 90) return "优秀";
-  if (score >= 80) return "良好";
-  if (score >= 70) return "中等";
-  if (score >= 60) return "及格";
-  return "不及格";
+  if (score >= 90) return "A";
+  if (score >= 80) return "B";
+  if (score >= 70) return "C";
+  if (score >= 60) return "D";
+  return "E";
 };
 
 // 加载学生列表
@@ -319,6 +358,7 @@ const loadStudents = async () => {
     if (response.status === 200) {
       students.value = response.data.map((student) => ({
         ...student,
+        credit_hours: student.credit_hours || 0,
         modified: false,
         score:
           student.usual_score !== null
@@ -362,6 +402,26 @@ const handleQuickSet = () => {
   ElMessage.success(`已为选中的${selectedStudents.value.length}个学生设置分数`);
 };
 
+// 快速设置学时
+const handleQuickSetCreditHours = () => {
+  if (!quickCreditHours.value && quickCreditHours.value !== 0) {
+    ElMessage.warning("请输入学时");
+    return;
+  }
+
+  const targetStudents =
+    selectedStudents.value.length > 0 ? selectedStudents.value : students.value;
+
+  targetStudents.forEach((student) => {
+    student.credit_hours = parseFloat(quickCreditHours.value);
+    student.modified = true;
+  });
+
+  ElMessage.success(
+    `已为${targetStudents.length}个学生设置学时: ${quickCreditHours.value}`,
+  );
+};
+
 // 全部及格
 const handleSetAllPass = () => {
   students.value.forEach((student) => {
@@ -400,6 +460,7 @@ const handleSaveSingle = async (row) => {
           {
             student_id: row.user_id,
             usual_score: row.usual_score,
+            credit_hours: row.credit_hours,
             remarks: row.remarks || "",
           },
         ],
@@ -431,6 +492,7 @@ const handleBatchSave = async () => {
     const grades = modifiedStudents.map((student) => ({
       student_id: student.user_id,
       usual_score: student.usual_score,
+      credit_hours: student.credit_hours,
       remarks: student.remarks || "",
     }));
 
@@ -450,6 +512,24 @@ const handleBatchSave = async () => {
   } finally {
     saveLoading.value = false;
   }
+};
+
+const handleViewReport = (row) => {
+  router.push({
+    name: "TeacherGradeReport",
+    params: {
+      studentId: row.user_id,
+      semesterId: semesterId,
+      classId: classId,
+      subjectCode: subjectCode,
+    },
+    query: {
+      studentName: row.user_name,
+      semesterName: semesterName,
+      className: className,
+      subjectName: subjectName,
+    },
+  });
 };
 
 // 查看历史

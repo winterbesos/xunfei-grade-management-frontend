@@ -17,6 +17,10 @@
             <el-icon><Calendar /></el-icon>
             <span>学期管理</span>
           </el-menu-item>
+          <el-menu-item index="/admin/classes">
+            <el-icon><User /></el-icon>
+            <span>班级管理</span>
+          </el-menu-item>
         </template>
 
         <!-- 教师菜单 -->
@@ -134,6 +138,7 @@ const activeMenu = computed(() => route.path);
 const pageTitle = computed(() => {
   const titleMap = {
     AdminSemesters: "学期管理",
+    AdminClasses: "班级管理",
     TeacherGradeManagement: "成绩管理",
     TeacherGradeSemesters: "可打分学期",
     TeacherGradeClasses: "班级列表",
@@ -170,7 +175,7 @@ const fetchUserInfo = async () => {
   if (authStore.isLoggedIn && !authStore.userInfo) {
     try {
       const response = await authAPI.getUserInfo();
-      if (response.code === 200) {
+      if (response.status === 200) {
         authStore.updateUserInfo(response.data);
       } else {
         ElMessage.error("获取用户信息失败");
