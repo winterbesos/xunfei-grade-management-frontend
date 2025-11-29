@@ -21,16 +21,6 @@
             :value="statistics.activeSemesters"
           />
         </el-col>
-        <el-col :span="6">
-          <el-button
-            type="success"
-            @click="handleViewProof"
-            style="margin-top: 10px"
-          >
-            <el-icon><Document /></el-icon>
-            成绩证明
-          </el-button>
-        </el-col>
       </el-row>
 
       <!-- 学期列表 -->
@@ -57,8 +47,16 @@
           label="科目"
           min-width="150"
         />
-        <el-table-column prop="begin_time" label="开始时间" width="200" />
-        <el-table-column prop="end_time" label="结束时间" width="200" />
+        <el-table-column prop="begin_time" label="评分开始时间" width="200">
+          <template #default="{ row }">
+            {{ formatDate(row.scoring_begin_time) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="end_time" label="评分结束时间" width="200">
+          <template #default="{ row }">
+            {{ formatDate(row.scoring_end_time) }}
+          </template>
+        </el-table-column>
         <el-table-column label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="getStatusType(row)">
@@ -69,7 +67,7 @@
         <el-table-column label="操作" width="100" fixed="right">
           <template #default="{ row }">
             <el-button
-              :disabled="!row.enabled"
+              :disabled="!row.is_scoring"
               type="primary"
               size="small"
               link
@@ -133,6 +131,7 @@ import { ref, reactive, computed, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import { teacherAPI } from "@/api/teacher";
+import { formatDate } from "@/utils/date";
 
 const router = useRouter();
 const loading = ref(false);
@@ -220,10 +219,12 @@ const handleEnterGrades = (row) => {
     params: {
       semesterId: row.semester_id,
       subjectCode: row.subject.subject_code,
+      gradeCode: row.year.year_code,
     },
     query: {
       semesterName: row.semester_name,
       subjectName: row.subject.subject_name,
+      gradeName: row.year.year_name,
     },
   });
 };

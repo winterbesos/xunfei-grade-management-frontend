@@ -80,4 +80,42 @@ export const adminAPI = {
       method: "get",
     });
   },
+
+  getSchoolInfo() {
+    return request({
+      url: "/api/admin/school",
+      method: "get",
+    });
+  },
+
+  updateSchoolInfo(data) {
+    return request({
+      url: "/api/admin/school",
+      method: "put",
+      data,
+    });
+  },
+
+  getSemesters(params = {}) {
+    return request({
+      url: "/api/admin/semesters",
+      method: "get",
+      params,
+    });
+  },
+
+  toggleSemesterScore(semesterId) {
+    return request({
+      url: `/api/admin/semesters/${semesterId}/toggle-events`,
+      method: "post",
+    });
+  },
+
+  updateSemesterScoringTime(semesterId, data) {
+    return request({
+      url: `/api/admin/semesters/${semesterId}/scoring-times`,
+      method: "post",
+      data,
+    });
+  },
 };

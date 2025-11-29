@@ -10,6 +10,8 @@
           <div class="header-right">
             <span class="semester-info">学期: {{ semesterName }}</span>
             &nbsp;&nbsp; &nbsp;&nbsp;
+            <span class="semester-info">年级: {{ gradeName }}</span>
+            &nbsp;&nbsp; &nbsp;&nbsp;
             <span class="semester-info">科目: {{ subjectName }}</span>
           </div>
         </div>
@@ -171,8 +173,10 @@ const router = useRouter();
 
 const semesterId = route.params.semesterId;
 const subjectCode = route.params.subjectCode;
+const gradeCode = route.params.gradeCode;
 const semesterName = route.query.semesterName || "未知学期";
 const subjectName = route.query.subjectName || "未知科目";
+const gradeName = route.query.gradeName || "未知年级";
 
 const loading = ref(false);
 const classes = ref([]);
@@ -242,6 +246,7 @@ const loadClasses = async () => {
   try {
     const response = await teacherAPI.getClassesBySemester(semesterId, {
       subject_code: subjectCode,
+      year_code: gradeCode,
     });
     if (response.status === 200) {
       classes.value = response.data;
@@ -260,12 +265,14 @@ const handleEnterClass = (row) => {
     params: {
       semesterId: semesterId,
       subjectCode: subjectCode,
+      gradeCode: gradeCode,
       classId: row.class_id,
     },
     query: {
       subjectName: subjectName,
       semesterName: semesterName,
-      className: row.class_name,
+      gradeName: gradeName,
+      className: row.class_full_name,
     },
   });
 };

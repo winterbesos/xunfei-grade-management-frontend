@@ -768,6 +768,111 @@ export const mockAPI = {
     }
   },
 
+  // 学生专用：提交奖项
+  async submitAward(data) {
+    await delay()
+    console.log('提交奖项:', data)
+    return {
+      status: 200,
+      message: '提交成功'
+    }
+  },
+
+  // 学生专用：更新奖项
+  async updateAward(id, data) {
+    await delay()
+    console.log('更新奖项:', id, data)
+    return {
+      status: 200,
+      message: '更新成功'
+    }
+  },
+
+  // 学生专用：获取我的奖项
+  async getStudentAwards() {
+    await delay()
+    return {
+      status: 200,
+      data: [
+        { 
+          id: 1, 
+          name: '三好学生', 
+          content: '表现优异', 
+          approval_teacher_id: 2, 
+          approval_teacher_name: '张老师', 
+          awarded_at: '2023-12-01', 
+          status: 'pending' 
+        },
+        { 
+          id: 2, 
+          name: '优秀班干部', 
+          content: '管理能力强', 
+          approval_teacher_id: 2, 
+          approval_teacher_name: '张老师', 
+          awarded_at: '2023-06-15', 
+          status: 'approved' 
+        }
+      ]
+    }
+  },
+
+  // 获取所有教师列表 (用于下拉选择)
+  async getAllTeachers() {
+    await delay()
+    return {
+      status: 200,
+      data: [
+        { id: 2, name: '张老师' },
+        { id: 5, name: '李老师' },
+        { id: 6, name: '王老师' }
+      ]
+    }
+  },
+
+  // 教师专用：获取奖项审核列表
+  async getTeacherAwards(params = {}) {
+    await delay()
+    return {
+      status: 200,
+      data: [
+        { 
+          id: 1, 
+          studentName: '李明', 
+          name: '三好学生', 
+          content: '表现优异', 
+          awarded_at: '2023-12-01', 
+          status: 'pending' 
+        },
+        { 
+          id: 3, 
+          studentName: '王小红', 
+          name: '科技创新奖', 
+          content: '获得市级一等奖', 
+          awarded_at: '2023-11-15', 
+          status: 'pending' 
+        },
+        { 
+          id: 2, 
+          studentName: '张三', 
+          name: '优秀班干部', 
+          content: '管理能力强', 
+          awarded_at: '2023-06-15', 
+          status: 'approved' 
+        }
+      ]
+    }
+  },
+
+  // 教师专用：审核奖项
+  async reviewAward(id, status, comment) {
+    await delay()
+    console.log('审核奖项:', id, status, comment)
+    return {
+      status: 200,
+      message: '审核完成'
+    }
+  },
+
   // 学校管理相关API - 模拟后端真实结构
   async getSchools(params = {}) {
     await delay()

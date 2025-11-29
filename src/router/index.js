@@ -38,6 +38,12 @@ const routes = [
         component: () => import("@/views/admin/ClassDetail.vue"),
         meta: { requiresAuth: true, roles: ["admin"] },
       },
+      {
+        path: "/admin/settings",
+        name: "AdminSettings",
+        component: () => import("@/views/admin/SystemSettings.vue"),
+        meta: { requiresAuth: true, roles: ["admin"] },
+      },
 
       // 教师路由
       {
@@ -53,13 +59,13 @@ const routes = [
         meta: { requiresAuth: true, roles: ["teacher"] },
       },
       {
-        path: "/teacher/grade-management/classes/:semesterId/subject/:subjectCode",
+        path: "/teacher/grade-management/classes/grades/:gradeCode/:semesterId/subject/:subjectCode",
         name: "TeacherGradeClasses",
         component: () => import("@/views/teacher/GradeClasses.vue"),
         meta: { requiresAuth: true, roles: ["teacher"] },
       },
       {
-        path: "/teacher/grade-management/students/:semesterId/:classId/:subjectCode",
+        path: "/teacher/grade-management/students/:semesterId/:classId/:subjectCode/:gradeCode",
         name: "TeacherGradeStudents",
         component: () => import("@/views/teacher/GradeStudents.vue"),
         meta: { requiresAuth: true, roles: ["teacher"] },
@@ -108,12 +114,36 @@ const routes = [
         component: () => import("@/views/teacher/CharacterComments.vue"),
         meta: { requiresAuth: true, roles: ["teacher"] },
       },
+      {
+        path: "/teacher/awards",
+        name: "TeacherAwardReview",
+        component: () => import("@/views/teacher/AwardReview.vue"),
+        meta: { requiresAuth: true, roles: ["teacher"] },
+      },
 
       // 学生路由
       {
         path: "/student/grades",
         name: "StudentGrades",
         component: () => import("@/views/student/GradeView.vue"),
+        meta: { requiresAuth: true, roles: ["student"] },
+      },
+      {
+        path: "/student/semesters",
+        name: "StudentSemesters",
+        component: () => import("@/views/student/SemesterList.vue"),
+        meta: { requiresAuth: true, roles: ["student"] },
+      },
+      {
+        path: "/student/semesters/:semesterId/report",
+        name: "StudentSemesterReport",
+        component: () => import("@/views/common/Report.vue"),
+        meta: { requiresAuth: true, roles: ["student"] },
+      },
+      {
+        path: "/student/awards",
+        name: "StudentAwardSubmission",
+        component: () => import("@/views/student/AwardSubmission.vue"),
         meta: { requiresAuth: true, roles: ["student"] },
       },
 

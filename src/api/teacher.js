@@ -157,4 +157,25 @@ export const teacherAPI = {
       method: "get",
     });
   },
+
+  // 获取奖项审核列表
+  getAwards(params) {
+    if (USE_MOCK) {
+      return mockAPI.getTeacherAwards(params);
+    }
+    return request({
+      url: "/api/teacher/awards",
+      method: "get",
+      params,
+    });
+  },
+
+  // 审核奖项
+  reviewAward(id, data) {
+    return request({
+      url: `/api/teacher/awards/${id}/approve`,
+      method: "post",
+      data,
+    });
+  },
 };

@@ -5,6 +5,7 @@ export const useSettingsStore = defineStore('settings', () => {
   // 系统设置
   const systemConfig = ref({
     siteName: '成绩管理系统',
+    reportSignature: '上海音乐学院虹口区北虹高级中学教导处',
     enablePasswordLogin: true,
     enableOAuthLogin: true,
     oauthProvider: 'jyyun', // 可选: 'google', 'github', 'custom' 等

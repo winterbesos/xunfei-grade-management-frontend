@@ -21,6 +21,10 @@
             <el-icon><User /></el-icon>
             <span>班级管理</span>
           </el-menu-item>
+          <el-menu-item index="/admin/settings">
+            <el-icon><Setting /></el-icon>
+            <span>系统设置</span>
+          </el-menu-item>
         </template>
 
         <!-- 教师菜单 -->
@@ -33,6 +37,10 @@
             <el-icon><User /></el-icon>
             <span>学生管理</span>
           </el-menu-item>
+          <el-menu-item index="/teacher/awards">
+            <el-icon><Trophy /></el-icon>
+            <span>获奖审核</span>
+          </el-menu-item>
         </template>
 
         <!-- 学生菜单 -->
@@ -40,6 +48,14 @@
           <el-menu-item index="/student/grades">
             <el-icon><Document /></el-icon>
             <span>我的成绩</span>
+          </el-menu-item>
+          <el-menu-item index="/student/semesters">
+            <el-icon><Calendar /></el-icon>
+            <span>学期列表</span>
+          </el-menu-item>
+          <el-menu-item index="/student/awards">
+            <el-icon><Trophy /></el-icon>
+            <span>奖项提交</span>
           </el-menu-item>
         </template>
 
@@ -121,6 +137,7 @@ import {
   Monitor,
   Download,
   School,
+  Trophy,
 } from "@element-plus/icons-vue";
 import { useAuthStore } from "@/stores/auth";
 import { useSettingsStore } from "@/stores/settings";
@@ -147,7 +164,12 @@ const pageTitle = computed(() => {
     TeacherClassStudents: "学生列表",
     TeacherReportProof: "成绩证明单",
     TeacherStatusCard: "学籍卡",
+    TeacherCharacterComments: "品格评语",
+    TeacherAwardReview: "获奖审核",
     StudentGrades: "我的成绩",
+    StudentSemesters: "学期列表",
+    StudentSemesterReport: "成绩单",
+    StudentAwardSubmission: "奖项提交",
     maintenanceSettings: "系统设置",
     maintenanceSystemStatus: "系统状态",
     maintenanceLogs: "系统日志",

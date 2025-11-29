@@ -241,10 +241,12 @@ const router = useRouter();
 const semesterId = route.params.semesterId;
 const classId = route.params.classId;
 const subjectCode = route.params.subjectCode;
+const gradeCode = route.params.gradeCode;
 
 const semesterName = route.query.semesterName || "未知学期";
 const className = route.query.className || "未知班级";
 const subjectName = route.query.subjectName || "未知课程";
+const gradeName = route.query.gradeName || "未知年级";
 
 const loading = ref(false);
 const saveLoading = ref(false);
@@ -430,8 +432,16 @@ const filteredStudents = computed(() => {
 const handleBack = () => {
   router.push({
     name: "TeacherGradeClasses",
-    params: { semesterId: semesterId, subjectCode: subjectCode },
-    query: { semesterName: semesterName, subjectName: subjectName },
+    params: {
+      semesterId: semesterId,
+      subjectCode: subjectCode,
+      gradeCode: gradeCode,
+    },
+    query: {
+      semesterName: semesterName,
+      subjectName: subjectName,
+      gradeName: gradeName,
+    },
   });
 };
 
