@@ -153,4 +153,12 @@ export const studentAPI = {
       method: "get",
     });
   },
+
+  // 获取活动列表
+  getActivities() {
+    return request({
+      url: "/api/student/activities",
+      method: "get",
+    });
+  },
 };

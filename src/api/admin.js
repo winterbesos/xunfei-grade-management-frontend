@@ -118,4 +118,22 @@ export const adminAPI = {
       data,
     });
   },
+
+  // 获取活动列表
+  getActivities(params) {
+    return request({
+      url: `/api/admin/activities`,
+      method: "get",
+      params,
+    });
+  },
+
+  // 创建活动
+  createActivity(semesterId, data) {
+    return request({
+      url: `/api/admin/semesters/${semesterId}/activities`,
+      method: "post",
+      data,
+    });
+  },
 };

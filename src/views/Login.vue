@@ -50,18 +50,6 @@
               </el-button>
             </el-form-item>
           </el-form>
-
-          <el-alert
-            title="测试账号"
-            type="info"
-            :closable="false"
-            style="margin-top: 20px"
-          >
-            <div>管理员: admin / admin123</div>
-            <div>教师: teacher1 / teacher123</div>
-            <div>学生: student1 / student123</div>
-            <div>维护人员: maintenance / maintenance123</div>
-          </el-alert>
         </el-tab-pane>
 
         <!-- OAuth 登录 -->
@@ -79,16 +67,6 @@
             >
               使用 OAuth 登录
             </el-button>
-
-            <el-alert
-              title="OAuth 登录"
-              type="info"
-              :closable="false"
-              style="margin-top: 20px"
-            >
-              <div>当前 OAuth 提供者：{{ oauthProvider || '未配置' }}</div>
-              <div v-if="!oauthProvider">请在系统设置中配置 OAuth 提供者</div>
-            </el-alert>
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -133,7 +111,10 @@
           </el-form-item>
         </el-form>
 
-        <div v-else-if="settingsStore.systemConfig.enableOAuthLogin" class="oauth-container">
+        <div
+          v-else-if="settingsStore.systemConfig.enableOAuthLogin"
+          class="oauth-container"
+        >
           <el-button
             type="primary"
             :loading="loading"
@@ -149,101 +130,103 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { useAuthStore } from '@/stores/auth'
-import { useSettingsStore } from '@/stores/settings'
-import { authAPI } from '@/api/auth'
+import { ref, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { ElMessage } from "element-plus";
+import { useAuthStore } from "@/stores/auth";
+import { useSettingsStore } from "@/stores/settings";
+import { authAPI } from "@/api/auth";
 
-const router = useRouter()
-const route = useRoute()
-const authStore = useAuthStore()
-const settingsStore = useSettingsStore()
+const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
+const settingsStore = useSettingsStore();
 
-const activeTab = ref('password')
-const loading = ref(false)
-const loginFormRef = ref(null)
+const activeTab = ref("password");
+const loading = ref(false);
+const loginFormRef = ref(null);
 
 const loginForm = ref({
-  username: '',
-  password: ''
-})
+  username: "",
+  password: "",
+});
 
 const loginRules = {
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' }
-  ],
+  username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
   password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, message: '密码长度至少为 6 位', trigger: 'blur' }
-  ]
-}
+    { required: true, message: "请输入密码", trigger: "blur" },
+    { min: 6, message: "密码长度至少为 6 位", trigger: "blur" },
+  ],
+};
 
 // 是否显示 tabs（两种登录方式都启用时显示）
 const showTabs = computed(() => {
-  return settingsStore.systemConfig.enablePasswordLogin &&
-         settingsStore.systemConfig.enableOAuthLogin
-})
+  return (
+    settingsStore.systemConfig.enablePasswordLogin &&
+    settingsStore.systemConfig.enableOAuthLogin
+  );
+});
 
 // OAuth 提供者
 const oauthProvider = computed(() => {
-  return settingsStore.systemConfig.oauthProvider || '模拟登录'
-})
+  return settingsStore.systemConfig.oauthProvider || "模拟登录";
+});
 
 // 账号密码登录
 const handlePasswordLogin = async () => {
-  if (!loginFormRef.value) return
+  if (!loginFormRef.value) return;
 
   await loginFormRef.value.validate(async (valid) => {
-    if (!valid) return
+    if (!valid) return;
 
-    loading.value = true
+    loading.value = true;
     try {
       const response = await authAPI.loginByPassword(
         loginForm.value.username,
-        loginForm.value.password
-      )
+        loginForm.value.password,
+      );
 
       if (response.status === 200 && response.data.access_token) {
-        const token = response.data.access_token
+        const token = response.data.access_token;
 
         // 存储token
-        authStore.login(token, null)
+        authStore.login(token, null);
 
         // 获取用户信息
-        const userInfoResponse = await authAPI.getUserInfo()
+        const userInfoResponse = await authAPI.getUserInfo();
         if (userInfoResponse.status === 200) {
-          authStore.updateUserInfo(userInfoResponse.data)
-          ElMessage.success('登录成功')
+          authStore.updateUserInfo(userInfoResponse.data);
+          ElMessage.success("登录成功");
 
-          const redirect = route.query.redirect || getDefaultRoute()
-          router.push(redirect)
+          const redirect = route.query.redirect || getDefaultRoute();
+          router.push(redirect);
         } else {
-          throw new Error('获取用户信息失败')
+          throw new Error("获取用户信息失败");
         }
       } else {
-        throw new Error('登录响应无效')
+        throw new Error("登录响应无效");
       }
     } catch (error) {
-      ElMessage.error(error.message || '登录失败')
+      ElMessage.error(error.message || "登录失败");
     } finally {
-      loading.value = false
+      loading.value = false;
     }
-  })
-}
+  });
+};
 
 // OAuth 登录
 const handleOAuthLogin = async () => {
-  loading.value = true
+  loading.value = true;
   try {
-    const response = await authAPI.getOAuthUrl(oauthProvider.value)
+    const response = await authAPI.getOAuthUrl(oauthProvider.value);
 
     if (response.status === 200 && response.data.authorization_url) {
-      console.log('重定向到 OAuth 提供者登录页：', response.data.authorization_url)
-      window.location.href = response.data.authorization_url
+      console.log(
+        "重定向到 OAuth 提供者登录页：",
+        response.data.authorization_url,
+      );
+      window.location.href = response.data.authorization_url;
     }
-
 
     // // 模拟 OAuth 登录
     // const response = await authAPI.loginByOAuth(oauthProvider.value, 'mock_code')
@@ -266,23 +249,23 @@ const handleOAuthLogin = async () => {
     //   }
     // }
   } catch (error) {
-    ElMessage.error(error.message || 'OAuth 登录失败')
+    ElMessage.error(error.message || "OAuth 登录失败");
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 // 根据角色获取默认路由
 const getDefaultRoute = () => {
-  const role = authStore.userRole
+  const role = authStore.userRole;
   const routeMap = {
-    admin: '/admin/semesters',
-    teacher: '/teacher/grade-management',
-    student: '/student/grades',
-    maintenance: '/maintenance/system-status'
-  }
-  return routeMap[role] || '/dashboard'
-}
+    admin: "/admin/semesters",
+    teacher: "/teacher/grade-management",
+    student: "/student/grades",
+    maintenance: "/maintenance/system-status",
+  };
+  return routeMap[role] || "/dashboard";
+};
 </script>
 
 <style scoped>

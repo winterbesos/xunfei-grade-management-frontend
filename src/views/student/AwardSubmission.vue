@@ -13,9 +13,9 @@
       </template>
 
       <el-table :data="awards" style="width: 100%" v-loading="loading">
-        <el-table-column prop="name" label="奖项名称" />
+        <el-table-column prop="activity_name" label="活动名称" />
+        <el-table-column prop="name" label="荣誉奖项" />
         <el-table-column prop="approval_teacher_name" label="审核老师" />
-        <el-table-column prop="awarded_at" label="获奖日期" />
         <el-table-column label="状态">
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.status)">{{
@@ -45,25 +45,44 @@
       width="500px"
     >
       <el-form :model="form" :rules="rules" ref="formRef" label-width="100px">
-        <el-form-item label="奖项名称" prop="name">
-          <el-input
-            v-model="form.name"
-            placeholder="请输入奖项名称"
-          ></el-input>
+        <el-form-item label="活动名称" prop="activity_id">
+          <el-select
+            v-model="form.activity_id"
+            placeholder="请选择活动"
+            filterable
+            @change="handleActivityChange"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="activity in activities"
+              :key="activity.id"
+              :label="activity.name"
+              :value="activity.id"
+            ></el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="奖项内容" prop="content">
-          <el-input
-            type="textarea"
-            v-model="form.content"
-            placeholder="请输入奖项内容"
-            :rows="4"
-          ></el-input>
+        <el-form-item label="荣誉奖项" prop="name">
+          <el-select
+            v-model="form.name"
+            placeholder="请选择荣誉奖项"
+            filterable
+            style="width: 100%"
+            :disabled="!form.activity_id"
+          >
+            <el-option
+              v-for="reward in availableRewards"
+              :key="reward"
+              :label="reward"
+              :value="reward"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="审核老师" prop="approval_teacher_id">
           <el-select
             v-model="form.approval_teacher_id"
             placeholder="请选择审核老师"
             filterable
+            style="width: 100%"
           >
             <el-option
               v-for="teacher in teachers"
@@ -72,15 +91,6 @@
               :value="teacher.id"
             ></el-option>
           </el-select>
-        </el-form-item>
-        <el-form-item label="获奖日期" prop="awarded_at">
-          <el-date-picker
-            v-model="form.awarded_at"
-            type="date"
-            placeholder="选择日期"
-            value-format="YYYY-MM-DD"
-            style="width: 100%"
-          ></el-date-picker>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -96,7 +106,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
 import { studentAPI } from "@/api/student";
 import { ElMessage } from "element-plus";
 
@@ -105,24 +115,31 @@ const submitting = ref(false);
 const dialogVisible = ref(false);
 const awards = ref([]);
 const teachers = ref([]);
+const activities = ref([]);
 const formRef = ref(null);
 
 const form = reactive({
   id: null,
-  name: "",
-  content: "",
+  activity_id: "",
+  name: "", // This will store the selected reward
   approval_teacher_id: "",
-  awarded_at: "",
 });
 
 const rules = {
-  name: [{ required: true, message: "请输入奖项名称", trigger: "blur" }],
+  activity_id: [{ required: true, message: "请选择活动", trigger: "change" }],
+  name: [{ required: true, message: "请选择荣誉奖项", trigger: "change" }],
   approval_teacher_id: [
     { required: true, message: "请选择审核老师", trigger: "change" },
   ],
-  awarded_at: [
-    { required: true, message: "请选择获奖日期", trigger: "change" },
-  ],
+};
+
+const availableRewards = computed(() => {
+  const activity = activities.value.find((a) => a.id === form.activity_id);
+  return activity ? activity.awards : [];
+});
+
+const handleActivityChange = () => {
+  form.name = ""; // Reset reward when activity changes
 };
 
 const getStatusType = (status) => {
@@ -146,9 +163,10 @@ const getStatusText = (status) => {
 const loadData = async () => {
   loading.value = true;
   try {
-    const [awardsRes, teachersRes] = await Promise.all([
+    const [awardsRes, teachersRes, activitiesRes] = await Promise.all([
       studentAPI.getAwards(),
       studentAPI.getAllTeachers(),
+      studentAPI.getActivities(),
     ]);
 
     if (awardsRes.status === 200) {
@@ -156,6 +174,10 @@ const loadData = async () => {
     }
     if (teachersRes.status === 200) {
       teachers.value = teachersRes.data;
+    }
+    if (activitiesRes.status === 200) {
+      // Ensure data structure matches expected activity list
+      activities.value = activitiesRes.data.list || activitiesRes.data;
     }
   } catch (error) {
     ElMessage.error("加载数据失败");
@@ -166,19 +188,17 @@ const loadData = async () => {
 
 const handleAdd = () => {
   form.id = null;
+  form.activity_id = "";
   form.name = "";
-  form.content = "";
   form.approval_teacher_id = "";
-  form.awarded_at = "";
   dialogVisible.value = true;
 };
 
 const handleEdit = (row) => {
   form.id = row.id;
+  form.activity_id = row.activity_id;
   form.name = row.name;
-  form.content = row.content;
   form.approval_teacher_id = row.approval_teacher_id;
-  form.awarded_at = row.awarded_at;
   dialogVisible.value = true;
 };
 

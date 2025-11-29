@@ -44,6 +44,12 @@ const routes = [
         component: () => import("@/views/admin/SystemSettings.vue"),
         meta: { requiresAuth: true, roles: ["admin"] },
       },
+      {
+        path: "/admin/activities",
+        name: "AdminActivities",
+        component: () => import("@/views/admin/ActivityManagement.vue"),
+        meta: { requiresAuth: true, roles: ["admin"] },
+      },
 
       // 教师路由
       {

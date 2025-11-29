@@ -14,14 +14,13 @@
 
       <el-table :data="filteredAwards" v-loading="loading" style="width: 100%">
         <el-table-column prop="student_name" label="学生姓名" width="120" />
-        <el-table-column prop="name" label="奖项名称" width="150" />
+        <el-table-column prop="activity_name" label="活动名称" width="150" />
         <el-table-column
-          prop="content"
-          label="奖项内容"
+          prop="name"
+          label="奖项"
           min-width="200"
           show-overflow-tooltip
         />
-        <el-table-column prop="awarded_at" label="获奖日期" width="120" />
         <el-table-column label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.status)">{{

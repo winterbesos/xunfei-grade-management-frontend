@@ -21,6 +21,10 @@
             <el-icon><User /></el-icon>
             <span>班级管理</span>
           </el-menu-item>
+          <el-menu-item index="/admin/activities">
+            <el-icon><Trophy /></el-icon>
+            <span>活动管理</span>
+          </el-menu-item>
           <el-menu-item index="/admin/settings">
             <el-icon><Setting /></el-icon>
             <span>系统设置</span>
@@ -156,6 +160,7 @@ const pageTitle = computed(() => {
   const titleMap = {
     AdminSemesters: "学期管理",
     AdminClasses: "班级管理",
+    AdminActivities: "活动管理",
     TeacherGradeManagement: "成绩管理",
     TeacherGradeSemesters: "可打分学期",
     TeacherGradeClasses: "班级列表",
