@@ -1,12 +1,14 @@
 <template>
   <el-container class="main-container">
-    <el-aside width="200px">
+    <el-aside :width="isCollapse ? '64px' : '200px'" class="aside-transition">
       <div class="logo">
-        <h3>{{ settingsStore.systemConfig.siteName }}</h3>
+        <h3 v-show="!isCollapse">{{ settingsStore.systemConfig.siteName }}</h3>
       </div>
       <el-menu
         :default-active="activeMenu"
         :router="true"
+        :collapse="isCollapse"
+        :collapse-transition="false"
         background-color="#304156"
         text-color="#bfcbd9"
         active-text-color="#409EFF"
@@ -15,19 +17,19 @@
         <template v-if="authStore.userRole === 'admin'">
           <el-menu-item index="/admin/semesters">
             <el-icon><Calendar /></el-icon>
-            <span>学期管理</span>
+            <template #title>学期管理</template>
           </el-menu-item>
           <el-menu-item index="/admin/classes">
             <el-icon><User /></el-icon>
-            <span>班级管理</span>
+            <template #title>班级管理</template>
           </el-menu-item>
           <el-menu-item index="/admin/activities">
             <el-icon><Trophy /></el-icon>
-            <span>活动管理</span>
+            <template #title>活动管理</template>
           </el-menu-item>
           <el-menu-item index="/admin/settings">
             <el-icon><Setting /></el-icon>
-            <span>系统设置</span>
+            <template #title>系统设置</template>
           </el-menu-item>
         </template>
 
@@ -35,15 +37,15 @@
         <template v-if="authStore.userRole === 'teacher'">
           <el-menu-item index="/teacher/grade-management">
             <el-icon><Document /></el-icon>
-            <span>成绩管理</span>
+            <template #title>成绩管理</template>
           </el-menu-item>
           <el-menu-item index="/teacher/classes">
             <el-icon><User /></el-icon>
-            <span>学生管理</span>
+            <template #title>学生管理</template>
           </el-menu-item>
           <el-menu-item index="/teacher/awards">
             <el-icon><Trophy /></el-icon>
-            <span>获奖审核</span>
+            <template #title>获奖审核</template>
           </el-menu-item>
         </template>
 
@@ -51,15 +53,15 @@
         <template v-if="authStore.userRole === 'student'">
           <el-menu-item index="/student/grades">
             <el-icon><Document /></el-icon>
-            <span>我的成绩</span>
+            <template #title>我的成绩</template>
           </el-menu-item>
           <el-menu-item index="/student/semesters">
             <el-icon><Calendar /></el-icon>
-            <span>学期列表</span>
+            <template #title>学期列表</template>
           </el-menu-item>
           <el-menu-item index="/student/awards">
             <el-icon><Trophy /></el-icon>
-            <span>奖项提交</span>
+            <template #title>奖项提交</template>
           </el-menu-item>
         </template>
 
@@ -67,31 +69,31 @@
         <template v-if="authStore.userRole === 'maintenance'">
           <el-menu-item index="/maintenance/settings">
             <el-icon><Setting /></el-icon>
-            <span>系统设置</span>
+            <template #title>系统设置</template>
           </el-menu-item>
           <el-menu-item index="/maintenance/system-status">
             <el-icon><Monitor /></el-icon>
-            <span>系统状态</span>
+            <template #title>系统状态</template>
           </el-menu-item>
           <el-menu-item index="/maintenance/logs">
             <el-icon><Document /></el-icon>
-            <span>系统日志</span>
+            <template #title>系统日志</template>
           </el-menu-item>
           <el-menu-item index="/maintenance/backup">
             <el-icon><Download /></el-icon>
-            <span>数据备份</span>
+            <template #title>数据备份</template>
           </el-menu-item>
           <el-menu-item index="/maintenance/schools">
             <el-icon><School /></el-icon>
-            <span>学校管理</span>
+            <template #title>学校管理</template>
           </el-menu-item>
           <el-menu-item index="/maintenance/students">
             <el-icon><User /></el-icon>
-            <span>学生管理</span>
+            <template #title>学生管理</template>
           </el-menu-item>
           <el-menu-item index="/maintenance/semesters">
             <el-icon><Calendar /></el-icon>
-            <span>学期管理</span>
+            <template #title>学期管理</template>
           </el-menu-item>
         </template>
       </el-menu>
@@ -101,13 +103,19 @@
       <el-header>
         <div class="header-content">
           <div class="header-left">
+            <el-button link @click="toggleCollapse" class="collapse-btn">
+              <el-icon :size="20">
+                <Expand v-if="isCollapse" />
+                <Fold v-else />
+              </el-icon>
+            </el-button>
             <span class="page-title">{{ pageTitle }}</span>
           </div>
           <div class="header-right">
             <el-dropdown @command="handleCommand">
               <span class="user-info">
                 <el-icon><User /></el-icon>
-                {{ authStore.realname }} ({{ roleText }})
+                <span class="username">{{ authStore.realname }} ({{ roleText }})</span>
                 <el-icon class="el-icon--right"><arrow-down /></el-icon>
               </span>
               <template #dropdown>
@@ -128,7 +136,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
@@ -142,6 +150,8 @@ import {
   Download,
   School,
   Trophy,
+  Fold,
+  Expand,
 } from "@element-plus/icons-vue";
 import { useAuthStore } from "@/stores/auth";
 import { useSettingsStore } from "@/stores/settings";
@@ -151,6 +161,12 @@ const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 const settingsStore = useSettingsStore();
+
+const isCollapse = ref(false);
+
+const toggleCollapse = () => {
+  isCollapse.value = !isCollapse.value;
+};
 
 // 当前激活的菜单
 const activeMenu = computed(() => route.path);
@@ -250,6 +266,8 @@ onMounted(() => {
 .el-aside {
   background-color: #304156;
   color: #fff;
+  transition: width 0.3s;
+  overflow-x: hidden;
 }
 
 .logo {
@@ -259,6 +277,8 @@ onMounted(() => {
   justify-content: center;
   background-color: #2b3849;
   border-bottom: 1px solid #1f2d3d;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .logo h3 {
@@ -288,6 +308,16 @@ onMounted(() => {
 
 .header-left {
   flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.collapse-btn {
+  margin-right: 15px;
+  color: #333;
+}
+.collapse-btn:hover {
+  color: #409eff;
 }
 
 .page-title {
@@ -311,6 +341,11 @@ onMounted(() => {
 
 .user-info:hover {
   background-color: #f5f5f5;
+}
+
+.username {
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .el-main {

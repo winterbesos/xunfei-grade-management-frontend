@@ -140,12 +140,6 @@ const semesters = ref([]);
 const dialogVisible = ref(false);
 const currentSemester = ref({});
 
-// 查询表单
-const queryForm = reactive({
-  name: "",
-  status: null,
-});
-
 // 分页配置
 const pagination = reactive({
   currentPage: 1,

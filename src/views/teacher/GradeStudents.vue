@@ -118,9 +118,19 @@
         <el-table-column type="selection" width="55" />
         <el-table-column type="index" label="序号" width="60" />
         <el-table-column prop="user_name" label="姓名" />
-        <el-table-column prop="midterm_score" label="期中成绩" width="120" />
-        <el-table-column prop="final_score" label="期末成绩" width="120" />
-        <el-table-column label="平时成绩" width="130">
+        <el-table-column
+          prop="midterm_score"
+          label="期中成绩"
+          width="80"
+          align="center"
+        />
+        <el-table-column
+          prop="final_score"
+          label="期末成绩"
+          width="80"
+          align="center"
+        />
+        <el-table-column label="平时成绩" width="110">
           <template #default="{ row }">
             <div class="grade-input-group">
               <el-input-number
@@ -145,13 +155,13 @@
                 :precision="1"
                 :step="0.5"
                 controls-position="right"
-                style="width: 100px"
+                style="width: 110px"
                 @change="row.modified = true"
               />
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="学时学分" width="100" align="center">
+        <el-table-column label="学时学分" width="80" align="center">
           <template #default="{ row }">
             <span>{{
               row.credits_hours ? (row.credits_hours / 18).toFixed(1) : "0.0"
@@ -180,7 +190,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <el-button
               type="primary"
