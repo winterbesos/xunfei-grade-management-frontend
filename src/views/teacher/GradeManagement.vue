@@ -167,13 +167,13 @@ const statistics = computed(() => {
 
 // 获取状态类型
 const getStatusType = (cycle) => {
-  if (cycle.enabled) return "success";
+  if (cycle.is_scoring) return "success";
   return null;
 };
 
 // 获取状态文本
 const getStatusText = (cycle) => {
-  if (!cycle.enabled) return "未开始";
+  if (!cycle.is_scoring) return "未开始";
   else return "已开启";
 };
 
