@@ -132,6 +132,7 @@ import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import { teacherAPI } from "@/api/teacher";
 import { formatDate } from "@/utils/date";
+import dayjs from "dayjs";
 
 const router = useRouter();
 const loading = ref(false);
@@ -156,8 +157,14 @@ const pagination = reactive({
 const statistics = computed(() => {
   const allSemesters = semesters.value;
   return {
-    availableSemesters: allSemesters.filter((s) => s.canGrade).length,
-    activeSemesters: allSemesters.filter((s) => s.status === "active").length,
+    availableSemesters: allSemesters.filter((s) => s.is_scoring).length,
+    activeSemesters: allSemesters.filter((s) => {
+      const now = dayjs();
+      return (
+        dayjs(s.scoring_begin_time).isBefore(now) &&
+        dayjs(s.scoring_end_time).isAfter(now)
+      );
+    }).length,
     totalCourses: allSemesters.reduce(
       (sum, s) => sum + (s.courseCount || 0),
       0,
@@ -181,22 +188,7 @@ const getStatusText = (cycle) => {
 const loadAvailableSemesters = async () => {
   loading.value = true;
   try {
-    const params = {
-      page: pagination.currentPage,
-      pageSize: pagination.pageSize,
-      teacherId: 2, // TODO: 从authStore获取当前教师ID
-      canGrade: true, // 只显示可打分的学期
-      ...queryForm,
-    };
-
-    // 移除空值参数
-    Object.keys(params).forEach((key) => {
-      if (params[key] === null || params[key] === "") {
-        delete params[key];
-      }
-    });
-
-    const response = await teacherAPI.getSemesterSubjects(params);
+    const response = await teacherAPI.getSemesterSubjects();
     if (response.status === 200) {
       semesters.value = response.data.map((item) => {
         item.semester.subject = item.subject;
