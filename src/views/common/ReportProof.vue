@@ -3,6 +3,7 @@
     <!-- 打印操作栏 -->
     <div class="action-bar no-print">
       <button @click="handlePrint">🖨️ 打印证明单</button>
+      <button @click="handleExportWord" class="ml-4">💾 保存为 Word</button>
     </div>
 
     <!-- A4 纸张容器 -->
@@ -120,57 +121,6 @@ const fetchData = (id) => {
       console.error("获取成绩报告失败:", error);
 
     });
-
-
-
-  // 使用模拟数据，符合 StudentReportProofResponse 结构
-
-  // gradeProofData.value = {
-
-  //   student: {
-
-  //     user_id: id,
-
-  //     user_name: "王艺诺",
-
-  //     birth_date: "2007 年 3 月 30 日",
-
-  //     enrollment_date: "2022 年 9 月",
-
-  //     year_name: "2022级",
-
-  //     class_name: "高三 5 班"
-
-  //   },
-
-  //   signature: "上海音乐学院虹口区北虹高级中学教导处",
-
-  //   signature_date: "2025 年 4 月 29 日",
-
-  //   subject_grades: [
-
-  //     {
-
-  //       subject_name: "政治",
-
-  //       year_grades: [
-
-  //         { year_name: "高一", term_grades: [{ term_name: "第一学期", score: "90" }, { term_name: "第二学期", score: "85" }] },
-
-  //         { year_name: "高二", term_grades: [{ term_name: "第一学期", score: "78" }, { term_name: "第二学期", score: "73" }] },
-
-  //         { year_name: "高三", term_grades: [{ term_name: "第一学期", score: "88" }, { term_name: "第二学期", score: "86" }] }
-
-  //       ]
-
-  //     },
-
-  //     // ... other subjects
-
-  //   ]
-
-  // };
-
 };
 
 
@@ -301,6 +251,50 @@ const handlePrint = () => {
     printElement(container);
   }
 };
+
+const handleExportWord = () => {
+  const content = document.querySelector(".a4-container").innerHTML;
+  // 构建包含样式的完整 HTML
+  // 注意：Word 对 CSS 的支持有限，尽量使用简单的 CSS
+  const style = `
+    <style>
+      body { font-family: 'SimSun', '宋体', serif; }
+      .main-title { text-align: center; font-size: 22pt; font-weight: bold; margin-bottom: 30px; }
+      .intro-text { font-size: 12pt; line-height: 1.8; margin-bottom: 15px; }
+      .intro-text p { text-indent: 2em; margin: 0; text-align: justify; }
+      .score-table { width: 100%; border-collapse: collapse; border: 1px solid #000; font-size: 11pt; margin-bottom: 10px; }
+      .score-table th, .score-table td { border: 1px solid #000; text-align: center; padding: 6px 2px; }
+      .col-subject { width: 80px; }
+      .subject-name { text-align: left; padding-left: 15px; }
+      .footer-section { margin-top: 10px; height: 100px; overflow: hidden; }
+      .note { float: left; font-size: 10.5pt; }
+      .signature { float: right; text-align: right; margin-top: 30px; font-size: 12pt; }
+      .school-name { margin-bottom: 5px; }
+    </style>
+  `;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <title>成绩证明</title>
+        ${style}
+      </head>
+      <body>
+        ${content}
+      </body>
+    </html>
+  `;
+
+  const blob = new Blob([html], { type: "application/msword;charset=utf-8" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  // 使用 .doc 后缀，Word 能更好识别这种 HTML 格式
+  link.download = `成绩证明_${studentInfo.value.name}.doc`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+};
 </script>
 
 <style scoped>
@@ -311,6 +305,10 @@ const handlePrint = () => {
   margin-bottom: 20px;
 }
 
+.ml-4 {
+  margin-left: 16px;
+}
+
 button {
   padding: 8px 16px;
   background-color: #409eff;
@@ -318,6 +316,10 @@ button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+button:hover {
+  background-color: #66b1ff;
 }
 
 /* A4 纸张模拟 */

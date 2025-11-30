@@ -72,7 +72,7 @@
           <el-input
             v-model="quickScore"
             placeholder="快速设置分数"
-            style="width: 150px"
+            style="width: 180px"
             @keyup.enter="handleQuickSet"
           >
             <template #append>
@@ -82,7 +82,7 @@
           <el-input
             v-model="quickCreditHours"
             placeholder="快速设置学时"
-            style="width: 150px; margin-left: 10px"
+            style="width: 180px; margin-left: 10px"
             @keyup.enter="handleQuickSetCreditHours"
           >
             <template #append>
@@ -519,7 +519,7 @@ const handleQuickSet = () => {
   }
 
   selectedStudents.value.forEach((student) => {
-    student.score = parseFloat(quickScore.value);
+    student.usual_score = parseFloat(quickScore.value);
     student.modified = true;
   });
 
@@ -550,7 +550,7 @@ const handleQuickSetCreditHours = () => {
 const handleSetAllPass = () => {
   students.value.forEach((student) => {
     if (student.score == null) {
-      student.score = 60;
+      student.usual_score = 60;
       student.modified = true;
     }
   });
@@ -569,7 +569,7 @@ const handleSelectionChange = (selection) => {
 
 // 保存单个学生
 const handleSaveSingle = async (row) => {
-  if (row.score === null) {
+  if (row.usual_score === null) {
     ElMessage.warning("请输入分数");
     return;
   }
@@ -603,7 +603,7 @@ const handleSaveSingle = async (row) => {
 // 批量保存
 const handleBatchSave = async () => {
   const modifiedStudents = students.value.filter(
-    (s) => s.modified && s.score !== null,
+    (s) => s.modified && s.usual_score !== null,
   );
 
   if (modifiedStudents.length === 0) {
@@ -659,26 +659,6 @@ const handleViewReport = (row) => {
       subjectName: subjectName,
     },
   });
-};
-
-// 查看历史
-const handleViewHistory = (row) => {
-  // 模拟历史数据
-  gradeHistory.value = [
-    {
-      date: "2024-01-15 14:30:00",
-      score: 85,
-      teacher: "张老师",
-      remarks: "表现良好",
-    },
-    {
-      date: "2024-01-10 10:15:00",
-      score: 82,
-      teacher: "李老师",
-      remarks: "有进步",
-    },
-  ];
-  historyDialogVisible.value = true;
 };
 
 onMounted(() => {

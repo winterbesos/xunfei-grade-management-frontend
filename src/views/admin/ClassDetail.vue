@@ -82,10 +82,28 @@
             />
             <el-table-column prop="user_name" label="姓名" width="150" />
             <el-table-column prop="gender" label="性别" />
+            <el-table-column label="操作" width="150" align="center">
+              <template #default="{ row }">
+                <el-button type="primary" link @click="handleViewProof(row)">
+                  成绩证明
+                </el-button>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
       </div>
     </el-card>
+
+    <el-dialog
+      v-model="proofDialogVisible"
+      title="成绩证明预览"
+      width="800px"
+      top="5vh"
+      destroy-on-close
+      append-to-body
+    >
+      <ReportProof v-if="proofDialogVisible" :student-id="currentStudentId" />
+    </el-dialog>
   </div>
 </template>
 
@@ -95,6 +113,7 @@ import { useRoute, useRouter } from "vue-router";
 import { adminAPI } from "@/api/admin";
 import { ElMessage } from "element-plus";
 import { ArrowLeft } from "@element-plus/icons-vue";
+import ReportProof from "@/views/common/ReportProof.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -102,6 +121,9 @@ const loading = ref(false);
 const classInfo = ref({
   students: [],
 });
+
+const proofDialogVisible = ref(false);
+const currentStudentId = ref(null);
 
 const fetchClassDetail = async () => {
   const id = route.params.id;
@@ -119,6 +141,11 @@ const fetchClassDetail = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const handleViewProof = (row) => {
+  currentStudentId.value = row.user_id;
+  proofDialogVisible.value = true;
 };
 
 onMounted(() => {
