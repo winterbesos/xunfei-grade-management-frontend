@@ -23,6 +23,10 @@
             <el-icon><User /></el-icon>
             <template #title>班级管理</template>
           </el-menu-item>
+          <el-menu-item index="/admin/subjects">
+            <el-icon><Reading /></el-icon>
+            <template #title>科目管理</template>
+          </el-menu-item>
           <el-menu-item index="/admin/activities">
             <el-icon><Trophy /></el-icon>
             <template #title>活动管理</template>
@@ -67,10 +71,6 @@
 
         <!-- 维护人员菜单 -->
         <template v-if="authStore.userRole === 'maintenance'">
-          <el-menu-item index="/maintenance/settings">
-            <el-icon><Setting /></el-icon>
-            <template #title>系统设置</template>
-          </el-menu-item>
           <el-menu-item index="/maintenance/system-status">
             <el-icon><Monitor /></el-icon>
             <template #title>系统状态</template>
@@ -115,7 +115,12 @@
             <el-dropdown @command="handleCommand">
               <span class="user-info">
                 <el-icon><User /></el-icon>
-                <span class="username">{{ authStore.realname }} ({{ roleText }})</span>
+                <span class="username"
+                  >{{ authStore.realname }} ({{
+                    authStore.userInfo.school_name
+                  }}
+                  - {{ roleText }})</span
+                >
                 <el-icon class="el-icon--right"><arrow-down /></el-icon>
               </span>
               <template #dropdown>
@@ -152,6 +157,7 @@ import {
   Trophy,
   Fold,
   Expand,
+  Reading,
 } from "@element-plus/icons-vue";
 import { useAuthStore } from "@/stores/auth";
 import { useSettingsStore } from "@/stores/settings";

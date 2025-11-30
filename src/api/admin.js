@@ -49,12 +49,18 @@ export const adminAPI = {
 
   // 获取课程列表
   getCourses() {
-    if (USE_MOCK) {
-      return mockAPI.getCourses();
-    }
     return request({
-      url: "/admin/courses",
+      url: "/api/admin/subjects",
       method: "get",
+    });
+  },
+
+  // 更新课程
+  updateCourse(id, data) {
+    return request({
+      url: `/api/admin/subjects/${id}`,
+      method: "put",
+      data,
     });
   },
 

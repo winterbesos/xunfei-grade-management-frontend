@@ -50,6 +50,12 @@ const routes = [
         component: () => import("@/views/admin/ActivityManagement.vue"),
         meta: { requiresAuth: true, roles: ["admin"] },
       },
+      {
+        path: "/admin/subjects",
+        name: "AdminSubjects",
+        component: () => import("@/views/admin/SubjectManagement.vue"),
+        meta: { requiresAuth: true, roles: ["admin"] },
+      },
 
       // 教师路由
       {
@@ -155,12 +161,6 @@ const routes = [
 
       // 维护人员路由
       {
-        path: "/maintenance/settings",
-        name: "maintenanceSettings",
-        component: () => import("@/views/admin/SystemSettings.vue"),
-        meta: { requiresAuth: true, roles: ["maintenance"] },
-      },
-      {
         path: "/maintenance/system-status",
         name: "maintenanceSystemStatus",
         component: () => import("@/views/maintenance/SystemStatus.vue"),
@@ -233,7 +233,7 @@ router.beforeEach((to, from, next) => {
       admin: "/admin/semesters",
       teacher: "/teacher/grade-management",
       student: "/student/grades",
-      maintenance: "/maintenance/settings",
+      maintenance: "/maintenance/system-status",
     };
     next(redirectMap[authStore.userRole] || "/login");
     return;
@@ -245,7 +245,7 @@ router.beforeEach((to, from, next) => {
       admin: "/admin/semesters",
       teacher: "/teacher/grade-management",
       student: "/student/grades",
-      maintenance: "/maintenance/settings",
+      maintenance: "/maintenance/system-status",
     };
     next(redirectMap[authStore.userRole] || "/dashboard");
     return;

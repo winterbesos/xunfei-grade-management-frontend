@@ -5,30 +5,6 @@ import { mockAPI } from "@/utils/mock";
 const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
 
 export const studentAPI = {
-  // 获取学生列表
-  async getStudents(params = {}) {
-    if (USE_MOCK) {
-      return mockAPI.getStudents(params);
-    }
-    return request({
-      url: "/api/students",
-      method: "get",
-      params,
-    });
-  },
-
-  // 创建新学生
-  async createStudent(student) {
-    if (USE_MOCK) {
-      return mockAPI.createStudent(student);
-    }
-    return request({
-      url: "/api/students",
-      method: "post",
-      data: student,
-    });
-  },
-
   // 更新学生信息
   async updateStudent(id, student) {
     if (USE_MOCK) {
@@ -38,17 +14,6 @@ export const studentAPI = {
       url: `/api/students/${id}`,
       method: "put",
       data: student,
-    });
-  },
-
-  // 删除学生
-  async deleteStudent(id) {
-    if (USE_MOCK) {
-      return mockAPI.deleteStudent(id);
-    }
-    return request({
-      url: `/api/students/${id}`,
-      method: "delete",
     });
   },
 
@@ -117,25 +82,25 @@ export const studentAPI = {
   // 提交奖项
   submitAward(data) {
     if (USE_MOCK) {
-      return mockAPI.submitAward(data)
+      return mockAPI.submitAward(data);
     }
     return request({
-      url: '/api/student/awards',
-      method: 'post',
-      data
-    })
+      url: "/api/student/awards",
+      method: "post",
+      data,
+    });
   },
 
   // 更新奖项
   updateAward(id, data) {
     if (USE_MOCK) {
-      return mockAPI.updateAward(id, data)
+      return mockAPI.updateAward(id, data);
     }
     return request({
       url: `/api/student/awards/${id}`,
-      method: 'put',
-      data
-    })
+      method: "put",
+      data,
+    });
   },
 
   // 获取奖项列表

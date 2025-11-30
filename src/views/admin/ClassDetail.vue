@@ -76,7 +76,7 @@
           <el-table :data="classInfo.students" stripe style="width: 100%">
             <el-table-column
               prop="user_id"
-              label="学号"
+              label="学生ID"
               width="150"
               show-overflow-tooltip
             />
@@ -97,12 +97,14 @@
     <el-dialog
       v-model="proofDialogVisible"
       title="成绩证明预览"
-      width="800px"
+      width="900px"
       top="5vh"
       destroy-on-close
       append-to-body
     >
-      <ReportProof v-if="proofDialogVisible" :student-id="currentStudentId" />
+      <div class="dialog-center">
+        <ReportProof v-if="proofDialogVisible" :student-id="currentStudentId" />
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -116,7 +118,6 @@ import { ArrowLeft } from "@element-plus/icons-vue";
 import ReportProof from "@/views/common/ReportProof.vue";
 
 const route = useRoute();
-const router = useRouter();
 const loading = ref(false);
 const classInfo = ref({
   students: [],
@@ -200,5 +201,11 @@ onMounted(() => {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.dialog-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

@@ -20,12 +20,7 @@
           width="150"
           show-overflow-tooltip
         />
-        <el-table-column
-          prop="semester_name"
-          label="学期名称"
-          min-width="150"
-        />
-        <el-table-column prop="school_name" label="学校名称" min-width="120" />
+        <el-table-column prop="semester_name" label="学期名称" min-width="80" />
         <el-table-column prop="begin_time" label="开始时间" width="200">
           <template #default="{ row }">
             {{ formatDate(row.begin_time) }}
@@ -218,17 +213,9 @@ const form = ref({
   remark: "",
 });
 
-const rules = {
-  schoolId: [{ required: true, message: "请选择学校", trigger: "change" }],
-  name: [{ required: true, message: "请输入学期名称", trigger: "blur" }],
-  startDate: [{ required: true, message: "请选择开始日期", trigger: "change" }],
-  endDate: [{ required: true, message: "请选择结束日期", trigger: "change" }],
-  status: [{ required: true, message: "请选择状态", trigger: "change" }],
-};
-
 // 获取状态类型
 const getStatusType = (cycle) => {
-  if (cycle.enabled) return "success";
+  if (cycle.is_scoring) return "success";
   return null;
 };
 

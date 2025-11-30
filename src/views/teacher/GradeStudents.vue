@@ -613,7 +613,7 @@ const handleSaveSingle = async (row) => {
 // 批量保存
 const handleBatchSave = async () => {
   const modifiedStudents = students.value.filter(
-    (s) => s.modified && s.usual_score !== null,
+    (s) => s.modified && (s.usual_score !== null || s.credits_hours !== null),
   );
 
   if (modifiedStudents.length === 0) {

@@ -1,5 +1,32 @@
 <script setup>
+import { watch, onMounted } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import { useSettingsStore } from "@/stores/settings";
 import VersionInfo from "@/components/common/VersionInfo.vue";
+
+const authStore = useAuthStore();
+const settingsStore = useSettingsStore();
+
+const updateTitle = () => {
+  const schoolName = authStore.userInfo?.schoolName || authStore.userInfo?.school_name;
+  if (schoolName) {
+    document.title = `${schoolName}成绩管理系统`;
+  } else {
+    document.title = settingsStore.systemConfig.siteName;
+  }
+};
+
+watch(
+  () => [authStore.userInfo, settingsStore.systemConfig.siteName],
+  () => {
+    updateTitle();
+  },
+  { deep: true }
+);
+
+onMounted(() => {
+  updateTitle();
+});
 </script>
 
 <template>

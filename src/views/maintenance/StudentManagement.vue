@@ -100,7 +100,7 @@
 import { ref, computed, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Plus, Search } from "@element-plus/icons-vue";
-import { studentAPI } from "@/api/student";
+import { maintenanceAPI } from "@/api/maintenance";
 
 // 数据
 const loading = ref(false);
@@ -212,7 +212,7 @@ const filteredStudents = computed(() => {
 // 方法
 const loadStudents = async () => {
   loading.value = true;
-  studentAPI
+  maintenanceAPI
     .getStudents()
     .then((response) => {
       if (response.status === 200) {
