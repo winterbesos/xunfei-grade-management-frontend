@@ -38,26 +38,24 @@
 
       <!-- 筛选条件 -->
       <el-form :inline="true" :model="queryForm">
-        <el-form-item label="学期">
+        <el-form-item label="教学周期">
           <el-select
             v-model="queryForm.semesterId"
-            placeholder="请选择学期"
+            placeholder="请选择教学周期"
             style="width: 200px"
             @change="handleQuery"
           >
-            <el-option label="全部学期" :value="null" />
             <el-option
               v-for="semester in semesters"
-              :key="semester.id"
-              :label="semester.name"
-              :value="semester.id"
+              :key="semester.semester_id"
+              :label="semester.semester_name"
+              :value="semester.semester_id"
             />
           </el-select>
         </el-form-item>
 
         <el-form-item>
           <el-button type="primary" @click="handleQuery">查询</el-button>
-          <el-button @click="handleExport">导出成绩单</el-button>
         </el-form-item>
       </el-form>
 
@@ -69,12 +67,13 @@
         style="width: 100%; margin-top: 20px"
       >
         <el-table-column type="index" label="序号" width="60" />
-        <el-table-column prop="courseName" label="课程名称" />
-        <el-table-column prop="semesterId" label="学期" width="180">
+        <el-table-column prop="subject_name" label="课程名称" />
+        <el-table-column prop="term_name" label="学期" width="180">
           <template #default="{ row }">
-            {{ getSemesterName(row.semesterId) }}
+            <span>{{ row.academic_year_name }}{{ row.term_name }}</span>
           </template>
         </el-table-column>
+        <el-table-column prop="semester_name" label="教学周期" />
         <el-table-column prop="score" label="成绩" width="100" align="center">
           <template #default="{ row }">
             <span
@@ -91,7 +90,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="teacherName" label="任课教师" width="120" />
+        <el-table-column prop="teacher_name" label="任课教师" width="120" />
       </el-table>
 
       <el-empty
@@ -106,10 +105,7 @@
 import { ref, computed, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { studentAPI } from "@/api/student";
-import { semesterAPI } from "@/api/semester";
-import { useAuthStore } from "@/stores/auth";
 
-const authStore = useAuthStore();
 const loading = ref(false);
 const semesters = ref([]);
 const grades = ref([]);
@@ -143,9 +139,20 @@ const statistics = computed(() => {
 // 加载学期列表
 const loadSemesters = async () => {
   try {
-    const response = await semesterAPI.getSemesters();
+    const response = await studentAPI.getSemesters();
     if (response.status === 200) {
       semesters.value = response.data;
+      // 默认选中最新的学期 (假设返回的列表是按时间排序的，或者可以通过ID排序)
+      // 这里简单地取列表的第一个，通常API返回的应该是最近的或者有标记
+      // 如果需要更精确的排序，可以根据 id 或其他字段排序
+      if (semesters.value.length > 0) {
+        // 尝试找到 ID 最大的作为最新学期
+        const latestSemester = semesters.value.reduce((prev, current) => {
+          return prev.id > current.id ? prev : current;
+        });
+        queryForm.value.semesterId = latestSemester.id;
+        handleQuery(); // 选中后立即查询
+      }
     }
   } catch (error) {
     ElMessage.error("加载学期列表失败");
@@ -154,16 +161,11 @@ const loadSemesters = async () => {
 
 // 查询成绩
 const handleQuery = async () => {
+  if (!queryForm.value.semesterId) return;
+
   loading.value = true;
   try {
-    const params = {
-      studentId: authStore.userInfo.id,
-    };
-    if (queryForm.value.semesterId) {
-      params.semesterId = queryForm.value.semesterId;
-    }
-
-    const response = await studentAPI.getMyGrades(params);
+    const response = await studentAPI.getMyGrades(queryForm.value.semesterId);
     if (response.status === 200) {
       grades.value = response.data;
     }
@@ -172,18 +174,6 @@ const handleQuery = async () => {
   } finally {
     loading.value = false;
   }
-};
-
-// 导出成绩单
-const handleExport = () => {
-  ElMessage.info("导出功能开发中");
-  // TODO: 实现导出功能
-};
-
-// 获取学期名称
-const getSemesterName = (semesterId) => {
-  const semester = semesters.value.find((s) => s.id === semesterId);
-  return semester ? semester.name : "-";
 };
 
 // 获取成绩颜色
@@ -218,7 +208,6 @@ const getGradeType = (score) => {
 
 onMounted(async () => {
   await loadSemesters();
-  await handleQuery();
 });
 </script>
 

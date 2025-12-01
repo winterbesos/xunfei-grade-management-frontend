@@ -49,9 +49,9 @@ export const studentAPI = {
   },
 
   // 获取我的成绩
-  getMyGrades(params) {
+  getMyGrades(semesterId, params) {
     return request({
-      url: "/api/grades",
+      url: `/api/student/semesters/${semesterId}/grades`,
       method: "get",
       params,
     });

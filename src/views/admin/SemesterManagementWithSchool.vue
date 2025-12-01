@@ -123,15 +123,12 @@
 
 <script setup>
 import { ref, reactive, onMounted } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElMessage } from "element-plus";
 import { adminAPI } from "@/api/admin";
 import { formatDate } from "@/utils/date";
 
 const loading = ref(false);
-const submitLoading = ref(false);
 const semesters = ref([]);
-const dialogVisible = ref(false);
-const formRef = ref(null);
 
 // 打分时间设置相关
 const scoringTimeDialogVisible = ref(false);
@@ -203,16 +200,6 @@ const pagination = reactive({
   total: 0,
 });
 
-const form = ref({
-  id: null,
-  schoolId: "",
-  name: "",
-  startDate: "",
-  endDate: "",
-  status: "upcoming",
-  remark: "",
-});
-
 // 获取状态类型
 const getStatusType = (cycle) => {
   if (cycle.is_scoring) return "success";
@@ -252,63 +239,6 @@ const loadSemesters = async () => {
   } finally {
     loading.value = false;
   }
-};
-
-const activeSemesterScore = (row) => {
-  ElMessageBox.confirm(
-    `确定要开启学期"${row.semester_name}"的打分功能吗？`,
-    "提示",
-    {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-      type: "warning",
-    },
-  )
-    .then(async () => {
-      try {
-        const response = await adminAPI.toggleSemesterScore(row.semester_id);
-        if (response.status === 200) {
-          ElMessage.success("打分功能已开启");
-          await loadSemesters();
-        }
-      } catch (error) {
-        ElMessage.error(error.message || "操作失败");
-      }
-    })
-    .catch(() => {
-      // 取消操作
-    });
-};
-
-// 提交表单
-const handleSubmit = async () => {
-  if (!formRef.value) return;
-
-  await formRef.value.validate(async (valid) => {
-    if (!valid) return;
-
-    submitLoading.value = true;
-    try {
-      let response;
-      if (form.value.id) {
-        // 编辑
-        response = await semesterAPI.updateSemester(form.value.id, form.value);
-      } else {
-        // 添加
-        response = await semesterAPI.createSemester(form.value);
-      }
-
-      if (response.status === 200) {
-        ElMessage.success(form.value.id ? "更新成功" : "添加成功");
-        dialogVisible.value = false;
-        await loadSemesters();
-      }
-    } catch (error) {
-      ElMessage.error(error.message || "操作失败");
-    } finally {
-      submitLoading.value = false;
-    }
-  });
 };
 
 onMounted(async () => {
