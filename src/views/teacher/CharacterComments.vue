@@ -85,6 +85,24 @@
           </template>
         </el-table-column>
 
+        <el-table-column label="品格等第" width="120">
+          <template #default="{ row }">
+            <el-select
+              v-model="row.grade"
+              placeholder="请选择"
+              size="small"
+              @change="row.modified = true"
+            >
+              <el-option
+                v-for="item in gradeOptions"
+                :key="item"
+                :label="item"
+                :value="item"
+              />
+            </el-select>
+          </template>
+        </el-table-column>
+
         <el-table-column label="品格评语">
           <template #default="{ row }">
             <el-input
@@ -127,24 +145,53 @@ const loading = ref(false);
 const saveLoading = ref(false);
 const students = ref([]);
 
+const gradeOptions = ["A", "B", "C", "D", "E"];
+
+const gradeMap = {
+  A: 5,
+  B: 4,
+  C: 3,
+  D: 2,
+  E: 1,
+};
+
+const scoreMap = {
+  5: "A",
+  4: "B",
+  3: "C",
+  2: "D",
+  1: "E",
+};
+
 // 加载学生列表
 const loadStudents = async () => {
   loading.value = true;
   try {
     const response = await teacherAPI.getCharacterComments(semesterId, classId);
     if (response.status === 200) {
-      students.value = response.data.map((student) => ({
-        ...student,
-        comment: student.comment || "",
-        study_ability: student.study_ability || 4,
-        logical_thinking: student.logical_thinking || 3,
-        creativity: student.creativity || 2,
-        teamwork: student.teamwork || 3,
-        responsibility: student.responsibility || 3,
-        modified: false,
-      }));
+      students.value = response.data.map((student) => {
+        // Ensure abilities object exists and populate it
+        const abilities = student.abilities || {};
+        return {
+          ...student,
+          comment: student.comment || "",
+          grade: scoreMap[student.grade] || student.grade || "",
+          abilities: {
+            study_ability:
+              abilities.study_ability || student.study_ability || 0,
+            logical_thinking:
+              abilities.logical_thinking || student.logical_thinking || 0,
+            creativity: abilities.creativity || student.creativity || 0,
+            teamwork: abilities.teamwork || student.teamwork || 0,
+            responsibility:
+              abilities.responsibility || student.responsibility || 0,
+          },
+          modified: false,
+        };
+      });
     }
   } catch (error) {
+    console.error(error);
     ElMessage.error("加载学生列表失败");
   } finally {
     loading.value = false;
@@ -160,14 +207,10 @@ const handleSaveSingle = async (row) => {
       {
         comments: [
           {
+            student_id: row.student_id,
             comment: row.comment,
-            abilities: {
-              study_ability: row.study_ability,
-              logical_thinking: row.logical_thinking,
-              creativity: row.creativity,
-              teamwork: row.teamwork,
-              responsibility: row.responsibility,
-            },
+            grade: gradeMap[row.grade] || row.grade,
+            abilities: row.abilities,
           },
         ],
       },
@@ -198,13 +241,8 @@ const handleBatchSave = async () => {
           {
             student_id: row.student_id,
             comment: row.comment,
-            abilities: {
-              study_ability: row.study_ability,
-              logical_thinking: row.logical_thinking,
-              creativity: row.creativity,
-              teamwork: row.teamwork,
-              responsibility: row.responsibility,
-            },
+            grade: gradeMap[row.grade] || row.grade,
+            abilities: row.abilities,
           },
         ],
       }),

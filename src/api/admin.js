@@ -142,4 +142,19 @@ export const adminAPI = {
       data,
     });
   },
+
+  getStudentStatusCard(studentId) {
+    return request({
+      url: `/api/admin/students/${studentId}/status_card`,
+      method: "get",
+    });
+  },
+
+  exportStudentStatusCard(studentId) {
+    return request({
+      url: `/api/admin/students/${studentId}/status_card/export`,
+      method: "get",
+      responseType: "blob",
+    });
+  },
 };

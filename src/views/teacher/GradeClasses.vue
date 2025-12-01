@@ -96,15 +96,6 @@
             >
               录入成绩
             </el-button>
-            <el-button
-              v-if="row.is_header"
-              type="success"
-              size="small"
-              link
-              @click="handleCharacterComment(row)"
-            >
-              品格评语
-            </el-button>
           </template>
         </el-table-column>
       </el-table>

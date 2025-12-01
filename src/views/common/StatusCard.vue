@@ -6,10 +6,11 @@
         <!-- 顶部标题 -->
         <div class="header">
           <h1 class="card-title">
-            上海市高中学生学籍卡（{{ info.gradYear }} 届）
+            上海市高中学生学籍卡（&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            届）
           </h1>
           <div class="sub-header">
-            <span>区：{{ info.district }}</span>
+            <span>区：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <span style="margin-left: 20px">学校：{{ info.school }}</span>
           </div>
         </div>
@@ -47,7 +48,8 @@
               <td>{{ info.nativePlace }}</td>
               <td colspan="2" rowspan="4" class="photo-cell">
                 <div class="photo-box">
-                  <img :src="info.photo" alt="照片" />
+                  <img v-if="info.photo" :src="info.photo" alt="照片" />
+                  <span v-else>照片</span>
                 </div>
               </td>
               <td rowspan="4" class="photo-cell">
@@ -58,7 +60,7 @@
             </tr>
             <tr>
               <td colspan="2" class="label">证件类型</td>
-              <td colspan="2">居民身份证</td>
+              <td colspan="2"></td>
               <td class="label">证件号码</td>
               <td colspan="3">{{ info.idCard }}</td>
               <td colspan="2" class="label">出生日期</td>
@@ -162,62 +164,38 @@
           <tbody>
             <tr>
               <td colspan="3">学业成绩</td>
-              <td>思想政治</td>
-              <td>语文</td>
-              <td>数学</td>
-              <td>外语</td>
-              <td>物理</td>
-              <td>化学</td>
-              <td>生命科学</td>
-              <td>历史</td>
-              <td>地理</td>
-              <td>艺术</td>
-              <td>体育与健身</td>
-              <td>劳动技术</td>
-              <td>信息科技</td>
-              <td></td>
-              <td></td>
-              <td></td>
+              <td v-for="(, index) in 16" :key="index">
+                <div style="height: 100px" class="vertical-text">
+                  {{ subjects[index]?.subject_name || "" }}
+                </div>
+              </td>
               <td rowspan="4">转入本校日期及原因</td>
               <td rowspan="4" colspan="2"></td>
             </tr>
             <tr>
               <td rowspan="4" class="vertical-text label-bg">高一年级</td>
               <td colspan="2" class="label">上学期</td>
-              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
-                {{ getScore(gIndex, 0, sub) }}
+              <td v-for="(, index) in 16" :key="index">
+                {{ subjects[index]?.year_grades?.[0]?.term_1_score || "" }}
               </td>
-
-              <td></td>
-              <td></td>
-              <td></td>
             </tr>
             <tr>
               <td colspan="2" class="label">下学期</td>
-              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
-                {{ getScore(gIndex, 1, sub) }}
+              <td v-for="(, index) in 16" :key="index">
+                {{ subjects[index]?.year_grades?.[0]?.term_2_score || "" }}
               </td>
-
-              <td></td>
-              <td></td>
-              <td></td>
             </tr>
             <tr>
               <td colspan="2" class="label">总评</td>
-              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
-                {{ getScore(gIndex, 2, sub) }}
+              <td v-for="(, index) in 16" :key="index">
+                {{ subjects[index]?.year_grades?.[0]?.score || "" }}
               </td>
-
-              <td></td>
-              <td></td>
-              <td></td>
             </tr>
             <tr>
               <td colspan="2" class="label">补考</td>
-              <td v-for="(sub, sIndex) in subjects" :key="sIndex"></td>
-              <td></td>
-              <td></td>
-              <td></td>
+              <td v-for="(, index) in 16" :key="index">
+                {{ subjects[index]?.year_grades?.[0]?.makeup_score || "" }}
+              </td>
               <td rowspan="7">转出本校日期及原因</td>
               <td rowspan="7" colspan="2"></td>
             </tr>
@@ -225,99 +203,67 @@
             <tr>
               <td rowspan="4" class="vertical-text label-bg">高二年级</td>
               <td colspan="2" class="label">上学期</td>
-              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
-                {{ getScore(gIndex, 0, sub) }}
+              <td v-for="(, index) in 16" :key="index">
+                {{ subjects[index]?.year_grades?.[1]?.term_1_score || "" }}
               </td>
-
-              <td></td>
-              <td></td>
-              <td></td>
             </tr>
             <tr>
               <td colspan="2" class="label">下学期</td>
-              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
-                {{ getScore(gIndex, 1, sub) }}
+              <td v-for="(, index) in 16" :key="index">
+                {{ subjects[index]?.year_grades?.[1]?.term_2_score || "" }}
               </td>
-
-              <td></td>
-              <td></td>
-              <td></td>
             </tr>
             <tr>
               <td colspan="2" class="label">总评</td>
-              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
-                {{ getScore(gIndex, 2, sub) }}
+              <td v-for="(, index) in 16" :key="index">
+                {{ subjects[index]?.year_grades?.[1]?.score || "" }}
               </td>
-
-              <td></td>
-              <td></td>
-              <td></td>
             </tr>
             <tr>
               <td colspan="2" class="label">补考</td>
-              <td v-for="(sub, sIndex) in subjects" :key="sIndex"></td>
-              <td></td>
-              <td></td>
-              <td></td>
+              <td v-for="(, index) in 16" :key="index">
+                {{ subjects[index]?.year_grades?.[1]?.makeup_score || "" }}
+              </td>
             </tr>
 
             <tr>
               <td rowspan="4" class="vertical-text label-bg">高三年级</td>
               <td colspan="2" class="label">上学期</td>
-              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
-                {{ getScore(gIndex, 0, sub) }}
+              <td v-for="(, index) in 16" :key="index">
+                {{ subjects[index]?.year_grades?.[2]?.term_1_score || "" }}
               </td>
-
-              <td></td>
-              <td></td>
-              <td></td>
             </tr>
             <tr>
               <td colspan="2" class="label">下学期</td>
-              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
-                {{ getScore(gIndex, 1, sub) }}
+              <td v-for="(, index) in 16" :key="index">
+                {{ subjects[index]?.year_grades?.[2]?.term_2_score || "" }}
               </td>
-
-              <td></td>
-              <td></td>
-              <td></td>
             </tr>
             <tr>
               <td colspan="2" class="label">总评</td>
-              <td v-for="(sub, sIndex) in subjects" :key="sIndex">
-                {{ getScore(gIndex, 2, sub) }}
+              <td v-for="(, index) in 16" :key="index">
+                {{ subjects[index]?.year_grades?.[2]?.score || "" }}
               </td>
-
-              <td></td>
-              <td></td>
-              <td></td>
 
               <td colspan="2" rowspan="3">毕业日期及证书编号</td>
               <td rowspan="3"></td>
             </tr>
             <tr>
               <td colspan="2" class="label">补考</td>
-              <td v-for="(sub, sIndex) in subjects" :key="sIndex"></td>
-              <td></td>
-              <td></td>
-              <td></td>
+              <td v-for="(, index) in 16" :key="index">
+                {{ subjects[index]?.year_grades?.[2]?.makeup_score || "" }}
+              </td>
             </tr>
 
             <!-- 学业水平考试 -->
             <tr>
               <td rowspan="2" class="zysp">学业水平考试</td>
               <td colspan="2" class="label">成绩</td>
-              <td v-for="(sub, sIndex) in subjects" :key="sIndex"></td>
-              <td></td>
-              <td></td>
-              <td></td>
+              <td v-for="(sub, sIndex) in 16" :key="sIndex"></td>
             </tr>
             <tr>
               <td colspan="2" class="label">补考</td>
-              <td v-for="(sub, sIndex) in subjects" :key="sIndex"></td>
-              <td></td>
-              <td></td>
-              <td></td>
+              <td v-for="(sub, sIndex) in 16" :key="sIndex"></td>
 
               <td colspan="2" rowspan="1">毕业后去向</td>
               <td rowspan="1"></td>
@@ -372,94 +318,142 @@
             <!-- 第二学期 -->
           </colgroup>
 
-          <!-- 高一 -->
-          <tr class="h-33">
-            <td class="vertical-text label-bg">高一年级</td>
-            <td class="cell-content">
-              <div class="term-header">第一学期品德测评成绩</div>
-              <div class="term-row">
-                品德总评等第：<span class="handwriting"></span>
-              </div>
-              <div class="term-label">评语：</div>
-              <div class="comment-text handwriting">
-                {{ comments.g1.t1 }}
-              </div>
-              <div class="sign-box">
-                班主任（签名）<span class="handwriting"></span>
-                <span class="date"
-                  >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span
-                >
-              </div>
-            </td>
-            <td class="cell-content">
-              <div class="term-header">第二学期品德测评成绩</div>
-              <div class="term-row">品德总评等第：</div>
-              <div class="term-label">评语：</div>
-              <div class="comment-text handwriting">
-                {{ comments.g1.t2 }}
-              </div>
-              <div class="sign-box">
-                班主任（签名）
-                <span class="date"
-                  >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span
-                >
-              </div>
-            </td>
-          </tr>
+          <tbody>
+            <!-- 高一 -->
+            <tr class="h-33">
+              <td class="vertical-text label-bg">高一年级</td>
+              <td class="cell-content">
+                <div class="term-header">第一学期品德测评成绩</div>
+                <div class="term-row">
+                  品德总评等第：
+                  <span>
+                    {{ character_comments[0]?.term_1_level || "" }}
+                  </span>
+                </div>
+                <div class="term-label">评语：</div>
+                <div class="comment-text">
+                  {{ character_comments[0]?.term_1_comment }}
+                </div>
+                <div class="sign-box">
+                  班主任（签名）
+                  <span class="date"
+                    >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span
+                  >
+                </div>
+              </td>
+              <td class="cell-content">
+                <div class="term-header">第二学期品德测评成绩</div>
+                <div class="term-row">
+                  品德总评等第：
+                  <span>
+                    {{ character_comments[0]?.term_2_level }}
+                  </span>
+                </div>
+                <div class="term-label">评语：</div>
+                <div class="comment-text">
+                  {{ character_comments[0]?.term_2_comment }}
+                </div>
+                <div class="sign-box">
+                  班主任（签名）
+                  <span class="date"
+                    >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span
+                  >
+                </div>
+              </td>
+            </tr>
 
-          <!-- 高二 -->
-          <tr class="h-33">
-            <td class="vertical-text label-bg">高二年级</td>
-            <td class="cell-content">
-              <div class="term-header">第一学期品德测评成绩</div>
-              <div class="term-row">品德总评等第：</div>
-              <div class="term-label">评语：</div>
-              <div class="sign-box">
-                班主任（签名）
-                <span class="date"
-                  >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span
-                >
-              </div>
-            </td>
-            <td class="cell-content">
-              <div class="term-header">第二学期品德测评成绩</div>
-              <div class="term-row">品德总评等第：</div>
-              <div class="term-label">评语：</div>
-              <div class="sign-box">
-                班主任（签名）
-                <span class="date"
-                  >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span
-                >
-              </div>
-            </td>
-          </tr>
+            <!-- 高二 -->
+            <tr class="h-33">
+              <td class="vertical-text label-bg">高二年级</td>
+              <td class="cell-content">
+                <div class="term-header">第一学期品德测评成绩</div>
+                <div class="term-row">
+                  品德总评等第：
+                  <span>
+                    {{ character_comments[1]?.term_1_level }}
+                  </span>
+                </div>
+                <div class="term-label">评语：</div>
+                <div class="comment-text">
+                  {{ character_comments[1]?.term_1_comment }}
+                </div>
+                <div class="sign-box">
+                  班主任（签名）
+                  <span class="date"
+                    >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span
+                  >
+                </div>
+              </td>
+              <td class="cell-content">
+                <div class="term-header">第二学期品德测评成绩</div>
+                <div class="term-row">
+                  品德总评等第：
+                  <span>
+                    {{ character_comments[1]?.term_2_level }}
+                  </span>
+                </div>
+                <div class="term-label">评语：</div>
+                <div class="comment-text">
+                  {{ character_comments[1]?.term_2_comment }}
+                </div>
+                <div class="sign-box">
+                  班主任（签名）
+                  <span class="date"
+                    >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span
+                  >
+                </div>
+              </td>
+            </tr>
 
-          <!-- 高三 -->
-          <tr class="h-33">
-            <td class="vertical-text label-bg">高三年级</td>
-            <td class="cell-content">
-              <div class="term-header">第一学期品德测评成绩</div>
-              <div class="term-row">品德总评等第：</div>
-              <div class="term-label">评语：</div>
-              <div class="sign-box">
-                班主任（签名）
-                <span class="date">年 月 日</span>
-              </div>
-            </td>
-            <td class="cell-content">
-              <div class="term-header">第二学期品德测评成绩</div>
-              <div class="term-row">品德总评等第：</div>
-              <div class="term-label">评语：</div>
-              <div class="sign-box">
-                班主任（签名）
-                <span class="date">年 月 日</span>
-              </div>
-            </td>
-          </tr>
+            <!-- 高三 -->
+            <tr class="h-33">
+              <td class="vertical-text label-bg">高三年级</td>
+              <td class="cell-content">
+                <div class="term-header">第一学期品德测评成绩</div>
+                <div class="term-row">
+                  品德总评等第：
+                  <span>
+                    {{ character_comments[2]?.term_1_level }}
+                  </span>
+                </div>
+                <div class="term-label">评语：</div>
+                <div class="comment-text">
+                  {{ character_comments[2]?.term_1_comment }}
+                </div>
+                <div class="sign-box">
+                  班主任（签名）
+                  <span class="date"
+                    >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span
+                  >
+                </div>
+              </td>
+              <td class="cell-content">
+                <div class="term-header">第二学期品德测评成绩</div>
+                <div class="term-row">
+                  品德总评等第：
+                  <span>
+                    {{ character_comments[2]?.term_2_level }}
+                  </span>
+                </div>
+                <div class="term-label">评语：</div>
+                <div class="comment-text">
+                  {{ character_comments[2]?.term_2_comment }}
+                </div>
+                <div class="sign-box">
+                  班主任（签名）
+                  <span class="date"
+                    >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</span
+                  >
+                </div>
+              </td>
+            </tr>
+          </tbody>
         </table>
 
         <div class="remarks-box">
@@ -473,6 +467,7 @@
 
 <script setup>
 import { ref, onMounted, defineProps, watch, defineExpose } from "vue";
+import { adminAPI } from "@/api/admin";
 
 // --- 组件Props ---
 const props = defineProps({
@@ -482,130 +477,49 @@ const props = defineProps({
   },
 });
 
-const fetchData = (id) => {
-  console.log("Fetching status card data for studentId:", id);
-  // 在这里，你可以根据id从API获取学生数据并更新下面的ref
-  // 例如:
-  // const studentData = await studentAPI.getStudentDetails(id);
-  // info.value = studentData.info;
-  // family.value = studentData.family;
-  // ...等等
+const fillData = (data) => {
+  info.value.name = data.student_name;
+  info.value.gender = data.gender;
+  info.value.school = data.school_name;
+  info.value.idCard = data.id_number;
+  info.value.shanghaiCode = data.student_status_number;
+  subjects.value = data.subject_grades;
+  character_comments.value = data.character_comments;
+};
+
+const fetchData = async (id) => {
+  if (!id) return;
+  try {
+    const res = await adminAPI.getStudentStatusCard(id);
+    fillData(res.data);
+  } catch (error) {
+    console.error("Failed to fetch status card:", error);
+  }
 };
 
 // --- 数据定义 ---
 const info = ref({
-  gradYear: "2025",
-  district: "虹口区",
-  school: "上海市北虹高级中学",
-  name: "李尚颐",
-  gender: "男性",
-  nation: "汉族",
-  nativePlace: "浙江省",
-  idCard: "310109200706152017",
-  birthday: "2007-06-15",
-  nationalCode: "G310109200706152017",
-  shanghaiCode: "3101093003320220155",
-  middleSchool: "上海民办沪东外国语学校",
-  health: "良好",
-  hukouAddress: "四平路780弄4号2404室",
-  hukouStreet: "嘉兴路街道",
-  currentAddress: "四平路780弄4号2404室",
-  currentStreet: "街道居委",
-  entryDate: "2022.9",
-  dropoutInfo: "2023.12.25 退学",
-  dropoutDest: "出国",
-  photo: "https://via.placeholder.com/100x130?text=Photo", // 替换为真实图片URL
+  district: "",
+  school: "",
+  name: "",
+  gender: "",
+  nation: "",
+  nativePlace: "",
+  idCard: "",
+  birthday: "",
+  nationalCode: "",
+  shanghaiCode: "",
+  middleSchool: "",
+  health: "",
+  hukouAddress: "",
+  hukouStreet: "",
+  currentAddress: "",
+  currentStreet: "",
+  photo: "",
 });
 
-const family = ref([
-  { relation: "父亲", name: "李增阳", face: "", job: "", phone: "18917576009" },
-  { relation: "母亲", name: "吴颖洁", face: "", job: "", phone: "13611652548" },
-]);
-
-const subjects = [
-  "思想政治",
-  "语文",
-  "数学",
-  "外语",
-  "物理",
-  "化学",
-  "生命科学",
-  "历史",
-  "地理",
-  "艺术",
-  "体育与健身",
-  "劳动技术",
-  "信息科技",
-];
-
-// 成绩数据结构：[高一上, 高一下, 高一总评, 高二上...]
-// 为了演示方便，这里用简单对象，实际开发建议用更严谨的结构
-const scoresRaw = {
-  g1: {
-    t1: {
-      思想政治: 74,
-      语文: 63,
-      数学: 76,
-      外语: 86,
-      物理: 84,
-      化学: 81,
-      历史: 78,
-      体育与健身: 85,
-      信息科技: 74,
-    },
-    t2: {
-      思想政治: 70,
-      语文: 73,
-      数学: 80,
-      外语: 81,
-      物理: 83,
-      化学: 80,
-      历史: 58,
-      艺术: 68,
-      体育与健身: 90,
-      信息科技: 53,
-    },
-    total: {
-      思想政治: 71,
-      语文: 70,
-      数学: 79,
-      外语: 83,
-      物理: 84,
-      化学: 81,
-      历史: 60,
-      体育与健身: 88,
-      信息科技: 61,
-    },
-  },
-  g2: {
-    t1: {
-      思想政治: 61,
-      语文: 64,
-      数学: 70,
-      外语: 84,
-      物理: 17,
-      生命科学: 74,
-      历史: 71,
-      地理: 69,
-      艺术: 90,
-    },
-  },
-};
-
-const grades = ref([
-  { name: "高一年级", data: scoresRaw.g1 },
-  { name: "高二年级", data: scoresRaw.g2 },
-  { name: "高三年级", data: {} },
-]);
-
-const getScore = (gradeIdx, termIdx, subject) => {
-  const gradeKey = ["g1", "g2", "g3"][gradeIdx];
-  const termKey = ["t1", "t2", "total"][termIdx];
-  if (scoresRaw[gradeKey] && scoresRaw[gradeKey][termKey]) {
-    return scoresRaw[gradeKey][termKey][subject] || "";
-  }
-  return "";
-};
+const subjects = ref([]);
+const character_comments = ref([]);
 
 const comments = ref({
   g1: {

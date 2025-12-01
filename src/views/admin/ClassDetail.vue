@@ -82,10 +82,17 @@
             />
             <el-table-column prop="user_name" label="姓名" width="150" />
             <el-table-column prop="gender" label="性别" />
-            <el-table-column label="操作" width="150" align="center">
+            <el-table-column label="操作" width="200" align="center">
               <template #default="{ row }">
                 <el-button type="primary" link @click="handleViewProof(row)">
                   成绩证明
+                </el-button>
+                <el-button
+                  type="success"
+                  link
+                  @click="handleViewStatusCard(row)"
+                >
+                  学籍卡
                 </el-button>
               </template>
             </el-table-column>
@@ -106,6 +113,29 @@
         <ReportProof v-if="proofDialogVisible" :student-id="currentStudentId" />
       </div>
     </el-dialog>
+
+    <el-dialog
+      v-model="statusCardDialogVisible"
+      title="学籍卡预览"
+      width="1000px"
+      top="5vh"
+      destroy-on-close
+      append-to-body
+    >
+      <div class="dialog-center">
+        <StatusCard
+          v-if="statusCardDialogVisible"
+          ref="statusCardRef"
+          :student-id="currentStudentId"
+        />
+      </div>
+      <template #footer>
+        <el-button @click="statusCardDialogVisible = false">关闭</el-button>
+        <el-button type="primary" @click="handlePrintStatusCard">
+          打印
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -116,6 +146,7 @@ import { adminAPI } from "@/api/admin";
 import { ElMessage } from "element-plus";
 import { ArrowLeft } from "@element-plus/icons-vue";
 import ReportProof from "@/views/common/ReportProof.vue";
+import StatusCard from "@/views/common/StatusCard.vue";
 
 const route = useRoute();
 const loading = ref(false);
@@ -124,7 +155,9 @@ const classInfo = ref({
 });
 
 const proofDialogVisible = ref(false);
+const statusCardDialogVisible = ref(false);
 const currentStudentId = ref(null);
+const statusCardRef = ref(null);
 
 const fetchClassDetail = async () => {
   const id = route.params.id;
@@ -147,6 +180,17 @@ const fetchClassDetail = async () => {
 const handleViewProof = (row) => {
   currentStudentId.value = row.user_id;
   proofDialogVisible.value = true;
+};
+
+const handleViewStatusCard = (row) => {
+  currentStudentId.value = row.user_id;
+  statusCardDialogVisible.value = true;
+};
+
+const handlePrintStatusCard = () => {
+  if (statusCardRef.value) {
+    statusCardRef.value.printPage();
+  }
 };
 
 onMounted(() => {

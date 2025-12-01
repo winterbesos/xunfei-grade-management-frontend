@@ -47,6 +47,10 @@
             <el-icon><User /></el-icon>
             <template #title>学生管理</template>
           </el-menu-item>
+          <el-menu-item index="/teacher/character-comments">
+            <el-icon><Edit /></el-icon>
+            <template #title>品格评语</template>
+          </el-menu-item>
           <el-menu-item index="/teacher/awards">
             <el-icon><Trophy /></el-icon>
             <template #title>获奖审核</template>
@@ -191,6 +195,7 @@ const pageTitle = computed(() => {
     TeacherClassStudents: "学生列表",
     TeacherReportProof: "成绩证明单",
     TeacherStatusCard: "学籍卡",
+    TeacherCharacterCommentsList: "品格评语",
     TeacherCharacterComments: "品格评语",
     TeacherAwardReview: "获奖审核",
     StudentGrades: "我的成绩",

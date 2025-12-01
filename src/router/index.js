@@ -121,6 +121,18 @@ const routes = [
         meta: { requiresAuth: true, roles: ["teacher"] },
       },
       {
+        path: "/teacher/character-comments",
+        name: "TeacherCharacterCommentsList",
+        component: () => import("@/views/teacher/CharacterCommentsSemesterList.vue"),
+        meta: { requiresAuth: true, roles: ["teacher"] },
+      },
+      {
+        path: "/teacher/character-comments/:semesterId/classes",
+        name: "TeacherCharacterCommentsClassList",
+        component: () => import("@/views/teacher/CharacterCommentsClassList.vue"),
+        meta: { requiresAuth: true, roles: ["teacher"] },
+      },
+      {
         path: "/teacher/classes/:semesterId/:classId/character-comments",
         name: "TeacherCharacterComments",
         component: () => import("@/views/teacher/CharacterComments.vue"),
