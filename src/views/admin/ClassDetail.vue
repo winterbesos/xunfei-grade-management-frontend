@@ -82,7 +82,7 @@
             />
             <el-table-column prop="user_name" label="姓名" width="150" />
             <el-table-column prop="gender" label="性别" />
-            <el-table-column label="操作" width="200" align="center">
+            <el-table-column label="操作" width="280" align="center">
               <template #default="{ row }">
                 <el-button type="primary" link @click="handleViewProof(row)">
                   成绩证明
@@ -93,6 +93,20 @@
                   @click="handleViewStatusCard(row)"
                 >
                   学籍卡
+                </el-button>
+                <el-button
+                  type="warning"
+                  link
+                  @click="handleViewGradeTrend(row)"
+                >
+                  成绩趋势
+                </el-button>
+                <el-button
+                  type="danger"
+                  link
+                  @click="handleViewYearReport(row)"
+                >
+                  年度账单
                 </el-button>
               </template>
             </el-table-column>
@@ -149,6 +163,7 @@ import ReportProof from "@/views/common/ReportProof.vue";
 import StatusCard from "@/views/common/StatusCard.vue";
 
 const route = useRoute();
+const router = useRouter();
 const loading = ref(false);
 const classInfo = ref({
   students: [],
@@ -185,6 +200,22 @@ const handleViewProof = (row) => {
 const handleViewStatusCard = (row) => {
   currentStudentId.value = row.user_id;
   statusCardDialogVisible.value = true;
+};
+
+const handleViewGradeTrend = (row) => {
+  router.push({
+    name: "AdminStudentGradeTrend",
+    params: { studentId: row.user_id },
+    query: { studentId: row.user_id },
+  });
+};
+
+const handleViewYearReport = (row) => {
+  const routeData = router.resolve({
+    name: "YearReport",
+    params: { studentId: row.user_id },
+  });
+  window.open(routeData.href, "_blank");
 };
 
 const handlePrintStatusCard = () => {

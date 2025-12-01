@@ -56,6 +56,12 @@ const routes = [
         component: () => import("@/views/admin/SubjectManagement.vue"),
         meta: { requiresAuth: true, roles: ["admin"] },
       },
+      {
+        path: "/admin/student/:studentId/grade-trend",
+        name: "AdminStudentGradeTrend",
+        component: () => import("@/views/common/GradeTrend.vue"),
+        meta: { requiresAuth: true, roles: ["admin"] },
+      },
 
       // 教师路由
       {
@@ -144,12 +150,24 @@ const routes = [
         component: () => import("@/views/teacher/AwardReview.vue"),
         meta: { requiresAuth: true, roles: ["teacher"] },
       },
+      {
+        path: "/teacher/student/:studentId/grade-trend",
+        name: "TeacherStudentGradeTrend",
+        component: () => import("@/views/common/GradeTrend.vue"),
+        meta: { requiresAuth: true, roles: ["teacher"] },
+      },
 
       // 学生路由
       {
         path: "/student/grades",
         name: "StudentGrades",
         component: () => import("@/views/student/GradeView.vue"),
+        meta: { requiresAuth: true, roles: ["student"] },
+      },
+      {
+        path: "/student/grade-trend",
+        name: "StudentGradeTrend",
+        component: () => import("@/views/common/GradeTrend.vue"),
         meta: { requiresAuth: true, roles: ["student"] },
       },
       {
@@ -215,6 +233,12 @@ const routes = [
     name: "OAuthCallback",
     component: () => import("@/views/OAuthCallback.vue"),
     meta: { requiresAuth: false },
+  },
+  {
+    path: "/year-report/:studentId",
+    name: "YearReport",
+    component: () => import("@/views/common/YearReport.vue"),
+    meta: { requiresAuth: true },
   },
   {
     path: "/:pathMatch(.*)*",

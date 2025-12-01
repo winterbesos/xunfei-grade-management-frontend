@@ -126,4 +126,26 @@ export const studentAPI = {
       method: "get",
     });
   },
+
+  // 获取成绩趋势
+  getGradeTrend(studentId) {
+    if (false) {
+      return mockAPI.getGradeTrend(studentId);
+    }
+    return request({
+      url: `/api/admin/students/${studentId}/grades`,
+      method: "get",
+    });
+  },
+
+  getYearReport(studentId, academicYearId) {
+    return request({
+      url: `/api/student/year-reports`,
+      method: "get",
+      params: {
+        student_id: studentId,
+        academic_year_id: academicYearId,
+      },
+    });
+  },
 };
