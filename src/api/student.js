@@ -129,9 +129,6 @@ export const studentAPI = {
 
   // 获取成绩趋势
   getGradeTrend(studentId) {
-    if (false) {
-      return mockAPI.getGradeTrend(studentId);
-    }
     return request({
       url: `/api/admin/students/${studentId}/grades`,
       method: "get",
