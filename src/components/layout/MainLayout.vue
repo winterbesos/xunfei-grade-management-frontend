@@ -207,6 +207,7 @@ const pageTitle = computed(() => {
     maintenanceLogs: "系统日志",
     maintenanceBackup: "数据备份",
     maintenanceSchools: "学校管理",
+    maintenanceSchoolTeachers: "学校教师",
     maintenanceStudents: "学生管理",
     maintenanceSemesters: "学期管理",
   };

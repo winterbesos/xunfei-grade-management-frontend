@@ -57,4 +57,40 @@ export const maintenanceAPI = {
       data: school,
     });
   },
+
+  // 获取学校下的班级列表
+  async getSchoolClasses(schoolId, params = {}) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/classes`,
+      method: "get",
+      params,
+    });
+  },
+
+  // 获取学校下的教师列表
+  async getSchoolTeachers(schoolId, params = {}) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/teachers`,
+      method: "get",
+      params,
+    });
+  },
+
+  // 获取教师列表
+  async getTeachers(params = {}) {
+    return request({
+      url: "/api/maintenance/teachers",
+      method: "get",
+      params,
+    });
+  },
+
+  // 生成班级测试数据
+  async generateClassGradeData(classId, semesterId) {
+    return request({
+      url: `/api/test/generate-class-grades`,
+      method: "post",
+      data: { semester_id: semesterId, class_id: classId },
+    });
+  },
 };
