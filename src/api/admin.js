@@ -145,7 +145,7 @@ export const adminAPI = {
 
   getStudentStatusCard(studentId) {
     return request({
-      url: `/api/admin/students/${studentId}/status_card`,
+      url: `/api/teacher/students/${studentId}/status_card`,
       method: "get",
     });
   },

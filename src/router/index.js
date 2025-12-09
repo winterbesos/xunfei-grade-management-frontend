@@ -113,7 +113,7 @@ const routes = [
         meta: { requiresAuth: true, roles: ["teacher"] },
       },
       {
-        path: "/teacher/grade-management/report/:semesterId",
+        path: "/teacher/grade-management/report/:semesterId/:studentId",
         name: "TeacherGradeReport",
         component: () => import("@/views/common/Report.vue"),
         meta: { requiresAuth: true, roles: ["teacher"] },
@@ -153,13 +153,15 @@ const routes = [
       {
         path: "/teacher/character-comments",
         name: "TeacherCharacterCommentsList",
-        component: () => import("@/views/teacher/CharacterCommentsSemesterList.vue"),
+        component: () =>
+          import("@/views/teacher/CharacterCommentsSemesterList.vue"),
         meta: { requiresAuth: true, roles: ["teacher"] },
       },
       {
         path: "/teacher/character-comments/:semesterId/classes",
         name: "TeacherCharacterCommentsClassList",
-        component: () => import("@/views/teacher/CharacterCommentsClassList.vue"),
+        component: () =>
+          import("@/views/teacher/CharacterCommentsClassList.vue"),
         meta: { requiresAuth: true, roles: ["teacher"] },
       },
       {
@@ -201,7 +203,7 @@ const routes = [
         meta: { requiresAuth: true, roles: ["student"] },
       },
       {
-        path: "/student/semesters/:semesterId/report",
+        path: "/student/:studentId/semesters/:semesterId/report",
         name: "StudentSemesterReport",
         component: () => import("@/views/common/Report.vue"),
         meta: { requiresAuth: true, roles: ["student"] },

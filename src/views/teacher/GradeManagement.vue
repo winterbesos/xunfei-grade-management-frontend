@@ -219,7 +219,7 @@ const handleEnterGrades = (row) => {
 const handleViewReport = (row) => {
   router.push({
     name: "TeacherGradeReport",
-    params: { semesterId: row.semester_id },
+    params: { semesterId: row.semester_id, studentId: row.user_id },
     query: { semesterName: row.semester_name },
   });
 };

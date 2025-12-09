@@ -181,13 +181,12 @@ const abilities = ref({
 
 // 品德评语
 const moralComment = ref("");
+const semesterId = route.params.semesterId;
+const studentId = route.params.studentId;
 
 const loadReportData = async () => {
   teacherAPI
-    .getStudentSemesterReport(
-      "fbc284072a40da84013de8f267cbff8f878cf46b7c1d08b6a5f929926176d9966a829d13118c150b877d622da1965ea8f4eaa104ccb5b3a3",
-      "fbc284072a40da842499b27bd544445aa286500053bb38dcf1ef4577ba0a0093eae057116f0e65b5976bc9eaf39d4f21393405daf6ccf24d",
-    )
+    .getStudentSemesterReport(studentId, semesterId)
     .then((response) => {
       if (response.status !== 200) {
         ElMessage.error("加载学生列表失败");

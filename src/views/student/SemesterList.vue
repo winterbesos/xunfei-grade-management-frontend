@@ -70,7 +70,7 @@ const handleViewReport = (row) => {
   // Reusing existing Report.vue logic.
   router.push({
     name: "StudentSemesterReport",
-    params: { semesterId: row.semester_id },
+    params: { semesterId: row.semester_id, studentId: row.user_id },
     query: { semesterName: row.semester_name },
   });
 };
