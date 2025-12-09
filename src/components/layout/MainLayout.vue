@@ -27,6 +27,10 @@
             <el-icon><Reading /></el-icon>
             <template #title>科目管理</template>
           </el-menu-item>
+          <el-menu-item index="/admin/elective-subjects">
+            <el-icon><Reading /></el-icon>
+            <template #title>选修课管理</template>
+          </el-menu-item>
           <el-menu-item index="/admin/activities">
             <el-icon><Trophy /></el-icon>
             <template #title>活动管理</template>
@@ -187,6 +191,7 @@ const pageTitle = computed(() => {
     AdminSemesters: "学期管理",
     AdminClasses: "班级管理",
     AdminActivities: "活动管理",
+    AdminElectiveSubjects: "选修课管理",
     TeacherGradeManagement: "成绩管理",
     TeacherGradeSemesters: "可打分学期",
     TeacherGradeClasses: "班级列表",

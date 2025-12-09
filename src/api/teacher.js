@@ -178,4 +178,13 @@ export const teacherAPI = {
       data,
     });
   },
+
+  // 计算学期总评
+  computeFinalScore(data) {
+    return request({
+      url: "/api/teacher/compute-comp-score-events",
+      method: "post",
+      data,
+    });
+  },
 };

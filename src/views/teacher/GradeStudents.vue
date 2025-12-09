@@ -178,8 +178,8 @@
         </el-table-column>
         <el-table-column label="等级" width="80" align="center">
           <template #default="{ row }">
-            <el-tag :type="getGradeTagType(row.score)">
-              {{ getGradeLevel(row.score) }}
+            <el-tag :type="getGradeTagType(row)">
+              {{ getGradeLevel(row) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -463,7 +463,14 @@ const handleViewProof = () => {
 };
 
 // 获取成绩标签类型
-const getGradeTagType = (score) => {
+const getGradeTagType = (row) => {
+  if (row.level) {
+    const level = row.level;
+    if (["A", "B", "优秀", "良好"].includes(level)) return "success";
+    if (["C", "D", "中等", "及格"].includes(level)) return "warning";
+    return "danger";
+  }
+  const score = row.score;
   if (score === null || score === undefined) return "info";
   if (score >= 80) return "success"; // A & B
   if (score >= 60) return "warning"; // C & D
@@ -471,7 +478,9 @@ const getGradeTagType = (score) => {
 };
 
 // 获取成绩等级
-const getGradeLevel = (score) => {
+const getGradeLevel = (row) => {
+  if (row.level) return row.level;
+  const score = row.score;
   if (score === null || score === undefined) return "未录入";
   if (score >= 90) return "A";
   if (score >= 80) return "B";
@@ -512,12 +521,42 @@ const loadStudents = async () => {
 };
 
 // 成绩变化处理
-const handleScoreChange = (row) => {
+const handleScoreChange = async (row) => {
   if (row.usual_score !== null) {
     row.modified = true;
-    row.score = Math.round(
-      row.usual_score * 0.3 + row.midterm_score * 0.3 + row.final_score * 0.4,
-    );
+
+    // 构造请求数据
+    const payload = {
+      items: [
+        {
+          identifier: String(row.user_id),
+          usual_score: String(row.usual_score),
+          midterm_score: row.midterm_score ? String(row.midterm_score) : "0",
+          final_score: row.final_score ? String(row.final_score) : "0",
+        },
+      ],
+    };
+
+    try {
+      const res = await teacherAPI.computeFinalScore(payload);
+      if (
+        res.status === 200 &&
+        res.data &&
+        res.data.items &&
+        res.data.items.length > 0
+      ) {
+        const result = res.data.items[0];
+        // 更新总评和等级
+        // 注意：后端返回的 comp_score 可能是字符串，为了统计方便，尝试转为数字
+        row.score = parseFloat(result.comp_score);
+        row.level = result.comp_level;
+      } else {
+        ElMessage.error("计算总评失败");
+      }
+    } catch (error) {
+      console.error("Failed to compute score:", error);
+      ElMessage.error("计算总评失败");
+    }
   }
 };
 

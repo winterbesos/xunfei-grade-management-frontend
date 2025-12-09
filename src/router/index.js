@@ -57,6 +57,12 @@ const routes = [
         meta: { requiresAuth: true, roles: ["admin"] },
       },
       {
+        path: "/admin/elective-subjects",
+        name: "AdminElectiveSubjects",
+        component: () => import("@/views/admin/ElectiveSubjectManagement.vue"),
+        meta: { requiresAuth: true, roles: ["admin"] },
+      },
+      {
         path: "/admin/student/:studentId/grade-trend",
         name: "AdminStudentGradeTrend",
         component: () => import("@/views/common/GradeTrend.vue"),

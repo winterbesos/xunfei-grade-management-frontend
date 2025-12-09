@@ -157,4 +157,40 @@ export const adminAPI = {
       responseType: "blob",
     });
   },
+
+  // 获取教师列表
+  getTeachers(params) {
+    return request({
+      url: "/api/admin/teachers",
+      method: "get",
+      params,
+    });
+  },
+
+  // 获取选修课列表
+  getElectiveSubjects(params) {
+    return request({
+      url: "/api/admin/elective-subjects",
+      method: "get",
+      params,
+    });
+  },
+
+  // 创建选修课
+  createElectiveSubject(data) {
+    return request({
+      url: "/api/admin/elective-subjects",
+      method: "post",
+      data,
+    });
+  },
+
+  // 更新选修课
+  updateElectiveSubject(id, data) {
+    return request({
+      url: `/api/admin/elective-subjects/${id}`,
+      method: "put",
+      data,
+    });
+  },
 };
