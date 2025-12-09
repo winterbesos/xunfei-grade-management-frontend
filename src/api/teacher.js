@@ -187,4 +187,48 @@ export const teacherAPI = {
       data,
     });
   },
+
+  // 获取教师的选修科目列表
+  getElectiveSubjects(params) {
+    return request({
+      url: "/api/teacher/elective-subjects",
+      method: "get",
+      params,
+    });
+  },
+
+  // 获取选修课学生列表
+  getElectiveSubjectStudents(electiveSubjectId, semesterId) {
+    return request({
+      url: `/api/teacher/elective-subjects/${electiveSubjectId}/semesters/${semesterId}/students`,
+      method: "get",
+    });
+  },
+
+  // 添加选修课学生
+  addElectiveSubjectStudent(electiveSubjectId, semesterId, data) {
+    return request({
+      url: `/api/teacher/elective-subjects/${electiveSubjectId}/semesters/${semesterId}/students`,
+      method: "post",
+      data,
+    });
+  },
+
+  // 更新选修课学生
+  updateElectiveSubjectStudent(electiveSubjectId, semesterId, studentId, data) {
+    return request({
+      url: `/api/teacher/elective-subjects/${electiveSubjectId}/semesters/${semesterId}/students/${studentId}`,
+      method: "put",
+      data,
+    });
+  },
+
+  // 搜索学生
+  searchStudents(params) {
+    return request({
+      url: "/api/teacher/students",
+      method: "get",
+      params,
+    });
+  },
 };

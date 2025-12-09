@@ -59,6 +59,10 @@
             <el-icon><Trophy /></el-icon>
             <template #title>获奖审核</template>
           </el-menu-item>
+          <el-menu-item index="/teacher/elective-subjects">
+            <el-icon><Reading /></el-icon>
+            <template #title>我的选修科目</template>
+          </el-menu-item>
         </template>
 
         <!-- 学生菜单 -->
@@ -203,6 +207,7 @@ const pageTitle = computed(() => {
     TeacherCharacterCommentsList: "品格评语",
     TeacherCharacterComments: "品格评语",
     TeacherAwardReview: "获奖审核",
+    TeacherElectiveSubjects: "我的选修科目",
     StudentGrades: "我的成绩",
     StudentSemesters: "学期列表",
     StudentSemesterReport: "成绩单",

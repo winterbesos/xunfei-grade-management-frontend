@@ -71,6 +71,24 @@ const routes = [
 
       // 教师路由
       {
+        path: "/teacher/elective-subjects",
+        name: "TeacherElectiveSubjects", // Keeps the main entry point name
+        component: () => import("@/views/teacher/ElectiveSemesters.vue"),
+        meta: { requiresAuth: true, roles: ["teacher"] },
+      },
+      {
+        path: "/teacher/elective-subjects/:semesterId/subjects",
+        name: "TeacherElectiveSubjectList",
+        component: () => import("@/views/teacher/ElectiveSubjectList.vue"),
+        meta: { requiresAuth: true, roles: ["teacher"] },
+      },
+      {
+        path: "/teacher/elective-subjects/:semesterId/subjects/:electiveSubjectId/students",
+        name: "TeacherElectiveSubjectStudents",
+        component: () => import("@/views/teacher/ElectiveSubjectStudents.vue"),
+        meta: { requiresAuth: true, roles: ["teacher"] },
+      },
+      {
         path: "/teacher/grade-management",
         name: "TeacherGradeManagement",
         component: () => import("@/views/teacher/GradeManagement.vue"),
