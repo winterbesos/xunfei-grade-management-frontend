@@ -117,7 +117,7 @@
       >
         <el-table-column type="selection" width="55" />
         <el-table-column type="index" label="序号" width="60" />
-        <el-table-column prop="user_name" label="姓名" />
+        <el-table-column prop="user_name" label="姓名" width="80" />
         <el-table-column
           prop="midterm_score"
           label="期中成绩"
@@ -130,7 +130,7 @@
           width="80"
           align="center"
         />
-        <el-table-column label="平时成绩" width="110">
+        <el-table-column label="平时成绩" width="120">
           <template #default="{ row }">
             <div class="grade-input-group">
               <el-input-number
@@ -503,14 +503,7 @@ const loadStudents = async () => {
         ...student,
         credits_hours: student.credits_hours || 0,
         modified: false,
-        score:
-          student.usual_score !== null
-            ? Math.round(
-                student.usual_score * 0.3 +
-                  student.midterm_score * 0.3 +
-                  student.final_score * 0.4,
-              )
-            : null,
+        score: student.score,
       }));
     }
   } catch (error) {
