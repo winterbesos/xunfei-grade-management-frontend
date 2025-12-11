@@ -67,6 +67,26 @@ export const maintenanceAPI = {
     });
   },
 
+  // 获取学校下的学生列表
+  async getSchoolStudents(schoolId, params = {}) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/students`,
+      method: "get",
+      params,
+    });
+  },
+
+  // 绑定学生短ID
+  async bindStudentShortId(schoolId, studentId, shortId) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/students/${studentId}/short-id`,
+      method: "post",
+      data: { short_id: shortId },
+    });
+  },
+
+  // 获取学校下的教师列表
+
   // 获取学校下的教师列表
   async getSchoolTeachers(schoolId, params = {}) {
     return request({

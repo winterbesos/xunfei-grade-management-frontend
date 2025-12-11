@@ -66,10 +66,18 @@
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" label="创建时间" width="180" />
-        <el-table-column label="操作" width="280" fixed="right">
+        <el-table-column label="操作" width="320" fixed="right">
           <template #default="{ row }">
             <el-button size="small" type="primary" @click="viewClasses(row)">
               班级
+            </el-button>
+            <el-button
+              size="small"
+              type="primary"
+              plain
+              @click="viewStudents(row)"
+            >
+              学生
             </el-button>
             <el-button size="small" type="info" @click="viewTeachers(row)">
               教师
@@ -289,6 +297,13 @@ const resetSearch = () => {
 const viewClasses = (school) => {
   router.push({
     name: "maintenanceSchoolClasses",
+    params: { schoolId: school.schoolId },
+  });
+};
+
+const viewStudents = (school) => {
+  router.push({
+    name: "maintenanceSchoolStudents",
     params: { schoolId: school.schoolId },
   });
 };
