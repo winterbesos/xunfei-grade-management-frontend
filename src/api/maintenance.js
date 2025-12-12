@@ -76,6 +76,23 @@ export const maintenanceAPI = {
     });
   },
 
+  // 获取学校下的学期列表
+  async getSchoolSemesters(schoolId) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/semesters`,
+      method: "get",
+    });
+  },
+
+  // 同步学期考试成绩
+  async syncSemesterExamGrades(schoolId, semesterId, examId, examType) {
+    return request({
+      url: `/api/schools/${schoolId}/semesters/${semesterId}/sync-exam-grades`,
+      method: "post",
+      data: { exam_id: examId, type: examType },
+    });
+  },
+
   // 绑定学生短ID
   async bindStudentShortId(schoolId, studentId, shortId) {
     return request({
@@ -84,8 +101,6 @@ export const maintenanceAPI = {
       data: { short_id: shortId },
     });
   },
-
-  // 获取学校下的教师列表
 
   // 获取学校下的教师列表
   async getSchoolTeachers(schoolId, params = {}) {
