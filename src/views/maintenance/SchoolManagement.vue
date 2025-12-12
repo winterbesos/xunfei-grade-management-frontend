@@ -79,6 +79,14 @@
             >
               学生
             </el-button>
+            <el-button
+              size="small"
+              type="primary"
+              plain
+              @click="viewSubjects(row)"
+            >
+              学科
+            </el-button>
             <el-button size="small" type="info" @click="viewTeachers(row)">
               教师
             </el-button>
@@ -307,6 +315,13 @@ const viewClasses = (school) => {
 const viewStudents = (school) => {
   router.push({
     name: "maintenanceSchoolStudents",
+    params: { schoolId: school.schoolId },
+  });
+};
+
+const viewSubjects = (school) => {
+  router.push({
+    name: "maintenanceSchoolSubjects",
     params: { schoolId: school.schoolId },
   });
 };

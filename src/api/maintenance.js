@@ -128,4 +128,30 @@ export const maintenanceAPI = {
       data: { semester_id: semesterId, class_id: classId },
     });
   },
+
+  // 获取学校下的学科列表
+  async getSchoolSubjects(schoolId) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/subjects`,
+      method: "get",
+    });
+  },
+
+  // 创建子学科 (Matching the provided backend route)
+  async createSchoolSubject(schoolId, subjectData) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/students`,
+      method: "post",
+      data: subjectData,
+    });
+  },
+
+  // 更新子学科 (Matching the provided backend route)
+  async updateSchoolSubject(schoolId, subjectCode, subjectData) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/students/${subjectCode}`,
+      method: "put",
+      data: subjectData,
+    });
+  },
 };

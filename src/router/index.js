@@ -265,6 +265,12 @@ const routes = [
         meta: { requiresAuth: true, roles: ["maintenance"] },
       },
       {
+        path: "/maintenance/schools/:schoolId/subjects",
+        name: "maintenanceSchoolSubjects",
+        component: () => import("@/views/maintenance/SubjectManagement.vue"),
+        meta: { requiresAuth: true, roles: ["maintenance"] },
+      },
+      {
         path: "/maintenance/students",
         name: "maintenanceStudents",
         component: () => import("@/views/maintenance/StudentManagement.vue"),
