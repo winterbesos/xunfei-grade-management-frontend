@@ -30,7 +30,7 @@
               link
               @click="handleViewStudents(row)"
             >
-              查看学生
+              进入录入
             </el-button>
           </template>
         </el-table-column>
@@ -75,13 +75,13 @@ const loadElectiveSubjects = async () => {
 
 const handleViewStudents = (row) => {
   router.push({
-    name: "TeacherElectiveSubjectStudents",
+    name: "TeacherElectiveGradeEntry",
     params: {
       semesterId: route.params.semesterId,
       electiveSubjectId: row.id, // Assuming row.id is the elective subject ID
     },
     query: {
-      subjectName: row.subject_name,
+      subjectName: row.name,
     },
   });
 };

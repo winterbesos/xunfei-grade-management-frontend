@@ -57,9 +57,9 @@ export const teacherAPI = {
     });
   },
 
-  getSemesterSubjects() {
+  getSemesterSubjects(semesterId) {
     return request({
-      url: "/api/teacher/semester-subjects",
+      url: `/api/teacher/semesters/${semesterId}/subjects`,
       method: "get",
     });
   },
@@ -197,27 +197,27 @@ export const teacherAPI = {
     });
   },
 
-  // 获取选修课学生列表
-  getElectiveSubjectStudents(electiveSubjectId, semesterId) {
+  // 获取选修课学生成绩列表
+  getElectiveSubjectGrades(electiveSubjectId, semesterId) {
     return request({
-      url: `/api/teacher/elective-subjects/${electiveSubjectId}/semesters/${semesterId}/students`,
+      url: `/api/teacher/elective-subjects/${electiveSubjectId}/semesters/${semesterId}/grades`,
       method: "get",
     });
   },
 
-  // 添加选修课学生
-  addElectiveSubjectStudent(electiveSubjectId, semesterId, data) {
+  // 添加选修课成绩
+  addElectiveSubjectGrade(electiveSubjectId, semesterId, data) {
     return request({
-      url: `/api/teacher/elective-subjects/${electiveSubjectId}/semesters/${semesterId}/students`,
+      url: `/api/teacher/elective-subjects/${electiveSubjectId}/semesters/${semesterId}/grades`,
       method: "post",
       data,
     });
   },
 
-  // 更新选修课学生
-  updateElectiveSubjectStudent(electiveSubjectId, semesterId, studentId, data) {
+  // 更新选修课成绩
+  updateElectiveSubjectGrade(electiveSubjectId, semesterId, studentId, data) {
     return request({
-      url: `/api/teacher/elective-subjects/${electiveSubjectId}/semesters/${semesterId}/students/${studentId}`,
+      url: `/api/teacher/elective-subjects/${electiveSubjectId}/semesters/${semesterId}/grades/${studentId}`,
       method: "put",
       data,
     });
