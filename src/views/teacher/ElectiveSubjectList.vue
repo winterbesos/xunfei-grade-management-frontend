@@ -82,6 +82,7 @@ const handleViewStudents = (row) => {
     },
     query: {
       subjectName: row.name,
+      semesterName: semesterName.value,
     },
   });
 };

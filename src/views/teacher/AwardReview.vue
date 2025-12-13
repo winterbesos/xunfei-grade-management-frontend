@@ -3,51 +3,117 @@
     <el-card>
       <template #header>
         <div class="card-header">
-          <span>获奖审核</span>
-          <el-radio-group v-model="filterStatus" @change="handleFilter">
-            <el-radio-button label="all">全部</el-radio-button>
-            <el-radio-button label="pending">待审核</el-radio-button>
-            <el-radio-button label="processed">已处理</el-radio-button>
-          </el-radio-group>
+          <div class="header-left">
+            <span>获奖审核</span>
+          </div>
+          <div class="header-right" v-if="activeTab === 'pending'">
+            <el-button
+              type="success"
+              :disabled="!hasSelectedPending"
+              @click="handleBatchReview('approved')"
+            >
+              批量通过
+            </el-button>
+            <el-button
+              type="danger"
+              :disabled="!hasSelectedPending"
+              @click="handleBatchReview('rejected')"
+            >
+              批量拒绝
+            </el-button>
+          </div>
+          <div v-else style="height: 32px"></div>
         </div>
       </template>
 
-      <el-table :data="filteredAwards" v-loading="loading" style="width: 100%">
-        <el-table-column prop="student_name" label="学生姓名" width="120" />
-        <el-table-column prop="activity_name" label="活动名称" width="150" />
-        <el-table-column
-          prop="name"
-          label="奖项"
-          min-width="200"
-          show-overflow-tooltip
-        />
-        <el-table-column label="状态" width="100">
-          <template #default="{ row }">
-            <el-tag :type="getStatusType(row.status)">{{
-              getStatusText(row.status)
-            }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
-          <template #default="{ row }">
-            <div v-if="row.status === 'pending'">
-              <el-button
-                type="success"
-                size="small"
-                @click="handleReview(row, 'approved')"
-                >通过</el-button
-              >
-              <el-button
-                type="danger"
-                size="small"
-                @click="handleReview(row, 'rejected')"
-                >拒绝</el-button
-              >
-            </div>
-            <span v-else class="processed-text">已处理</span>
-          </template>
-        </el-table-column>
-      </el-table>
+      <el-tabs v-model="activeTab" class="demo-tabs">
+        <el-tab-pane label="待审核" name="pending">
+          <el-table
+            :data="pendingAwards"
+            v-loading="loading"
+            style="width: 100%; margin-top: 20px"
+            @selection-change="handleSelectionChange"
+          >
+            <el-table-column type="selection" width="55" />
+            <el-table-column prop="student_name" label="学生姓名" width="120" />
+            <el-table-column
+              prop="activity_name"
+              label="活动名称"
+              width="150"
+            />
+            <el-table-column
+              prop="name"
+              label="奖项"
+              min-width="200"
+              show-overflow-tooltip
+            />
+            <el-table-column label="状态" width="100">
+              <template #default="{ row }">
+                <el-tag type="warning">待审核</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="200" fixed="right">
+              <template #default="{ row }">
+                <div>
+                  <el-button
+                    type="success"
+                    size="small"
+                    @click="handleReview(row, 'approved')"
+                    >通过</el-button
+                  >
+                  <el-button
+                    type="danger"
+                    size="small"
+                    @click="handleReview(row, 'rejected')"
+                    >拒绝</el-button
+                  >
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-empty
+            v-if="!loading && pendingAwards.length === 0"
+            description="暂无待审核记录"
+          />
+        </el-tab-pane>
+
+        <el-tab-pane label="已处理" name="processed">
+          <el-table
+            :data="processedAwards"
+            v-loading="loading"
+            style="width: 100%; margin-top: 20px"
+          >
+            <el-table-column prop="student_name" label="学生姓名" width="120" />
+            <el-table-column
+              prop="activity_name"
+              label="活动名称"
+              width="150"
+            />
+            <el-table-column
+              prop="name"
+              label="奖项"
+              min-width="200"
+              show-overflow-tooltip
+            />
+            <el-table-column label="状态" width="100">
+              <template #default="{ row }">
+                <el-tag :type="getStatusType(row.status)">{{
+                  getStatusText(row.status)
+                }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="200" fixed="right">
+              <template #default>
+                <span class="processed-text">已处理</span>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-empty
+            v-if="!loading && processedAwards.length === 0"
+            description="暂无已处理记录"
+          />
+        </el-tab-pane>
+      </el-tabs>
     </el-card>
 
     <!-- 审核对话框 -->
@@ -79,7 +145,8 @@ import { ElMessage } from "element-plus";
 const loading = ref(false);
 const submitting = ref(false);
 const awards = ref([]);
-const filterStatus = ref("all");
+const activeTab = ref("pending");
+const selectedAwards = ref([]);
 
 const dialogVisible = ref(false);
 const currentAward = ref(null);
@@ -100,13 +167,51 @@ const loadAwards = async () => {
   }
 };
 
-const filteredAwards = computed(() => {
-  if (filterStatus.value === "all") return awards.value;
-  if (filterStatus.value === "pending")
-    return awards.value.filter((a) => a.status === "pending");
-  if (filterStatus.value === "processed")
-    return awards.value.filter((a) => a.status !== "pending");
-  return awards.value;
+const hasSelectedPending = computed(() => {
+  return selectedAwards.value.some((award) => award.status === "pending");
+});
+
+const handleSelectionChange = (selection) => {
+  selectedAwards.value = selection;
+};
+
+const handleBatchReview = async (status) => {
+  const pendingAwardsList = selectedAwards.value.filter(
+    (a) => a.status === "pending",
+  );
+  if (pendingAwardsList.length === 0) {
+    ElMessage.warning("请选择待审核的记录");
+    return;
+  }
+
+  loading.value = true;
+  try {
+    const promises = pendingAwardsList.map((award) =>
+      teacherAPI.reviewAward(award.id, {
+        approve: status === "approved",
+      }),
+    );
+
+    await Promise.all(promises);
+
+    ElMessage.success(
+      `已批量${status === "approved" ? "通过" : "拒绝"} ${pendingAwardsList.length} 条申请`,
+    );
+    loadAwards();
+    selectedAwards.value = [];
+  } catch (error) {
+    ElMessage.error("批量处理失败");
+  } finally {
+    loading.value = false;
+  }
+};
+
+const pendingAwards = computed(() => {
+  return awards.value.filter((a) => a.status === "pending");
+});
+
+const processedAwards = computed(() => {
+  return awards.value.filter((a) => a.status !== "pending");
 });
 
 const getStatusType = (status) => {
@@ -117,10 +222,6 @@ const getStatusType = (status) => {
 const getStatusText = (status) => {
   const map = { pending: "待审核", approved: "已通过", rejected: "已拒绝" };
   return map[status] || status;
-};
-
-const handleFilter = () => {
-  // Client-side filtering logic is handled by computed property
 };
 
 const handleReview = (row, status) => {
@@ -164,6 +265,15 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 .processed-text {
   color: #909399;

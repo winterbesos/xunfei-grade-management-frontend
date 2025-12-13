@@ -61,21 +61,21 @@
       <!-- 快速操作 -->
       <el-row :gutter="10" style="margin-bottom: 20px">
         <el-col :span="16">
-          <div style="display: flex; align-items: center;">
+          <div style="display: flex; align-items: center">
             <el-select
               v-model="quickScore"
               placeholder="快速设置评价"
-              style="width: 180px; margin-right: 10px;"
+              style="width: 180px; margin-right: 10px"
             >
               <el-option label="合格" :value="1" />
               <el-option label="不合格" :value="2" />
             </el-select>
             <el-button @click="handleQuickSet">应用</el-button>
-            
+
             <el-input
               v-model="quickCreditHours"
               placeholder="快速设置学时"
-              style="width: 180px; margin-left: 20px;"
+              style="width: 180px; margin-left: 20px"
               @keyup.enter="handleQuickSetCreditHours"
             >
               <template #append>
@@ -111,12 +111,12 @@
       >
         <el-table-column type="selection" width="55" />
         <el-table-column type="index" label="序号" width="60" />
-        <el-table-column prop="user_name" label="姓名" width="120" />
-        <el-table-column label="平时成绩/评价" width="180">
+        <el-table-column prop="user_name" label="姓名" min-width="120" />
+        <el-table-column label="评价" width="180">
           <template #default="{ row }">
             <div class="grade-input-group">
               <el-select
-                v-model="row.usual_score"
+                v-model="row.evaluation"
                 placeholder="请选择"
                 style="width: 140px"
                 @change="handleScoreChange(row)"
@@ -133,8 +133,8 @@
               <el-input-number
                 v-model="row.credits_hours"
                 :min="0"
-                :precision="1"
-                :step="0.5"
+                :precision="0"
+                :step="1"
                 controls-position="right"
                 style="width: 120px"
                 @change="row.modified = true"
@@ -147,18 +147,10 @@
             <span>{{ (row.credits_hours / 18).toFixed(1) || "0.0" }}</span>
           </template>
         </el-table-column>
-        <!-- Removed numeric Semester Total column -->
-        <el-table-column label="结果" width="100" align="center">
-          <template #default="{ row }">
-            <el-tag :type="getGradeTagType(row)">
-              {{ getGradeLevel(row) }}
-            </el-tag>
-          </template>
-        </el-table-column>
         <el-table-column label="状态" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.score !== null ? 'success' : 'info'">
-              {{ row.score !== null ? "已录入" : "未录入" }}
+            <el-tag :type="row.evaluation !== null ? 'success' : 'info'">
+              {{ row.evaluation !== null ? "已录入" : "未录入" }}
             </el-tag>
           </template>
         </el-table-column>
@@ -199,10 +191,16 @@
     >
       <el-table :data="gradeHistory" style="width: 100%">
         <el-table-column prop="date" label="录入时间" width="160" />
-        <el-table-column prop="score" label="成绩" width="80" >
-           <template #default="{ row }">
-             {{ row.score === 1 ? '合格' : (row.score === 2 ? '不合格' : row.score) }}
-           </template>
+        <el-table-column prop="evaluation" label="成绩" width="80">
+          <template #default="{ row }">
+            {{
+              row.evaluation === 1
+                ? "合格"
+                : row.evaluation === 2
+                  ? "不合格"
+                  : row.evaluation
+            }}
+          </template>
         </el-table-column>
         <el-table-column prop="teacher" label="录入教师" width="120" />
         <el-table-column prop="remarks" label="评语" />
@@ -220,6 +218,7 @@ import { ElMessage } from "element-plus";
 import { ArrowLeft, Check, Download, Upload } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
 import { teacherAPI } from "@/api/teacher";
+import * as XLSX from "xlsx";
 
 const route = useRoute();
 const router = useRouter();
@@ -243,55 +242,44 @@ const quickScore = ref(null);
 const quickCreditHours = ref("");
 const filterScore = ref("all");
 
-// 导出 Excel (CSV)
+// 导出 Excel (XLSX)
 const handleExport = () => {
   if (students.value.length === 0) {
     ElMessage.warning("没有数据可导出");
     return;
   }
 
-  // CSV Header
-  const headers = [
-    "学生ID",
-    "姓名",
-    "评价",
-    "学时",
-  ];
-  const keys = [
-    "user_id",
-    "user_name",
-    "usual_score_text",
-    "credits_hours",
-  ];
+  // Header
+  const headers = ["学生ID", "姓名", "评价", "学时"];
+  const keys = ["user_id", "user_name", "evaluation_text", "credits_hours"];
 
-  // Generate CSV content
-  let csvContent = headers.join(",") + "\n";
-
-  students.value.forEach((student) => {
-    const row = keys.map((key) => {
-      if (key === 'usual_score_text') {
-        return student.usual_score === 1 ? '合格' : (student.usual_score === 2 ? '不合格' : '');
+  // Generate data array
+  const data = students.value.map((student) => {
+    return keys.map((key) => {
+      if (key === "evaluation_text") {
+        return student.evaluation === 1
+          ? "合格"
+          : student.evaluation === 2
+            ? "不合格"
+            : "";
       }
       const val = student[key];
       return val === null || val === undefined ? "" : val;
     });
-    csvContent += row.join(",") + "\n";
   });
 
-  // Add BOM for Excel UTF-8 compatibility
-  const blob = new Blob(["\uFEFF" + csvContent],
-    {
-      type: "text/csv;charset=utf-8;",
-    }
-  );
-  const link = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-  link.setAttribute("href", url);
-  link.setAttribute("download", `${subjectName}_选修成绩表.csv`);
-  link.style.visibility = "hidden";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  // Add headers
+  data.unshift(headers);
+
+  // Create worksheet
+  const ws = XLSX.utils.aoa_to_sheet(data);
+
+  // Create workbook
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "选修成绩表");
+
+  // Write file
+  XLSX.writeFile(wb, `${subjectName}_选修成绩表.xlsx`);
 };
 
 // 触发导入
@@ -306,68 +294,83 @@ const handleImport = (event) => {
 
   const reader = new FileReader();
   reader.onload = (e) => {
-    const content = e.target.result;
-    const lines = content.split(/\r\n|\n/);
-    let updatedCount = 0;
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      const results = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-    // Skip header
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
+      let updatedCount = 0;
 
-      const [studentId, name, usualScoreStr, creditHoursStr] =
-        line.split(",");
+      // Skip header
+      for (let i = 1; i < results.length; i++) {
+        const row = results[i];
+        if (!row || row.length === 0) continue;
 
-      if (!studentId) continue;
+        // Assuming order: StudentID, Name, Evaluation, CreditHours
+        const studentId = row[0];
+        const usualScoreStr = row[2]; // Evaluation text
+        const creditHoursStr = row[3];
 
-      const student = students.value.find(
-        (s) => String(s.user_id) === String(studentId),
-      );
+        if (!studentId) continue;
 
-      if (student) {
-        let changed = false;
+        const student = students.value.find(
+          (s) => String(s.user_id) === String(studentId),
+        );
 
-        // Update Usual Score (Evaluation)
-        let newScore = null;
-        if (usualScoreStr) {
-           const trimmed = usualScoreStr.trim();
-           if (trimmed === '合格' || trimmed === '1') newScore = 1;
-           else if (trimmed === '不合格' || trimmed === '2') newScore = 2;
-        }
-        
-        if (newScore !== null && student.usual_score !== newScore) {
-            student.usual_score = newScore;
-            changed = true;
-        }
+        if (student) {
+          let changed = false;
 
-        // Update Credit Hours
-        if (creditHoursStr && !isNaN(parseFloat(creditHoursStr))) {
-          const newCredit = parseFloat(creditHoursStr);
-          if (student.credits_hours !== newCredit) {
-            student.credits_hours = newCredit;
+          // Update Usual Score (Evaluation)
+          let newScore = null;
+          if (usualScoreStr) {
+            const trimmed = String(usualScoreStr).trim();
+            if (trimmed === "合格" || trimmed === "1") newScore = 1;
+            else if (trimmed === "不合格" || trimmed === "2") newScore = 2;
+          }
+
+          if (newScore !== null && student.evaluation !== newScore) {
+            student.evaluation = newScore;
             changed = true;
           }
-        }
 
-        if (changed) {
-          student.modified = true;
-          handleScoreChange(student); 
-          updatedCount++;
+          // Update Credit Hours
+          if (
+            creditHoursStr !== undefined &&
+            creditHoursStr !== "" &&
+            !isNaN(parseFloat(creditHoursStr))
+          ) {
+            const newCredit = parseFloat(creditHoursStr);
+            if (student.credits_hours !== newCredit) {
+              student.credits_hours = newCredit;
+              changed = true;
+            }
+          }
+
+          if (changed) {
+            student.modified = true;
+            handleScoreChange(student);
+            updatedCount++;
+          }
         }
       }
-    }
 
-    if (updatedCount > 0) {
-      ElMessage.success(`成功更新 ${updatedCount} 条记录`);
-    } else {
-      ElMessage.info("没有数据变更");
+      if (updatedCount > 0) {
+        ElMessage.success(`成功更新 ${updatedCount} 条记录`);
+      } else {
+        ElMessage.info("没有数据变更");
+      }
+    } catch (error) {
+      console.error("Import error:", error);
+      ElMessage.error("导入失败，请检查文件格式");
     }
 
     // Reset file input
     event.target.value = "";
   };
 
-  reader.readAsText(file);
+  reader.readAsArrayBuffer(file);
 };
 
 // 分页配置
@@ -380,9 +383,9 @@ const pagination = reactive({
 // 统计信息
 const statistics = computed(() => {
   const allStudents = students.value;
-  const validScores = allStudents.filter((s) => s.score !== null);
+  const validScores = allStudents.filter((s) => s.evaluation !== null);
   // Average score is not relevant for categorical data (1/2)
-  const passedStudents = validScores.filter((s) => s.score === 1);
+  const passedStudents = validScores.filter((s) => s.evaluation === 1);
 
   return {
     totalStudents: allStudents.length,
@@ -399,9 +402,9 @@ const filteredStudents = computed(() => {
   let result = students.value;
 
   if (filterScore.value === "graded") {
-    result = result.filter((s) => s.score !== null);
+    result = result.filter((s) => s.evaluation !== null);
   } else if (filterScore.value === "ungraded") {
-    result = result.filter((s) => s.score === null);
+    result = result.filter((s) => s.evaluation === null);
   }
 
   // 分页
@@ -415,7 +418,7 @@ const filteredStudents = computed(() => {
 // 返回上级
 const handleBack = () => {
   router.push({
-    name: "TeacherElectiveSubjectList",
+    name: "TeacherSemesterGradeManagement",
     params: {
       semesterId: semesterId,
     },
@@ -425,38 +428,18 @@ const handleBack = () => {
   });
 };
 
-// 获取成绩标签类型
-const getGradeTagType = (row) => {
-  const score = row.score;
-  if (score === 1) return "success";
-  if (score === 2) return "danger";
-  return "info";
-};
-
-// 获取成绩等级
-const getGradeLevel = (row) => {
-  const score = row.score;
-  if (score === 1) return "合格";
-  if (score === 2) return "不合格";
-  return "未录入";
-};
-
 // 加载学生列表
 const loadStudents = async () => {
   loading.value = true;
   try {
-    const response = await teacherAPI.getElectiveSubjectGrades(
-      electiveSubjectId,
-      semesterId,
-    );
+    const response =
+      await teacherAPI.getElectiveSubjectGrades(electiveSubjectId);
     if (response.status === 200) {
       students.value = response.data.map((student) => ({
         ...student,
         credits_hours: student.credits_hours || 0,
         modified: false,
-        usual_score: student.usual_score || null,
-        // Removed midterm and final
-        score: student.score || null, 
+        evaluation: student.evaluation || null,
       }));
     }
   } catch (error) {
@@ -468,9 +451,8 @@ const loadStudents = async () => {
 
 // 成绩变化处理
 const handleScoreChange = async (row) => {
-  if (row.usual_score !== null) {
+  if (row.evaluation !== null) {
     row.modified = true;
-    row.score = row.usual_score; // Sync score with usual_score (1 or 2)
   }
 };
 
@@ -482,7 +464,7 @@ const handleQuickSet = () => {
   }
 
   selectedStudents.value.forEach((student) => {
-    student.usual_score = quickScore.value;
+    student.evaluation = quickScore.value;
     student.modified = true;
     handleScoreChange(student);
   });
@@ -513,8 +495,8 @@ const handleQuickSetCreditHours = () => {
 // 全部及格 -> 全部合格
 const handleSetAllPass = () => {
   students.value.forEach((student) => {
-    if (student.usual_score == null) {
-      student.usual_score = 1; // 1 = 合格
+    if (student.evaluation == null) {
+      student.evaluation = 1; // 1 = 合格
       student.modified = true;
       handleScoreChange(student);
     }
@@ -534,7 +516,7 @@ const handleSelectionChange = (selection) => {
 
 // 保存单个学生
 const handleSaveSingle = async (row) => {
-  if (row.usual_score === null) {
+  if (row.evaluation === null) {
     ElMessage.warning("请选择评价");
     return;
   }
@@ -542,27 +524,15 @@ const handleSaveSingle = async (row) => {
   try {
     const payload = {
       student_id: row.user_id,
-      usual_score: row.usual_score, // 1 or 2
       credits_hours: row.credits_hours,
-      score: row.score,
-      remarks: row.remarks || "",
+      evaluation: row.evaluation,
     };
 
-    let response;
-    if (row.has_grade) {
-      response = await teacherAPI.updateElectiveSubjectGrade(
-        electiveSubjectId,
-        semesterId,
-        row.user_id,
-        payload,
-      );
-    } else {
-      response = await teacherAPI.addElectiveSubjectGrade(
-        electiveSubjectId,
-        semesterId,
-        payload,
-      );
-    }
+    let response = await teacherAPI.updateElectiveSubjectGrade(
+      electiveSubjectId,
+      row.user_id,
+      payload,
+    );
 
     if (response.status === 200 || response.status === 201) {
       ElMessage.success("保存成功");
@@ -577,7 +547,7 @@ const handleSaveSingle = async (row) => {
 // 批量保存
 const handleBatchSave = async () => {
   const modifiedStudents = students.value.filter(
-    (s) => s.modified && (s.usual_score !== null || s.credits_hours !== null),
+    (s) => s.modified && (s.evaluation !== null || s.credits_hours !== null),
   );
 
   if (modifiedStudents.length === 0) {
@@ -590,7 +560,7 @@ const handleBatchSave = async () => {
     let allPromises = [];
 
     for (const student of modifiedStudents) {
-        allPromises.push(handleSaveSingle(student));
+      allPromises.push(handleSaveSingle(student));
     }
 
     await Promise.all(allPromises);

@@ -7,22 +7,6 @@
         </div>
       </template>
 
-      <!-- 统计信息 -->
-      <el-row :gutter="20" style="margin-bottom: 20px">
-        <el-col :span="6">
-          <el-statistic
-            title="可打分学期数"
-            :value="statistics.availableSemesters"
-          />
-        </el-col>
-        <el-col :span="6">
-          <el-statistic
-            title="进行中学期"
-            :value="statistics.activeSemesters"
-          />
-        </el-col>
-      </el-row>
-
       <!-- 学期列表 -->
       <el-table
         v-loading="loading"
@@ -31,28 +15,16 @@
         style="width: 100%; margin-top: 20px"
       >
         <el-table-column
-          prop="semester_id"
-          label="学期ID"
-          width="150"
-          show-overflow-tooltip
-        />
-        <el-table-column
           prop="semester_name"
           label="学期名称"
-          min-width="150"
+          min-width="180"
         />
-        <el-table-column prop="year.year_name" label="年级" min-width="150" />
-        <el-table-column
-          prop="subject.subject_name"
-          label="科目"
-          min-width="150"
-        />
-        <el-table-column prop="begin_time" label="评分开始时间" width="200">
+        <el-table-column prop="begin_time" label="评分开始时间" width="180">
           <template #default="{ row }">
             {{ formatDate(row.scoring_begin_time) }}
           </template>
         </el-table-column>
-        <el-table-column prop="end_time" label="评分结束时间" width="200">
+        <el-table-column prop="end_time" label="评分结束时间" width="180">
           <template #default="{ row }">
             {{ formatDate(row.scoring_end_time) }}
           </template>
@@ -127,44 +99,17 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import { teacherAPI } from "@/api/teacher";
 import { formatDate } from "@/utils/date";
-import dayjs from "dayjs";
 
 const router = useRouter();
 const loading = ref(false);
 const semesters = ref([]);
 const dialogVisible = ref(false);
 const currentSemester = ref({});
-
-// 分页配置
-const pagination = reactive({
-  currentPage: 1,
-  pageSize: 10,
-  total: 0,
-});
-
-// 统计信息
-const statistics = computed(() => {
-  const allSemesters = semesters.value;
-  return {
-    availableSemesters: allSemesters.filter((s) => s.is_scoring).length,
-    activeSemesters: allSemesters.filter((s) => {
-      const now = dayjs();
-      return (
-        dayjs(s.scoring_begin_time).isBefore(now) &&
-        dayjs(s.scoring_end_time).isAfter(now)
-      );
-    }).length,
-    totalCourses: allSemesters.reduce(
-      (sum, s) => sum + (s.courseCount || 0),
-      0,
-    ),
-  };
-});
 
 // 获取状态类型
 const getStatusType = (cycle) => {
@@ -182,14 +127,9 @@ const getStatusText = (cycle) => {
 const loadAvailableSemesters = async () => {
   loading.value = true;
   try {
-    const response = await teacherAPI.getSemesterSubjects();
+    const response = await teacherAPI.getAvailableSemesters();
     if (response.status === 200) {
-      semesters.value = response.data.map((item) => {
-        item.semester.subject = item.subject;
-        item.semester.year = item.year;
-        return item.semester;
-      });
-      pagination.total = response.data.length;
+      semesters.value = response.data;
     }
   } catch (error) {
     ElMessage.error("加载可打分学期列表失败");
@@ -201,33 +141,13 @@ const loadAvailableSemesters = async () => {
 // 进入打分
 const handleEnterGrades = (row) => {
   router.push({
-    name: "TeacherGradeClasses",
+    name: "TeacherSemesterGradeManagement",
     params: {
       semesterId: row.semester_id,
-      subjectCode: row.subject.subject_code,
-      gradeCode: row.year.year_code,
     },
     query: {
       semesterName: row.semester_name,
-      subjectName: row.subject.subject_name,
-      gradeName: row.year.year_name,
     },
-  });
-};
-
-// 查看学生成绩报告
-const handleViewReport = (row) => {
-  router.push({
-    name: "TeacherGradeReport",
-    params: { semesterId: row.semester_id, studentId: row.user_id },
-    query: { semesterName: row.semester_name },
-  });
-};
-
-// 查看成绩证明
-const handleViewProof = () => {
-  router.push({
-    name: "TeacherGradeProof",
   });
 };
 

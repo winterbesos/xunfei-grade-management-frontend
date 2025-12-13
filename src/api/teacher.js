@@ -198,26 +198,17 @@ export const teacherAPI = {
   },
 
   // 获取选修课学生成绩列表
-  getElectiveSubjectGrades(electiveSubjectId, semesterId) {
+  getElectiveSubjectGrades(electiveSubjectId) {
     return request({
-      url: `/api/teacher/elective-subjects/${electiveSubjectId}/semesters/${semesterId}/grades`,
+      url: `/api/teacher/elective-subjects/${electiveSubjectId}/grades`,
       method: "get",
     });
   },
 
-  // 添加选修课成绩
-  addElectiveSubjectGrade(electiveSubjectId, semesterId, data) {
-    return request({
-      url: `/api/teacher/elective-subjects/${electiveSubjectId}/semesters/${semesterId}/grades`,
-      method: "post",
-      data,
-    });
-  },
-
   // 更新选修课成绩
-  updateElectiveSubjectGrade(electiveSubjectId, semesterId, studentId, data) {
+  updateElectiveSubjectGrade(electiveSubjectId, studentId, data) {
     return request({
-      url: `/api/teacher/elective-subjects/${electiveSubjectId}/semesters/${semesterId}/grades/${studentId}`,
+      url: `/api/teacher/elective-subjects/${electiveSubjectId}/students/${studentId}/grade`,
       method: "put",
       data,
     });

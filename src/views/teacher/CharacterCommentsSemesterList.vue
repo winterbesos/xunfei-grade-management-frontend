@@ -16,19 +16,14 @@
         style="width: 100%"
       >
         <el-table-column
-          prop="semester_id"
-          label="学期ID"
-          width="150"
-          show-overflow-tooltip
-        />
-        <el-table-column
           prop="semester_name"
           label="学期名称"
-          min-width="150"
+          min-width="180"
         />
-        <el-table-column label="起止时间" width="250">
+        <el-table-column label="起止时间" width="400">
           <template #default="{ row }">
-            {{ formatDate(row.start_date) }} ~ {{ formatDate(row.end_date) }}
+            {{ formatDate(row.scoring_begin_time) }} ~
+            {{ formatDate(row.scoring_end_time) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right">
@@ -87,8 +82,8 @@ const handleSelectSemester = (row) => {
   router.push({
     name: "TeacherCharacterCommentsClassList",
     params: {
-      semesterId: row.semester_id
-    }
+      semesterId: row.semester_id,
+    },
   });
 };
 

@@ -64,6 +64,11 @@
             style="width: 100%; margin-top: 20px"
           >
             <el-table-column prop="name" label="学科名称" min-width="150" />
+            <el-table-column
+              prop="student_count"
+              label="学生数量"
+              min-width="150"
+            />
             <el-table-column label="操作" width="150" fixed="right">
               <template #default="{ row }">
                 <el-button
@@ -195,6 +200,7 @@ const handleEnterElectiveStudentList = (row) => {
     },
     query: {
       subjectName: row.name,
+      semesterName: semesterName,
     },
   });
 };

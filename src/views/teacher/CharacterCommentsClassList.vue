@@ -22,7 +22,13 @@
           width="150"
           show-overflow-tooltip
         />
-        <el-table-column prop="class_name" label="班级名称" min-width="150" />
+        <el-table-column prop="class_name" label="班级名称" min-width="150">
+          <template #default="{ row }">
+            <el-tooltip :content="row.class_name" placement="top">
+              <span>{{ row.year_name + row.class_name }}</span>
+            </el-tooltip>
+          </template>
+        </el-table-column>
         <el-table-column
           prop="student_count"
           label="学生数"
@@ -87,6 +93,9 @@ const handleEvaluate = (row) => {
     params: {
       classId: row.class_id,
       semesterId: semesterId,
+    },
+    query: {
+      className: row.year_name + row.class_name,
     },
   });
 };

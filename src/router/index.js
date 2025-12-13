@@ -78,7 +78,7 @@ const routes = [
         meta: { requiresAuth: true, roles: ["teacher"] },
       },
       {
-        path: "/teacher/grade-management/semester/:semesterId",
+        path: "/teacher/grade-management/semester/:semesterId/grades",
         name: "TeacherSemesterGradeManagement",
         component: () => import("@/views/teacher/SemesterGradeManagement.vue"),
         meta: { requiresAuth: true, roles: ["teacher"] },
@@ -96,19 +96,13 @@ const routes = [
         meta: { requiresAuth: true, roles: ["teacher"] },
       },
       {
-        path: "/teacher/grade-management/semesters",
-        name: "TeacherGradeSemesters",
-        component: () => import("@/views/teacher/GradeManagement.vue"),
-        meta: { requiresAuth: true, roles: ["teacher"] },
-      },
-      {
-        path: "/teacher/grade-management/classes/grades/:gradeCode/:semesterId/subject/:subjectCode",
+        path: "/teacher/grade-management/semesters/:semesterId/subjects/:subjectCode/:gradeCode",
         name: "TeacherGradeClasses",
         component: () => import("@/views/teacher/GradeClasses.vue"),
         meta: { requiresAuth: true, roles: ["teacher"] },
       },
       {
-        path: "/teacher/grade-management/students/:semesterId/:classId/:subjectCode/:gradeCode",
+        path: "/teacher/grade-management/semesters/:semesterId/classes/:classId/:subjectCode/:gradeCode",
         name: "TeacherGradeStudents",
         component: () => import("@/views/teacher/GradeStudents.vue"),
         meta: { requiresAuth: true, roles: ["teacher"] },

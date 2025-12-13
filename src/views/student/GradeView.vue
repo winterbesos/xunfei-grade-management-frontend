@@ -48,7 +48,7 @@
             <el-option
               v-for="semester in semesters"
               :key="semester.semester_id"
-              :label="semester.semester_name"
+              :label="semester.academic_year_name + semester.term_name"
               :value="semester.semester_id"
             />
           </el-select>
@@ -73,7 +73,6 @@
             <span>{{ row.academic_year_name }}{{ row.term_name }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="semester_name" label="教学周期" />
         <el-table-column prop="score" label="成绩" width="100" align="center">
           <template #default="{ row }">
             <span
@@ -148,9 +147,9 @@ const loadSemesters = async () => {
       if (semesters.value.length > 0) {
         // 尝试找到 ID 最大的作为最新学期
         const latestSemester = semesters.value.reduce((prev, current) => {
-          return prev.id > current.id ? prev : current;
+          return prev.semester_id > current.semester_id ? prev : current;
         });
-        queryForm.value.semesterId = latestSemester.id;
+        queryForm.value.semesterId = latestSemester.semester_id;
         handleQuery(); // 选中后立即查询
       }
     }

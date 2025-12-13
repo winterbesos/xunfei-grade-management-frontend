@@ -228,7 +228,11 @@ const getClassStatusText = (graded, total) => {
 
 // 返回上级
 const handleBack = () => {
-  router.push("/teacher/grade-management");
+  router.push({
+    name: "TeacherSemesterGradeManagement",
+    params: { semesterId: semesterId },
+    query: { semesterName: semesterName },
+  });
 };
 
 // 加载班级列表
@@ -256,7 +260,6 @@ const handleEnterClass = (row) => {
     params: {
       semesterId: semesterId,
       subjectCode: subjectCode,
-      gradeCode: gradeCode,
       classId: row.class_id,
     },
     query: {
@@ -266,23 +269,6 @@ const handleEnterClass = (row) => {
       className: row.class_full_name,
     },
   });
-};
-
-// 进入品格评语
-const handleCharacterComment = (row) => {
-  router.push({
-    name: "TeacherCharacterComments",
-    params: {
-      semesterId: semesterId,
-      classId: row.class_id,
-    },
-  });
-};
-
-// 查看进度
-const handleViewProgress = (row) => {
-  currentClass.value = { ...row };
-  dialogVisible.value = true;
 };
 
 onMounted(() => {

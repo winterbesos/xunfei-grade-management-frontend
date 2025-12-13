@@ -18,10 +18,9 @@
             {{ row.academic_year_name }}
           </template>
         </el-table-column>
-        <el-table-column prop="semester_name" label="学期" />
-        <el-table-column label="教学周期">
+        <el-table-column label="学期">
           <template #default="{ row }">
-            {{ row.semester_name }}
+            {{ row.academic_year_name + row.term_name }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="150" align="center">
@@ -45,6 +44,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { studentAPI } from "@/api/student";
 import { ElMessage } from "element-plus";
+import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
 const loading = ref(false);
@@ -68,9 +68,12 @@ const handleViewReport = (row) => {
   // Assuming studentId is needed, but Report.vue often assumes context.
   // We can pass semesterId as query or param.
   // Reusing existing Report.vue logic.
+  const authStore = useAuthStore();
+  const studentId = authStore.userInfo.user_id;
+
   router.push({
     name: "StudentSemesterReport",
-    params: { semesterId: row.semester_id, studentId: row.user_id },
+    params: { semesterId: row.semester_id, studentId: studentId },
     query: { semesterName: row.semester_name },
   });
 };

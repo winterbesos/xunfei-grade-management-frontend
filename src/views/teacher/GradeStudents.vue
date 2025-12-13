@@ -244,6 +244,7 @@ import { ElMessage } from "element-plus";
 import { ArrowLeft, Check, Download, Upload } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
 import { teacherAPI } from "@/api/teacher";
+import * as XLSX from "xlsx";
 
 const route = useRoute();
 const router = useRouter();
@@ -273,14 +274,14 @@ const filterScore = ref("all");
 
 // ... (rest of the code)
 
-// 导出 Excel (CSV)
+// 导出 Excel (XLSX)
 const handleExport = () => {
   if (students.value.length === 0) {
     ElMessage.warning("没有数据可导出");
     return;
   }
 
-  // CSV Header
+  // Header
   const headers = [
     "学生ID",
     "姓名",
@@ -298,29 +299,26 @@ const handleExport = () => {
     "credits_hours",
   ];
 
-  // Generate CSV content
-  let csvContent = headers.join(",") + "\n";
-
-  students.value.forEach((student) => {
-    const row = keys.map((key) => {
+  // Generate data array
+  const data = students.value.map((student) => {
+    return keys.map((key) => {
       const val = student[key];
       return val === null || val === undefined ? "" : val;
     });
-    csvContent += row.join(",") + "\n";
   });
 
-  // Add BOM for Excel UTF-8 compatibility
-  const blob = new Blob(["\uFEFF" + csvContent], {
-    type: "text/csv;charset=utf-8;",
-  });
-  const link = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-  link.setAttribute("href", url);
-  link.setAttribute("download", `${className}_${subjectName}_成绩表.csv`);
-  link.style.visibility = "hidden";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  // Add headers to the beginning
+  data.unshift(headers);
+
+  // Create worksheet
+  const ws = XLSX.utils.aoa_to_sheet(data);
+
+  // Create workbook
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "成绩表");
+
+  // Write file
+  XLSX.writeFile(wb, `${className}_${subjectName}_成绩表.xlsx`);
 };
 
 // 触发导入
@@ -335,64 +333,84 @@ const handleImport = (event) => {
 
   const reader = new FileReader();
   reader.onload = (e) => {
-    const content = e.target.result;
-    const lines = content.split(/\r\n|\n/);
-    let updatedCount = 0;
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      const results = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-    // Skip header
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
+      let updatedCount = 0;
 
-      const [studentId, name, midterm, final, usualScoreStr, creditHoursStr] =
-        line.split(",");
+      // Skip header (index 0)
+      for (let i = 1; i < results.length; i++) {
+        const row = results[i];
+        if (!row || row.length === 0) continue;
 
-      if (!studentId) continue;
+        // Assuming order: ID, Name, Midterm, Final, Usual, Credit
+        const studentId = row[0];
+        // const name = row[1]; // Not used for lookup
+        const usualScoreStr = row[4];
+        const creditHoursStr = row[5];
 
-      const student = students.value.find(
-        (s) => String(s.user_id) === String(studentId),
-      );
+        if (!studentId) continue;
 
-      if (student) {
-        let changed = false;
+        const student = students.value.find(
+          (s) => String(s.user_id) === String(studentId),
+        );
 
-        // Update Usual Score
-        if (usualScoreStr && !isNaN(parseFloat(usualScoreStr))) {
-          const newScore = parseFloat(usualScoreStr);
-          if (student.usual_score !== newScore) {
-            student.usual_score = newScore;
-            changed = true;
+        if (student) {
+          let changed = false;
+
+          // Update Usual Score
+          if (
+            usualScoreStr !== undefined &&
+            usualScoreStr !== "" &&
+            !isNaN(parseFloat(usualScoreStr))
+          ) {
+            const newScore = parseFloat(usualScoreStr);
+            if (student.usual_score !== newScore) {
+              student.usual_score = newScore;
+              changed = true;
+            }
           }
-        }
 
-        // Update Credit Hours
-        if (creditHoursStr && !isNaN(parseFloat(creditHoursStr))) {
-          const newCredit = parseFloat(creditHoursStr);
-          if (student.credits_hours !== newCredit) {
-            student.credits_hours = newCredit;
-            changed = true;
+          // Update Credit Hours
+          if (
+            creditHoursStr !== undefined &&
+            creditHoursStr !== "" &&
+            !isNaN(parseFloat(creditHoursStr))
+          ) {
+            const newCredit = parseFloat(creditHoursStr);
+            if (student.credits_hours !== newCredit) {
+              student.credits_hours = newCredit;
+              changed = true;
+            }
           }
-        }
 
-        if (changed) {
-          student.modified = true;
-          handleScoreChange(student); // Recalculate total score
-          updatedCount++;
+          if (changed) {
+            student.modified = true;
+            handleScoreChange(student); // Recalculate total score
+            updatedCount++;
+          }
         }
       }
-    }
 
-    if (updatedCount > 0) {
-      ElMessage.success(`成功更新 ${updatedCount} 条记录`);
-    } else {
-      ElMessage.info("没有数据变更");
+      if (updatedCount > 0) {
+        ElMessage.success(`成功更新 ${updatedCount} 条记录`);
+      } else {
+        ElMessage.info("没有数据变更");
+      }
+    } catch (error) {
+      console.error("Import error:", error);
+      ElMessage.error("导入失败，请检查文件格式");
     }
 
     // Reset file input
     event.target.value = "";
   };
 
-  reader.readAsText(file);
+  reader.readAsArrayBuffer(file);
 };
 
 // 分页配置

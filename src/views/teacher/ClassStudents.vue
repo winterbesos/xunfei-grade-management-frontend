@@ -1,6 +1,17 @@
 <template>
-  <div>
+  <div class="class-students-container">
     <el-card>
+      <template #header>
+        <div class="card-header">
+          <div class="header-left">
+            <el-button link @click="router.back()">
+              <el-icon><ArrowLeft /></el-icon> 返回
+            </el-button>
+            <span class="title">班级学生列表</span>
+          </div>
+        </div>
+      </template>
+
       <el-table :data="students" v-loading="loading" style="width: 100%">
         <el-table-column
           prop="user_id"
@@ -15,14 +26,12 @@
               type="primary"
               size="small"
               @click="viewStatusCard(row.user_id)"
-              >学籍卡</el-button
-            >
+              >学籍卡</el-button>
             <el-button
               type="success"
               size="small"
               @click="viewReportProof(row.user_id)"
-              >成绩证明</el-button
-            >
+              >成绩证明</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -56,13 +65,15 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { teacherAPI } from "@/api/teacher";
 import { ElMessage } from "element-plus";
 import StatusCard from "@/views/common/StatusCard.vue";
 import ReportProof from "@/views/common/ReportProof.vue";
+import { ArrowLeft } from "@element-plus/icons-vue";
 
 const route = useRoute();
+const router = useRouter();
 const students = ref([]);
 const loading = ref(false);
 const classId = ref(route.params.classId);
@@ -103,6 +114,26 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.class-students-container {
+  padding: 20px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
 .el-card {
   min-height: 400px;
 }
@@ -123,3 +154,4 @@ onMounted(() => {
   }
 }
 </style>
+
