@@ -26,12 +26,14 @@
               type="primary"
               size="small"
               @click="viewStatusCard(row.user_id)"
-              >学籍卡</el-button>
+              >学籍卡</el-button
+            >
             <el-button
               type="success"
               size="small"
               @click="viewReportProof(row.user_id)"
-              >成绩证明</el-button>
+              >成绩证明</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -154,4 +156,3 @@ onMounted(() => {
   }
 }
 </style>
-

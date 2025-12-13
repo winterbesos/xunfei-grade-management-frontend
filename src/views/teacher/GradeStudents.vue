@@ -536,6 +536,13 @@ const handleScoreChange = async (row) => {
   if (row.usual_score !== null) {
     row.modified = true;
 
+    if (row.midterm_score === null && row.final_score === null) {
+      // 如果期中和期末都为空，则总评等于平时成绩
+      row.score = 0;
+      row.level = "E";
+      return;
+    }
+
     // 构造请求数据
     const payload = {
       items: [

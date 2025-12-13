@@ -58,7 +58,14 @@
             style="width: 100%"
             border
           >
-            <el-table-column label="科目" width="250">
+            <el-table-column
+              prop="teacher_id"
+              label="教师ID"
+              width="150"
+              show-overflow-tooltip
+            />
+            <el-table-column prop="teacher_name" label="教师姓名" width="150" />
+            <el-table-column label="科目">
               <template #default="{ row }">
                 <el-tag
                   v-for="sub in row.subjects"
@@ -70,13 +77,6 @@
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="teacher_name" label="教师姓名" />
-            <el-table-column
-              prop="teacher_id"
-              label="教师ID"
-              width="360"
-              show-overflow-tooltip
-            />
           </el-table>
         </div>
 
@@ -92,13 +92,19 @@
               width="150"
               show-overflow-tooltip
             />
-            <el-table-column prop="user_name" label="姓名" min-width="150" />
-            <el-table-column label="操作" width="280" align="center">
+            <el-table-column prop="user_name" label="姓名" width="150" />
+            <el-table-column label="操作" align="center">
               <template #default="{ row }">
-                <el-button type="primary" link @click="handleViewProof(row)">
+                <el-button
+                  v-if="classInfo.class_phase_code === '05'"
+                  type="primary"
+                  link
+                  @click="handleViewProof(row)"
+                >
                   成绩证明
                 </el-button>
                 <el-button
+                  v-if="classInfo.class_phase_code === '05'"
                   type="success"
                   link
                   @click="handleViewStatusCard(row)"

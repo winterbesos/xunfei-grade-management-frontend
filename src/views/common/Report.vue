@@ -109,11 +109,11 @@
         </tbody>
       </table>
 
-      <!-- 4. 底部区域：品德评语 + 雷达图 -->
+      <!-- 4. 底部区域：品格评语 + 雷达图 -->
       <div class="footer-section">
-        <!-- 左侧：品德评语 -->
+        <!-- 左侧：品格评语 -->
         <div class="comments-box">
-          <h3 class="section-title box-header">品德评语</h3>
+          <h3 class="section-title box-header">品格评语</h3>
           <div class="comments-content">
             {{ moralComment }}
           </div>
@@ -180,7 +180,7 @@ const abilities = ref({
   responsibility: 0,
 });
 
-// 品德评语
+// 品格评语
 const moralComment = ref("");
 const semesterId = route.params.semesterId;
 const studentId = route.params.studentId;
@@ -486,6 +486,8 @@ td {
 }
 
 .comments-content {
+  word-break: break-word;
+  overflow-wrap: break-word;
   flex: 1;
   /* 留空给手写 */
   padding: 10px;

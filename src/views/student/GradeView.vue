@@ -117,9 +117,17 @@ const queryForm = ref({
 const statistics = computed(() => {
   const totalCourses = grades.value.length;
   const validGrades = grades.value.filter((g) => g.score !== null);
-  const totalScore = validGrades.reduce((sum, g) => sum + g.score, 0);
-  const averageScore =
-    validGrades.length > 0 ? totalScore / validGrades.length : 0;
+  if (validGrades.length === 0) {
+    return {
+      totalCourses: 0,
+      averageScore: 0,
+      passRate: 0,
+      totalCredits: 0,
+    };
+  }
+
+  const totalScore = validGrades.reduce((sum, g) => sum + Number(g.score), 0);
+  const averageScore = totalScore / validGrades.length;
   const passedCourses = validGrades.filter((g) => g.score >= 60).length;
   const passRate =
     validGrades.length > 0 ? (passedCourses / validGrades.length) * 100 : 0;

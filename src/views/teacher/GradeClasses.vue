@@ -71,18 +71,20 @@
         <el-table-column label="完成率" width="100" align="center">
           <template #default="{ row }">
             <el-progress
-              :percentage="getCompletionRate(row.gradedCount, row.studentCount)"
+              :percentage="
+                getCompletionRate(row.graded_count, row.student_count)
+              "
               :stroke-width="6"
-              :color="getProgressColor(row.gradedCount, row.studentCount)"
+              :color="getProgressColor(row.graded_count, row.student_count)"
             />
           </template>
         </el-table-column>
         <el-table-column label="状态" width="100" align="center">
           <template #default="{ row }">
             <el-tag
-              :type="getClassStatusType(row.gradedCount, row.studentCount)"
+              :type="getClassStatusType(row.graded_count, row.student_count)"
             >
-              {{ getClassStatusText(row.gradedCount, row.studentCount) }}
+              {{ getClassStatusText(row.graded_count, row.student_count) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -105,50 +107,6 @@
         description="暂无班级数据"
       />
     </el-card>
-
-    <!-- 进度详情对话框 -->
-    <el-dialog v-model="dialogVisible" title="班级成绩录入进度" width="500px">
-      <div v-if="currentClass">
-        <el-descriptions :column="1" border>
-          <el-descriptions-item label="班级名称">{{
-            currentClass.name
-          }}</el-descriptions-item>
-          <el-descriptions-item label="专业">{{
-            currentClass.major
-          }}</el-descriptions-item>
-          <el-descriptions-item label="学生总数">{{
-            currentClass.studentCount
-          }}</el-descriptions-item>
-          <el-descriptions-item label="已评分">{{
-            currentClass.gradedCount
-          }}</el-descriptions-item>
-          <el-descriptions-item label="未评分">{{
-            currentClass.studentCount - currentClass.gradedCount
-          }}</el-descriptions-item>
-          <el-descriptions-item label="完成率">
-            <el-progress
-              :percentage="
-                getCompletionRate(
-                  currentClass.gradedCount,
-                  currentClass.studentCount,
-                )
-              "
-              :stroke-width="8"
-              :color="
-                getProgressColor(
-                  currentClass.gradedCount,
-                  currentClass.studentCount,
-                )
-              "
-            />
-          </el-descriptions-item>
-        </el-descriptions>
-      </div>
-
-      <template #footer>
-        <el-button @click="dialogVisible = false">关闭</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -171,18 +129,16 @@ const gradeName = route.query.gradeName || "未知年级";
 
 const loading = ref(false);
 const classes = ref([]);
-const dialogVisible = ref(false);
-const currentClass = ref({});
 
 // 统计信息
 const statistics = computed(() => {
   const allClasses = classes.value;
   const totalStudents = allClasses.reduce(
-    (sum, c) => sum + (c.studentCount || 0),
+    (sum, c) => sum + (c.student_count || 0),
     0,
   );
   const gradedStudents = allClasses.reduce(
-    (sum, c) => sum + (c.gradedCount || 0),
+    (sum, c) => sum + (c.graded_count || 0),
     0,
   );
 

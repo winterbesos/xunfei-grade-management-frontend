@@ -194,7 +194,7 @@
 
         <div class="glass-card anim-item d-3 summary-card">
           <p>姓名：{{ reportData.student_name }}</p>
-          <p>学号：{{ reportData.student_id }}</p>
+          <!-- <p>学号：{{ reportData.student_id }}</p> -->
           <p>班级：{{ reportData.class_name }}</p>
         </div>
 

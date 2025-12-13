@@ -388,6 +388,10 @@ const loadStudents = async () => {
 
 // 保存单个
 const handleSaveSingle = async (row) => {
+  if (row.comment.length > 200) {
+    ElMessage.error("品格评语不能超过200个字符");
+    return;
+  }
   try {
     const response = await teacherAPI.saveCharacterComment(
       semesterId,
@@ -419,6 +423,13 @@ const handleBatchSave = async () => {
   if (modifiedStudents.length === 0) {
     ElMessage.info("没有需要保存的更改");
     return;
+  }
+
+  for (const student of modifiedStudents) {
+    if (student.comment.length > 200) {
+      ElMessage.error(`学生[${student.student_name}]品格评语不能超过200个字符`);
+      return;
+    }
   }
 
   saveLoading.value = true;

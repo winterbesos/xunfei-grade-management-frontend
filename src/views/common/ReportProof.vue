@@ -14,10 +14,12 @@
       <!-- 2. 证明正文 -->
       <div class="intro-text" v-if="gradeProofData">
         <p>
-          兹证明学生 {{ studentInfo.name }}，出生于
-          {{ studentInfo.birth }}。该生于
-          {{ studentInfo.enrollment_date }} 进入我校就读，现为我校{{
-            studentInfo.class_name
+          兹证明学生
+          {{
+            studentInfo.name
+          }}，出生于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          。该生于&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;进入我校就读，现为我校{{
+            studentInfo.year_name + studentInfo.class_name
           }}学生。该生在校成绩如下：
         </p>
       </div>
@@ -93,78 +95,57 @@ const gradeProofData = ref(null);
 // 获取数据的函数
 
 const fetchData = (id) => {
-
   console.log("Fetching data for studentId:", id);
-
-
 
   teacherAPI
 
     .getStudentGradeProof(id)
 
     .then((response) => {
-
       if (response.status !== 200) {
-
         ElMessage.error("加载学生列表失败");
 
         return;
-
       }
 
       gradeProofData.value = response.data;
-
     })
 
     .catch((error) => {
-
       console.error("获取成绩报告失败:", error);
-
     });
 };
-
-
 
 // 模拟从API获取数据
 
 onMounted(() => {
-
   fetchData(props.studentId);
-
 });
-
-
 
 // 监听 prop 变化，以便在 Dialog 复用时能重新加载数据
 
 watch(
-
   () => props.studentId,
 
   (newId) => {
-
     if (newId) {
-
       fetchData(newId);
-
     }
-
   },
-
 );
 
-
-
 const studentInfo = computed(() => {
-
   if (!gradeProofData.value) {
-
-    return { name: "", birth: "", enrollment_date: "", class_name: "" };
-
+    return {
+      name: "",
+      birth: "",
+      enrollment_date: "",
+      class_name: "",
+      year_name: "",
+    };
   }
 
   return {
-
     name: gradeProofData.value.student.user_name,
 
     birth: gradeProofData.value.student.birth_date,
@@ -172,25 +153,17 @@ const studentInfo = computed(() => {
     enrollment_date: gradeProofData.value.student.enrollment_date,
 
     class_name: gradeProofData.value.student.class_name,
-
+    year_name: gradeProofData.value.student.year_name,
   };
-
 });
-
-
 
 // 将后端数据转换为表格所需的格式
 
 const scores = computed(() => {
-
   if (!gradeProofData.value || !gradeProofData.value.subject_grades) return [];
 
-
-
   return gradeProofData.value.subject_grades.map((subjectItem) => {
-
     const row = {
-
       subject: subjectItem.subject_name,
 
       g1_1: "—",
@@ -204,45 +177,24 @@ const scores = computed(() => {
       g3_1: "—",
 
       g3_2: "—",
-
     };
-
-
 
     // 假设 year_grades 顺序为 高一, 高二, 高三
 
     // 假设 term_grades 顺序为 第一学期, 第二学期
 
     if (subjectItem.year_grades) {
-
       subjectItem.year_grades.forEach((yearItem, yearIndex) => {
-
         if (yearIndex < 3 && yearItem.term_grades) {
-
-          yearItem.term_grades.forEach((termItem, termIndex) => {
-
-            if (termIndex < 2) {
-
-              const key = `g${yearIndex + 1}_${termIndex + 1}`;
-
-              row[key] = termItem.score || "—";
-
-            }
-
-          });
-
+          row[`g${yearIndex + 1}_1`] = yearItem.term_grades.term_1_score || "—";
+          row[`g${yearIndex + 1}_2`] = yearItem.term_grades.term_2_score || "—";
         }
-
       });
-
     }
 
-
-
+    console.log(row);
     return row;
-
   });
-
 });
 
 const handlePrint = () => {
