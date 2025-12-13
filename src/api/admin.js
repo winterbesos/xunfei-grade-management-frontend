@@ -110,13 +110,6 @@ export const adminAPI = {
     });
   },
 
-  toggleSemesterScore(semesterId) {
-    return request({
-      url: `/api/admin/semesters/${semesterId}/toggle-events`,
-      method: "post",
-    });
-  },
-
   updateSemesterScoringTime(semesterId, data) {
     return request({
       url: `/api/admin/semesters/${semesterId}/scoring-times`,
@@ -191,6 +184,49 @@ export const adminAPI = {
       url: `/api/admin/elective-subjects/${id}`,
       method: "put",
       data,
+    });
+  },
+
+  // 获取选修课学生列表
+  getElectiveSubjectStudents(subjectId) {
+    return request({
+      url: `/api/admin/elective-subjects/${subjectId}/students`,
+      method: "get",
+    });
+  },
+
+  // 添加学生 to 选修课
+  addStudentToElectiveSubject(subjectId, studentId) {
+    return request({
+      url: `/api/admin/elective-subjects/${subjectId}/students`,
+      method: "post",
+      data: { student_ids: [studentId] },
+    });
+  },
+
+  // 从选修课移除学生
+  removeStudentFromElectiveSubject(subjectId, studentId) {
+    return request({
+      url: `/api/admin/elective-subjects/${subjectId}/students/${studentId}`,
+      method: "delete",
+    });
+  },
+
+  // 获取学生列表 (用于搜索)
+  getStudents(params) {
+    return request({
+      url: "/api/admin/students",
+      method: "get",
+      params,
+    });
+  },
+
+  // 批量添加学生 to 选修课
+  batchAddStudentsToElectiveSubject(subjectId, studentIds) {
+    return request({
+      url: `/api/admin/elective-subjects/${subjectId}/students`,
+      method: "post",
+      data: { student_ids: studentIds },
     });
   },
 };

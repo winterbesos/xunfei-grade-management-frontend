@@ -185,7 +185,10 @@ const fetchStudents = async () => {
       apiParams.has_short_id = queryParams.has_short_id_filter === "true";
     }
 
-    const res = await maintenanceAPI.getSchoolStudents(currentSchoolId.value, apiParams);
+    const res = await maintenanceAPI.getSchoolStudents(
+      currentSchoolId.value,
+      apiParams,
+    );
     if (res.status === 200) {
       // The user said response_model=list[StudentResponse]
       const data = res.data;
@@ -226,7 +229,7 @@ const submitBindShortId = async () => {
         const response = await maintenanceAPI.bindStudentShortId(
           currentSchoolId.value,
           currentStudentId.value,
-          bindForm.short_id
+          bindForm.short_id,
         );
         if (response.status === 200 || response.status === 201) {
           ElMessage.success("绑定成功");

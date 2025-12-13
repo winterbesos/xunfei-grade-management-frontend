@@ -15,17 +15,11 @@
       >
         <el-table-column
           prop="subject_code"
-          label="Code"
-          width="80"
-          align="center"
-        />
-        <el-table-column prop="subject_name" label="科目名称" min-width="150" />
-        <el-table-column
-          prop="credits"
-          label="学分"
+          label="学科代码"
           width="100"
           align="center"
         />
+        <el-table-column prop="subject_name" label="科目名称" min-width="150" />
         <el-table-column label="是否启用" width="120" align="center">
           <template #default="{ row }">
             <el-switch

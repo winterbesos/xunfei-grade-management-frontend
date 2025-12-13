@@ -163,6 +163,14 @@ const submitScoringTime = async () => {
   await scoringTimeFormRef.value.validate(async (valid) => {
     if (!valid) return;
 
+    if (
+      new Date(scoringTimeForm.scoringBeginTime) >=
+      new Date(scoringTimeForm.scoringEndTime)
+    ) {
+      ElMessage.error("打分结束时间必须晚于开始时间");
+      return;
+    }
+
     scoringTimeSubmitLoading.value = true;
     try {
       const response = await adminAPI.updateSemesterScoringTime(
@@ -202,13 +210,17 @@ const pagination = reactive({
 // 获取状态类型
 const getStatusType = (cycle) => {
   if (cycle.is_scoring) return "success";
+  if (cycle.scoring_end_time && new Date() > new Date(cycle.scoring_end_time))
+    return "disabled";
   return null;
 };
 
 // 获取状态文本
 const getStatusText = (cycle) => {
-  if (!cycle.is_scoring) return "未开始";
-  else return "已开启";
+  if (cycle.is_scoring) return "已开始";
+  if (cycle.scoring_end_time && new Date() > new Date(cycle.scoring_end_time))
+    return "已结束";
+  else return "未开始";
 };
 
 // 加载学期列表

@@ -38,6 +38,8 @@
         <el-table-column prop="id" label="ID" width="80" />
 
         <el-table-column prop="name" label="课程名称" min-width="150" />
+        <el-table-column prop="semester_name" label="学期" width="200">
+        </el-table-column>
         <el-table-column prop="teacher_name" label="任课教师" width="150" />
         <el-table-column prop="enabled" label="状态" width="100" align="center">
           <template #default="{ row }">
@@ -46,8 +48,15 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column label="操作" width="250" fixed="right">
           <template #default="{ row }">
+            <el-button
+              size="small"
+              type="warning"
+              @click="openStudentDialog(row)"
+            >
+              学生管理
+            </el-button>
             <el-button size="small" type="primary" @click="editSubject(row)">
               编辑
             </el-button>
@@ -78,6 +87,20 @@
       >
         <el-form-item label="课程名称" prop="name">
           <el-input v-model="subjectForm.name" placeholder="请输入课程名称" />
+        </el-form-item>
+        <el-form-item label="学期" prop="semester_id">
+          <el-select
+            v-model="subjectForm.semester_id"
+            :disabled="isEdit"
+            placeholder="请选择学期"
+          >
+            <el-option
+              v-for="item in semesters"
+              :key="item.id"
+              :label="item.academic_year_name + item.term_name"
+              :value="item.semester_id"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="任课教师" prop="teacher_id">
           <el-select
@@ -119,6 +142,85 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- 学生管理对话框 -->
+    <el-dialog
+      v-model="showStudentDialog"
+      :title="'学生管理 - ' + currentSubjectName"
+      width="800px"
+      @close="resetStudentDialog"
+    >
+      <div class="student-dialog-content">
+        <!-- 添加学生区域 -->
+        <div class="add-student-section">
+          <el-select
+            v-model="addStudentId"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="搜索学生姓名或学号添加"
+            :remote-method="searchStudents"
+            :loading="searchStudentLoading"
+            style="width: 300px; margin-right: 10px"
+          >
+            <el-option
+              v-for="item in searchStudentList"
+              :key="item.id"
+              :label="item.name + ' (' + item.year_name + item.class_name + ')'"
+              :value="item.id"
+            />
+          </el-select>
+          <el-button
+            type="primary"
+            @click="handleAddStudent"
+            :disabled="!addStudentId"
+          >
+            <el-icon><Plus /></el-icon>
+            添加学生
+          </el-button>
+
+          <el-button type="success" @click="handleExportStudents">
+            导出
+          </el-button>
+          <el-button type="warning" @click="triggerImport"> 导入 </el-button>
+          <input
+            type="file"
+            ref="fileInputRef"
+            style="display: none"
+            accept=".xlsx,.xls"
+            @change="handleImportStudents"
+          />
+        </div>
+
+        <!-- 学生列表 -->
+        <el-table
+          :data="subjectStudents"
+          style="width: 100%; margin-top: 20px"
+          v-loading="studentLoading"
+          border
+        >
+          <el-table-column
+            prop="student_id"
+            label="学号"
+            width="150"
+            show-overflow-tooltip
+          />
+          <el-table-column prop="student_name" label="姓名" width="120" />
+          <el-table-column prop="class_name" label="班级" min-width="150" />
+          <el-table-column label="操作" width="100" fixed="right">
+            <template #default="{ row }">
+              <el-button
+                size="small"
+                type="danger"
+                @click="handleRemoveStudent(row)"
+              >
+                移除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -127,6 +229,7 @@ import { ref, reactive, onMounted, computed } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Plus, Search } from "@element-plus/icons-vue";
 import { adminAPI } from "@/api/admin";
+import * as XLSX from "xlsx";
 
 // 数据
 const loading = ref(false);
@@ -137,6 +240,17 @@ const allElectiveSubjects = ref([]);
 const allTeachers = ref([]);
 const teacherList = ref([]);
 const teacherLoading = ref(false);
+const semesters = ref([]);
+
+// 学生管理相关
+const showStudentDialog = ref(false);
+const currentSubjectName = ref("");
+const currentSubjectId = ref(null);
+const subjectStudents = ref([]);
+const studentLoading = ref(false);
+const addStudentId = ref("");
+const searchStudentList = ref([]);
+const searchStudentLoading = ref(false);
 
 // 表单相关
 const showAddDialog = ref(false);
@@ -148,12 +262,14 @@ const subjectForm = reactive({
   id: null,
   name: "",
   teacher_id: "",
+  semester_id: "",
   enabled: true,
 });
 
 const subjectRules = {
   name: [{ required: true, message: "请输入课程名称", trigger: "blur" }],
   teacher_id: [{ required: true, message: "请输入教师ID", trigger: "blur" }],
+  semester_id: [{ required: true, message: "请选择学期", trigger: "change" }],
 };
 
 // 计算属性
@@ -171,6 +287,17 @@ const filteredElectiveSubjects = computed(() => {
 });
 
 // 方法
+const loadSemesters = async () => {
+  try {
+    const response = await adminAPI.getSemesters();
+    if (response.status === 200) {
+      semesters.value = response.data;
+    }
+  } catch (error) {
+    console.error("Failed to load semesters:", error);
+  }
+};
+
 const loadSubjects = async () => {
   loading.value = true;
   try {
@@ -226,6 +353,7 @@ const editSubject = (row) => {
   subjectForm.id = row.id;
   subjectForm.name = row.name;
   subjectForm.teacher_id = row.teacher_id;
+  subjectForm.semester_id = row.semester_id;
   subjectForm.enabled = row.enabled;
 
   // 确保列表包含当前教师
@@ -292,6 +420,7 @@ const submitSubject = async () => {
         const createPayload = {
           name: subjectForm.name,
           teacher_id: subjectForm.teacher_id,
+          semester_id: subjectForm.semester_id,
           enabled: subjectForm.enabled,
         };
         response = await adminAPI.createElectiveSubject(createPayload);
@@ -315,13 +444,192 @@ const resetForm = () => {
   subjectForm.id = null;
   subjectForm.name = "";
   subjectForm.teacher_id = "";
+  subjectForm.semester_id = "";
   subjectForm.enabled = true;
   isEdit.value = false;
+};
+
+// 学生管理方法
+const openStudentDialog = (row) => {
+  currentSubjectId.value = row.id;
+  currentSubjectName.value = row.name;
+  showStudentDialog.value = true;
+  loadSubjectStudents();
+};
+
+const resetStudentDialog = () => {
+  currentSubjectId.value = null;
+  currentSubjectName.value = "";
+  subjectStudents.value = [];
+  addStudentId.value = "";
+  searchStudentList.value = [];
+};
+
+const loadSubjectStudents = async () => {
+  if (!currentSubjectId.value) return;
+  studentLoading.value = true;
+  try {
+    const response = await adminAPI.getElectiveSubjectStudents(
+      currentSubjectId.value,
+    );
+    if (response.status === 200) {
+      subjectStudents.value = response.data;
+    }
+  } catch (error) {
+    console.error("Failed to load subject students:", error);
+    ElMessage.error("获取学生列表失败");
+  } finally {
+    studentLoading.value = false;
+  }
+};
+
+const searchStudents = async (query) => {
+  if (query) {
+    searchStudentLoading.value = true;
+    try {
+      const response = await adminAPI.getStudents({ keyword: query });
+      if (response.status === 200) {
+        // 适配不同的 API 返回结构
+        const students =
+          response.data.students || response.data.items || response.data || [];
+        searchStudentList.value = students.map((s) => ({
+          id: s.user_id || s.id,
+          name: s.user_name || s.name,
+          student_id: s.student_id || s.studentId || "",
+          year_name: s.year_name || s.yearName || "",
+          class_name: s.class_name || s.className || "",
+        }));
+      }
+    } catch (error) {
+      console.error("Failed to search students:", error);
+    } finally {
+      searchStudentLoading.value = false;
+    }
+  } else {
+    searchStudentList.value = [];
+  }
+};
+
+const handleAddStudent = async () => {
+  if (!addStudentId.value || !currentSubjectId.value) return;
+  try {
+    const response = await adminAPI.addStudentToElectiveSubject(
+      currentSubjectId.value,
+      addStudentId.value,
+    );
+    if (response.status === 200) {
+      ElMessage.success("添加学生成功");
+      addStudentId.value = "";
+      loadSubjectStudents();
+    }
+  } catch (error) {
+    console.error("Failed to add student:", error);
+    ElMessage.error("添加学生失败");
+  }
+};
+
+const handleRemoveStudent = async (row) => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要将学生 "${row.name}" 从该选修课中移除吗？`,
+      "确认移除",
+      {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      },
+    );
+
+    // 优先使用 id，如果没有则尝试 student_id (根据后端API定义)
+    const studentIdToRemove = row.id || row.student_id;
+    const response = await adminAPI.removeStudentFromElectiveSubject(
+      currentSubjectId.value,
+      studentIdToRemove,
+    );
+    if (response.status === 200) {
+      ElMessage.success("移除学生成功");
+      loadSubjectStudents();
+    }
+  } catch (error) {
+    if (error !== "cancel") {
+      console.error("Failed to remove student:", error);
+      ElMessage.error("移除学生失败");
+    }
+  }
+};
+
+const handleExportStudents = () => {
+  const header = ["学号", "姓名", "班级"];
+  const data = subjectStudents.value.map((s) => ({
+    学号: s.student_id,
+    姓名: s.name,
+    班级: s.class_name,
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(data, {
+    header,
+    skipHeader: false,
+  });
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "学生名单");
+
+  XLSX.writeFile(wb, `${currentSubjectName.value}_学生名单.xlsx`);
+};
+
+const fileInputRef = ref(null);
+
+const triggerImport = () => {
+  fileInputRef.value.click();
+};
+
+const handleImportStudents = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+      const studentIds = jsonData
+        .map((row) => row["学号"] || row["student_id"])
+        .filter(
+          (id) => id !== undefined && id !== null && String(id).trim() !== "",
+        );
+
+      if (studentIds.length === 0) {
+        ElMessage.warning("未解析到有效的学号数据");
+        return;
+      }
+
+      const response = await adminAPI.batchAddStudentsToElectiveSubject(
+        currentSubjectId.value,
+        studentIds,
+      );
+
+      if (response.status === 200) {
+        ElMessage.success(`导入完成`);
+        loadSubjectStudents();
+      }
+    } catch (error) {
+      console.error("Import error:", error);
+      ElMessage.error("导入失败，请检查文件格式");
+    } finally {
+      // 清空 input，允许重复上传同一文件
+      event.target.value = "";
+    }
+  };
+  reader.readAsArrayBuffer(file);
 };
 
 onMounted(() => {
   loadSubjects();
   loadAllTeachers();
+  loadSemesters();
 });
 </script>
 

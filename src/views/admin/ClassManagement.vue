@@ -118,11 +118,22 @@ const gradeOptions = computed(() => {
 });
 
 const filteredClassList = computed(() => {
-  if (!gradeFilter.value) return classList.value;
-  return classList.value.filter((item) => {
-    const name = item.class_name || "";
-    // 只要班级名称包含选中的年级关键词即可
-    return name.includes(gradeFilter.value);
+  let list = classList.value;
+  if (gradeFilter.value) {
+    list = list.filter((item) => {
+      const name = item.class_name || "";
+      // 只要班级名称包含选中的年级关键词即可
+      return name.includes(gradeFilter.value);
+    });
+  }
+  // 按 year_code 降序和 class_name 升序排序
+  return [...list].sort((a, b) => {
+    const yearA = Number(a.year_code) || 0;
+    const yearB = Number(b.year_code) || 0;
+    if (yearA !== yearB) {
+      return yearB - yearA;
+    }
+    return (a.class_name || "").localeCompare(b.class_name || "", "zh-CN");
   });
 });
 
