@@ -44,7 +44,6 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { studentAPI } from "@/api/student";
 import { ElMessage } from "element-plus";
-import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
 const loading = ref(false);
@@ -65,16 +64,9 @@ const loadSemesters = async () => {
 };
 
 const handleViewReport = (row) => {
-  // Assuming studentId is needed, but Report.vue often assumes context.
-  // We can pass semesterId as query or param.
-  // Reusing existing Report.vue logic.
-  const authStore = useAuthStore();
-  const studentId = authStore.userInfo.user_id;
-
   router.push({
-    name: "StudentSemesterReport",
-    params: { semesterId: row.semester_id, studentId: studentId },
-    query: { semesterName: row.semester_name },
+    name: "MySemesterReport",
+    params: { semesterId: row.semester_id },
   });
 };
 

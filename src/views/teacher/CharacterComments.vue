@@ -51,6 +51,8 @@
               v-model="row.abilities.study_ability"
               :min="0"
               :max="10"
+              :precision="0"
+              :step="1"
               controls-position="right"
               style="width: 90px"
               @change="row.modified = true"
@@ -63,6 +65,8 @@
               v-model="row.abilities.logical_thinking"
               :min="0"
               :max="10"
+              :precision="0"
+              :step="1"
               controls-position="right"
               style="width: 90px"
               @change="row.modified = true"
@@ -75,6 +79,8 @@
               v-model="row.abilities.creativity"
               :min="0"
               :max="10"
+              :precision="0"
+              :step="1"
               controls-position="right"
               style="width: 90px"
               @change="row.modified = true"
@@ -87,6 +93,8 @@
               v-model="row.abilities.teamwork"
               :min="0"
               :max="10"
+              :precision="0"
+              :step="1"
               controls-position="right"
               style="width: 90px"
               @change="row.modified = true"
@@ -99,6 +107,8 @@
               v-model="row.abilities.responsibility"
               :min="0"
               :max="10"
+              :precision="0"
+              :step="1"
               controls-position="right"
               style="width: 90px"
               @change="row.modified = true"
@@ -106,7 +116,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="品格等第" width="120">
+        <el-table-column label="品格等第" width="90">
           <template #default="{ row }">
             <el-select
               v-model="row.grade"

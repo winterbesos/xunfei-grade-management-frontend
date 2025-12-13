@@ -229,4 +229,11 @@ export const adminAPI = {
       data: { student_ids: studentIds },
     });
   },
+
+  getSchoolYears() {
+    return request({
+      url: "/api/admin/years",
+      method: "get",
+    });
+  },
 };

@@ -136,6 +136,7 @@ import * as echarts from "echarts";
 import { useRoute } from "vue-router";
 import { printElement } from "@/utils/print.js";
 import { teacherAPI } from "@/api/teacher";
+import { studentAPI } from "@/api/student";
 
 const route = useRoute();
 
@@ -185,8 +186,14 @@ const semesterId = route.params.semesterId;
 const studentId = route.params.studentId;
 
 const loadReportData = async () => {
-  teacherAPI
-    .getStudentSemesterReport(studentId, semesterId)
+  let promise = null;
+  if (studentId) {
+    promise = teacherAPI.getStudentSemesterReport(studentId, semesterId);
+  } else {
+    promise = studentAPI.getMySemesterReport(semesterId);
+  }
+
+  promise
     .then((response) => {
       if (response.status !== 200) {
         ElMessage.error("加载学生列表失败");
@@ -228,12 +235,6 @@ const loadReportData = async () => {
       moralComment.value = response.data.moral_education_comment;
       abilities.value = response.data.abilities;
 
-      // URL覆盖逻辑 (可选)
-      if (route.query.schoolName)
-        school.value.school_name = route.query.schoolName;
-      if (route.query.semesterName)
-        school.value.semester_name = route.query.semesterName;
-
       // 更新图表
       if (chartRef.value && myChart) {
         updateChart();
@@ -267,11 +268,11 @@ const updateChart = () => {
   const option = {
     radar: {
       indicator: [
-        { name: "学习能力", max: 5 },
-        { name: "逻辑思维", max: 5 },
-        { name: "创新创造", max: 5 },
-        { name: "团队协作", max: 5 },
-        { name: "责任心", max: 5 },
+        { name: "学习能力", max: 10 },
+        { name: "逻辑思维", max: 10 },
+        { name: "创新创造", max: 10 },
+        { name: "团队协作", max: 10 },
+        { name: "责任心", max: 10 },
       ],
       radius: "64%",
       center: ["56%", "55%"],

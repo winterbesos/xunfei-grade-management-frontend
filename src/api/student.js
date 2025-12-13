@@ -57,6 +57,13 @@ export const studentAPI = {
     });
   },
 
+  getMySemesterReport(semesterId) {
+    return request({
+      url: `/api/student/semesters/${semesterId}/report-grades`,
+      method: "get",
+    });
+  },
+
   // 获取学期列表
   getSemesters(params) {
     if (USE_MOCK) {

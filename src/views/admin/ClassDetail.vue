@@ -19,19 +19,31 @@
             <span class="ellipsis-id">{{ classInfo.class_name }}</span>
           </el-descriptions-item>
           <el-descriptions-item label="班级ID">
-            <span class="ellipsis-id">{{ classInfo.class_id }}</span>
+            <el-tooltip
+              :content="classInfo.class_id"
+              placement="top"
+              effect="dark"
+            >
+              <span class="ellipsis-id">{{ classInfo.class_id }}</span>
+            </el-tooltip>
           </el-descriptions-item>
           <el-descriptions-item label="班主任">
             <span class="ellipsis-id">{{ classInfo.header_teacher_name }}</span>
           </el-descriptions-item>
           <el-descriptions-item label="班主任ID">
-            <span class="ellipsis-id">{{ classInfo.header_teacher_id }}</span>
+            <el-tooltip
+              :content="classInfo.class_id"
+              placement="top"
+              effect="dark"
+            >
+              <span class="ellipsis-id">{{ classInfo.header_teacher_id }}</span>
+            </el-tooltip>
           </el-descriptions-item>
           <el-descriptions-item label="学生人数">{{
             classInfo.student_count
           }}</el-descriptions-item>
           <el-descriptions-item label="所属学期">
-            <span class="ellipsis-id">{{ classInfo.teaching_cycle_name }}</span>
+            <span class="ellipsis-id">{{ classInfo.semester_name }}</span>
           </el-descriptions-item>
         </el-descriptions>
 
@@ -80,8 +92,7 @@
               width="150"
               show-overflow-tooltip
             />
-            <el-table-column prop="user_name" label="姓名" width="150" />
-            <el-table-column prop="gender" label="性别" />
+            <el-table-column prop="user_name" label="姓名" min-width="150" />
             <el-table-column label="操作" width="280" align="center">
               <template #default="{ row }">
                 <el-button type="primary" link @click="handleViewProof(row)">
@@ -272,7 +283,7 @@ onMounted(() => {
 
 .ellipsis-id {
   display: inline-block;
-  width: 150px; /* 👈 控制宽度 */
+  width: 180px; /* 👈 控制宽度 */
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
