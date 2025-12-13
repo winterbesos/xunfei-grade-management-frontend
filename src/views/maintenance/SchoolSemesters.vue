@@ -1,6 +1,6 @@
 <template>
   <div class="school-semesters">
-    <div class="page-header">
+    <div class="page-header" v-if="!props.embedded">
       <el-page-header @back="goBack">
         <template #content>
           <span class="text-large font-600 mr-3"> 学校学期列表 </span>
@@ -11,10 +11,8 @@
     <el-card class="mt-4">
       <template #header>
         <div class="card-header">
-          <span>学期列表 (学校ID: {{ schoolId }})</span>
-          <div class="header-actions">
-            <el-button type="primary" @click="loadSemesters">刷新</el-button>
-          </div>
+          <span>学期列表</span>
+          <div class="header-actions"></div>
         </div>
       </template>
 
@@ -30,22 +28,22 @@
           width="200"
           show-overflow-tooltip
         />
-        <el-table-column prop="semester_name" label="学期名称" min-width="150" />
+        <el-table-column
+          prop="semester_name"
+          label="学期名称"
+          min-width="150"
+        />
         <el-table-column prop="begin_time" label="开始时间" width="200" />
         <el-table-column prop="end_time" label="结束时间" width="200" />
         <el-table-column label="操作" width="200" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button
-              type="primary"
-              size="small"
-              @click="openSyncDialog(row)"
-            >
+            <el-button type="primary" size="small" @click="openSyncDialog(row)">
               同步考试成绩
             </el-button>
           </template>
         </el-table-column>
       </el-table>
-      
+
       <el-empty
         v-if="!loading && semesters.length === 0"
         description="暂无学期数据"
@@ -66,13 +64,14 @@
         label-width="100px"
       >
         <el-form-item label="考试ID" prop="examId">
-          <el-input 
-            v-model="syncForm.examId" 
-            placeholder="请输入考试ID" 
-          />
+          <el-input v-model="syncForm.examId" placeholder="请输入考试ID" />
         </el-form-item>
         <el-form-item label="考试类型" prop="examType">
-          <el-select v-model="syncForm.examType" placeholder="请选择考试类型" style="width: 100%;">
+          <el-select
+            v-model="syncForm.examType"
+            placeholder="请选择考试类型"
+            style="width: 100%"
+          >
             <el-option label="期中考试" :value="1"></el-option>
             <el-option label="期末考试" :value="2"></el-option>
           </el-select>
@@ -95,14 +94,25 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { maintenanceAPI } from "@/api/maintenance";
 import { ElMessage } from "element-plus";
 
+const props = defineProps({
+  embedded: {
+    type: Boolean,
+    default: false,
+  },
+  schoolId: {
+    type: String,
+    default: "",
+  },
+});
+
 const route = useRoute();
 const router = useRouter();
-const schoolId = route.params.schoolId;
+const currentSchoolId = computed(() => props.schoolId || route.params.schoolId);
 
 const loading = ref(false);
 const semesters = ref([]);
@@ -128,7 +138,7 @@ const goBack = () => {
 const loadSemesters = async () => {
   loading.value = true;
   try {
-    const res = await maintenanceAPI.getSchoolSemesters(schoolId);
+    const res = await maintenanceAPI.getSchoolSemesters(currentSchoolId.value);
     if (res.status === 200) {
       // Handle different possible response structures
       if (Array.isArray(res.data)) {
@@ -167,20 +177,22 @@ const resetSyncForm = () => {
 
 const handleSyncGrades = async () => {
   if (!syncFormRef.value) return;
-  
+
   await syncFormRef.value.validate(async (valid) => {
     if (!valid) return;
-    
+
     syncLoading.value = true;
     try {
       const res = await maintenanceAPI.syncSemesterExamGrades(
-        schoolId,
+        currentSchoolId.value,
         currentSemester.value.semester_id,
         syncForm.examId,
-        syncForm.examType // Pass examType
+        syncForm.examType, // Pass examType
       );
       if (res.status === 200) {
-        ElMessage.success(`学期 ${currentSemester.value.semester_name} 成绩同步任务已提交`);
+        ElMessage.success(
+          `学期 ${currentSemester.value.semester_name} 成绩同步任务已提交`,
+        );
         syncDialogVisible.value = false;
       } else {
         ElMessage.error("同步失败");
@@ -195,7 +207,7 @@ const handleSyncGrades = async () => {
 };
 
 onMounted(() => {
-  if (schoolId) {
+  if (currentSchoolId.value) {
     loadSemesters();
   } else {
     ElMessage.error("缺少学校ID参数");

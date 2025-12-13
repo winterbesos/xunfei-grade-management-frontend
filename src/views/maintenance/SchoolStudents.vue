@@ -1,6 +1,6 @@
 <template>
   <div class="school-students">
-    <div class="page-header">
+    <div class="page-header" v-if="!props.embedded">
       <el-page-header @back="goBack">
         <template #content>
           <span class="text-large font-600 mr-3"> 学校学生列表 </span>
@@ -127,15 +127,26 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { maintenanceAPI } from "@/api/maintenance";
 import { ElMessage } from "element-plus";
 import { Search } from "@element-plus/icons-vue";
 
+const props = defineProps({
+  embedded: {
+    type: Boolean,
+    default: false,
+  },
+  schoolId: {
+    type: String,
+    default: "",
+  },
+});
+
 const route = useRoute();
 const router = useRouter();
-const schoolId = route.params.schoolId;
+const currentSchoolId = computed(() => props.schoolId || route.params.schoolId);
 
 const loading = ref(false);
 const studentList = ref([]);
@@ -174,7 +185,7 @@ const fetchStudents = async () => {
       apiParams.has_short_id = queryParams.has_short_id_filter === "true";
     }
 
-    const res = await maintenanceAPI.getSchoolStudents(schoolId, apiParams);
+    const res = await maintenanceAPI.getSchoolStudents(currentSchoolId.value, apiParams);
     if (res.status === 200) {
       // The user said response_model=list[StudentResponse]
       const data = res.data;
@@ -213,7 +224,7 @@ const submitBindShortId = async () => {
       binding.value = true;
       try {
         const response = await maintenanceAPI.bindStudentShortId(
-          schoolId,
+          currentSchoolId.value,
           currentStudentId.value,
           bindForm.short_id
         );
@@ -243,7 +254,7 @@ const resetBindForm = () => {
 };
 
 onMounted(() => {
-  if (schoolId) {
+  if (currentSchoolId.value) {
     fetchStudents();
   } else {
     ElMessage.error("缺少学校ID参数");

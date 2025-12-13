@@ -3,12 +3,14 @@
     <el-card>
       <template #header>
         <div class="card-header">
-          <div class="header-left">
+          <div class="header-left" v-if="!props.embedded">
             <el-button link @click="goBack">
               <el-icon><ArrowLeft /></el-icon> 返回
             </el-button>
             <h3 class="title">学科管理</h3>
           </div>
+          <div v-else>学科列表</div>
+          <!-- Spacer or just let flex handle it -->
           <el-button type="primary" @click="openAddDialog">
             <el-icon><Plus /></el-icon>
             添加子学科
@@ -43,35 +45,36 @@
       width="500px"
       @close="resetForm"
     >
-      <el-form
-        ref="formRef"
-        :model="form"
-        :rules="rules"
-        label-width="120px"
-      >
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="120px">
         <template v-if="!isEdit">
           <el-form-item label="学科名称" prop="subject_name">
-            <el-input v-model="form.subject_name" placeholder="请输入学科名称" />
+            <el-input
+              v-model="form.subject_name"
+              placeholder="请输入学科名称"
+            />
           </el-form-item>
           <el-form-item label="学科代码" prop="subject_code">
-            <el-input v-model="form.subject_code" placeholder="请输入学科代码" />
+            <el-input
+              v-model="form.subject_code"
+              placeholder="请输入学科代码"
+            />
           </el-form-item>
         </template>
-        
+
         <el-form-item label="主学科代码" prop="master_subject_code">
           <el-select
-             v-model="form.master_subject_code"
-             filterable
-             placeholder="请选择主学科"
-             style="width: 100%"
-           >
-             <el-option
-               v-for="item in existingSubjects"
-               :key="item.subject_code"
-               :label="item.subject_name + ' (' + item.subject_code + ')'"
-               :value="item.subject_code"
-             />
-           </el-select>
+            v-model="form.master_subject_code"
+            filterable
+            placeholder="请选择主学科"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="item in existingSubjects"
+              :key="item.subject_code"
+              :label="item.subject_name + ' (' + item.subject_code + ')'"
+              :value="item.subject_code"
+            />
+          </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -97,9 +100,20 @@ import { ElMessage } from "element-plus";
 import { Plus, ArrowLeft } from "@element-plus/icons-vue";
 import { maintenanceAPI } from "@/api/maintenance";
 
+const props = defineProps({
+  embedded: {
+    type: Boolean,
+    default: false,
+  },
+  schoolId: {
+    type: String,
+    default: "",
+  },
+});
+
 const route = useRoute();
 const router = useRouter();
-const schoolId = route.params.schoolId;
+const currentSchoolId = computed(() => props.schoolId || route.params.schoolId);
 
 const loading = ref(false);
 const subjects = ref([]);
@@ -128,7 +142,7 @@ const rules = {
 
 // Compute existing subjects for the dropdown, possibly filtering out the current subject if in edit mode (though circular dependency prevention is good, for now just list all)
 const existingSubjects = computed(() => {
-    return subjects.value;
+  return subjects.value;
 });
 
 const goBack = () => {
@@ -138,7 +152,9 @@ const goBack = () => {
 const loadSubjects = async () => {
   loading.value = true;
   try {
-    const response = await maintenanceAPI.getSchoolSubjects(schoolId);
+    const response = await maintenanceAPI.getSchoolSubjects(
+      currentSchoolId.value,
+    );
     if (response.status === 200) {
       subjects.value = response.data || [];
     } else {
@@ -174,21 +190,24 @@ const openEditDialog = (row) => {
 
 const handleSubmit = async () => {
   if (!formRef.value) return;
-  
+
   await formRef.value.validate(async (valid) => {
     if (!valid) return;
-    
+
     submitLoading.value = true;
     try {
       let response;
       if (isEdit.value) {
         response = await maintenanceAPI.updateSchoolSubject(
-          schoolId,
+          currentSchoolId.value,
           form.value.subject_code,
-          { master_subject_code: form.value.master_subject_code }
+          { master_subject_code: form.value.master_subject_code },
         );
       } else {
-        response = await maintenanceAPI.createSchoolSubject(schoolId, form.value);
+        response = await maintenanceAPI.createSchoolSubject(
+          currentSchoolId.value,
+          form.value,
+        );
       }
 
       if (response.status === 200) {
@@ -219,7 +238,7 @@ const resetForm = () => {
 };
 
 onMounted(() => {
-  if (schoolId) {
+  if (currentSchoolId.value) {
     loadSubjects();
   } else {
     ElMessage.error("参数错误：缺少学校ID");

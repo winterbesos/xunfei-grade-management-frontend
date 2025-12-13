@@ -14,13 +14,12 @@
         stripe
         style="width: 100%; margin-top: 20px"
       >
-        <el-table-column
-          prop="semester_id"
-          label="学期ID"
-          width="150"
-          show-overflow-tooltip
-        />
-        <el-table-column prop="semester_name" label="学期名称" min-width="80" />
+        <el-table-column prop="semester_name" label="学期名称" min-width="300">
+          <template #default="{ row }">
+            {{ row.academic_year_name }} {{ row.term_name }}
+            {{ row.semester_name }}
+          </template>
+        </el-table-column>
         <el-table-column prop="begin_time" label="开始时间" width="200">
           <template #default="{ row }">
             {{ formatDate(row.begin_time) }}

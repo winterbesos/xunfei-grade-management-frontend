@@ -1,6 +1,6 @@
 <template>
   <div class="school-teachers">
-    <div class="page-header">
+    <div class="page-header" v-if="!props.embedded">
       <el-page-header @back="goBack">
         <template #content>
           <span class="text-large font-600 mr-3"> 学校教师列表 </span>
@@ -11,7 +11,7 @@
     <el-card class="mt-4">
       <template #header>
         <div class="card-header">
-          <span>教师列表 (学校ID: {{ schoolId }})</span>
+          <span>教师列表</span>
           <div class="header-actions">
             <el-input
               v-model="queryParams.keyword"
@@ -76,15 +76,26 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { maintenanceAPI } from "@/api/maintenance";
 import { ElMessage } from "element-plus";
 import { Search } from "@element-plus/icons-vue";
 
+const props = defineProps({
+  embedded: {
+    type: Boolean,
+    default: false,
+  },
+  schoolId: {
+    type: String,
+    default: "",
+  },
+});
+
 const route = useRoute();
 const router = useRouter();
-const schoolId = route.params.schoolId;
+const currentSchoolId = computed(() => props.schoolId || route.params.schoolId);
 
 const loading = ref(false);
 const teacherList = ref([]);
@@ -103,7 +114,7 @@ const goBack = () => {
 const fetchTeachers = async () => {
   loading.value = true;
   try {
-    const res = await maintenanceAPI.getSchoolTeachers(schoolId, {
+    const res = await maintenanceAPI.getSchoolTeachers(currentSchoolId.value, {
       page: queryParams.page,
       limit: queryParams.pageSize,
       keyword: queryParams.keyword,
@@ -143,7 +154,7 @@ const handleCurrentChange = (val) => {
 };
 
 onMounted(() => {
-  if (schoolId) {
+  if (currentSchoolId.value) {
     fetchTeachers();
   } else {
     ElMessage.error("缺少学校ID参数");

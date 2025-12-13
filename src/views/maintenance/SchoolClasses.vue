@@ -1,6 +1,6 @@
 <template>
   <div class="school-classes">
-    <div class="page-header">
+    <div class="page-header" v-if="!props.embedded">
       <el-page-header @back="goBack">
         <template #content>
           <span class="text-large font-600 mr-3"> 学校班级列表 </span>
@@ -11,7 +11,7 @@
     <el-card class="mt-4">
       <template #header>
         <div class="card-header">
-          <span>班级列表 (学校ID: {{ schoolId }})</span>
+          <span>班级列表</span>
           <div class="header-actions">
             <el-select
               v-model="gradeFilter"
@@ -127,9 +127,20 @@ import { maintenanceAPI } from "@/api/maintenance";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Search } from "@element-plus/icons-vue";
 
+const props = defineProps({
+  embedded: {
+    type: Boolean,
+    default: false,
+  },
+  schoolId: {
+    type: String,
+    default: "",
+  },
+});
+
 const route = useRoute();
 const router = useRouter();
-const schoolId = route.params.schoolId;
+const currentSchoolId = computed(() => props.schoolId || route.params.schoolId);
 
 const loading = ref(false);
 const classList = ref([]);
@@ -156,7 +167,10 @@ const goBack = () => {
 const fetchClasses = async () => {
   loading.value = true;
   try {
-    const res = await maintenanceAPI.getSchoolClasses(schoolId, queryParams);
+    const res = await maintenanceAPI.getSchoolClasses(
+      currentSchoolId.value,
+      queryParams,
+    );
     if (res.status === 200) {
       // Adjust based on actual API response structure.
       // Assuming it returns an array or an object with a list.
@@ -268,7 +282,7 @@ const submitGenerateData = async () => {
 };
 
 onMounted(() => {
-  if (schoolId) {
+  if (currentSchoolId.value) {
     fetchClasses();
   } else {
     ElMessage.error("缺少学校ID参数");

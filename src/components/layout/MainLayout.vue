@@ -83,29 +83,9 @@
 
         <!-- 维护人员菜单 -->
         <template v-if="authStore.userRole === 'maintenance'">
-          <el-menu-item index="/maintenance/system-status">
-            <el-icon><Monitor /></el-icon>
-            <template #title>系统状态</template>
-          </el-menu-item>
-          <el-menu-item index="/maintenance/logs">
-            <el-icon><Document /></el-icon>
-            <template #title>系统日志</template>
-          </el-menu-item>
-          <el-menu-item index="/maintenance/backup">
-            <el-icon><Download /></el-icon>
-            <template #title>数据备份</template>
-          </el-menu-item>
           <el-menu-item index="/maintenance/schools">
             <el-icon><School /></el-icon>
             <template #title>学校管理</template>
-          </el-menu-item>
-          <el-menu-item index="/maintenance/students">
-            <el-icon><User /></el-icon>
-            <template #title>学生管理</template>
-          </el-menu-item>
-          <el-menu-item index="/maintenance/semesters">
-            <el-icon><Calendar /></el-icon>
-            <template #title>学期管理</template>
           </el-menu-item>
         </template>
       </el-menu>
