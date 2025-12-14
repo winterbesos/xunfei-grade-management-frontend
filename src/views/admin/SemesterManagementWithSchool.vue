@@ -124,7 +124,7 @@
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { adminAPI } from "@/api/admin";
-import { formatDate } from "@/utils/date";
+import { formatDate, toISODate } from "@/utils/date";
 
 const loading = ref(false);
 const semesters = ref([]);
@@ -151,8 +151,8 @@ const scoringTimeRules = {
 // 打开设置打分时间对话框
 const handleSetScoringTime = (row) => {
   scoringTimeForm.semesterId = row.semester_id;
-  scoringTimeForm.scoringBeginTime = row.scoring_begin_time || "";
-  scoringTimeForm.scoringEndTime = row.scoring_end_time || "";
+  scoringTimeForm.scoringBeginTime = formatDate(row.scoring_begin_time) || "";
+  scoringTimeForm.scoringEndTime = formatDate(row.scoring_end_time) || "";
   scoringTimeDialogVisible.value = true;
 };
 
@@ -176,8 +176,8 @@ const submitScoringTime = async () => {
       const response = await adminAPI.updateSemesterScoringTime(
         scoringTimeForm.semesterId,
         {
-          begin_time: scoringTimeForm.scoringBeginTime,
-          end_time: scoringTimeForm.scoringEndTime,
+          begin_time: toISODate(scoringTimeForm.scoringBeginTime),
+          end_time: toISODate(scoringTimeForm.scoringEndTime),
         },
       );
 

@@ -19,12 +19,20 @@
           label="学期名称"
           min-width="180"
         />
-        <el-table-column prop="begin_time" label="评分开始时间" width="180">
+        <el-table-column
+          prop="scoring_begin_time"
+          label="评分开始时间"
+          width="180"
+        >
           <template #default="{ row }">
             {{ formatDate(row.scoring_begin_time) }}
           </template>
         </el-table-column>
-        <el-table-column prop="end_time" label="评分结束时间" width="180">
+        <el-table-column
+          prop="scoring_end_time"
+          label="评分结束时间"
+          width="180"
+        >
           <template #default="{ row }">
             {{ formatDate(row.scoring_end_time) }}
           </template>
@@ -56,45 +64,6 @@
         description="暂无可打分的学期"
       />
     </el-card>
-
-    <!-- 查看详情对话框 -->
-    <el-dialog v-model="dialogVisible" title="学期详情" width="600px">
-      <el-descriptions :column="2" border>
-        <el-descriptions-item label="学期ID">{{
-          currentSemester.id
-        }}</el-descriptions-item>
-        <el-descriptions-item label="学期名称">{{
-          currentSemester.name
-        }}</el-descriptions-item>
-        <el-descriptions-item label="学校ID">{{
-          currentSemester.schoolId
-        }}</el-descriptions-item>
-        <el-descriptions-item label="学校名称">{{
-          currentSemester.schoolName
-        }}</el-descriptions-item>
-        <el-descriptions-item label="开始时间">{{
-          currentSemester.startDate
-        }}</el-descriptions-item>
-        <el-descriptions-item label="结束时间">{{
-          currentSemester.endDate
-        }}</el-descriptions-item>
-        <el-descriptions-item label="状态">
-          <el-tag :type="getStatusType(currentSemester)">
-            {{ getStatusText(currentSemester) }}
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item label="课程数">{{
-          currentSemester.courseCount || 0
-        }}</el-descriptions-item>
-        <el-descriptions-item label="备注" :span="2">{{
-          currentSemester.remark || "-"
-        }}</el-descriptions-item>
-      </el-descriptions>
-
-      <template #footer>
-        <el-button @click="dialogVisible = false">关闭</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -103,24 +72,26 @@ import { ref, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import { teacherAPI } from "@/api/teacher";
-import { formatDate } from "@/utils/date";
+import { formatDate, toISODate } from "@/utils/date";
 
 const router = useRouter();
 const loading = ref(false);
 const semesters = ref([]);
-const dialogVisible = ref(false);
-const currentSemester = ref({});
 
 // 获取状态类型
 const getStatusType = (cycle) => {
   if (cycle.is_scoring) return "success";
+  if (cycle.scoring_end_time && new Date() > new Date(cycle.scoring_end_time))
+    return "disabled";
   return null;
 };
 
 // 获取状态文本
 const getStatusText = (cycle) => {
-  if (!cycle.is_scoring) return "未开始";
-  else return "已开启";
+  if (cycle.is_scoring) return "已开始";
+  if (cycle.scoring_end_time && new Date() > new Date(cycle.scoring_end_time))
+    return "已结束";
+  else return "未开始";
 };
 
 // 加载可打分的学期列表

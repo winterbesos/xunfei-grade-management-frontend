@@ -20,21 +20,32 @@
           label="学期名称"
           min-width="180"
         />
-        <el-table-column label="起止时间" width="400">
+        <el-table-column label="评分开始时间" width="180">
           <template #default="{ row }">
-            {{ formatDate(row.scoring_begin_time) }} ~
+            {{ formatDate(row.scoring_begin_time) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="评分结束时间" width="180">
+          <template #default="{ row }">
             {{ formatDate(row.scoring_end_time) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" width="100">
+          <template #default="{ row }">
+            <el-tag :type="getStatusType(row)">
+              {{ getStatusText(row) }}
+            </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button
+              :disabled="!row.is_scoring"
               type="primary"
               size="small"
               link
               @click="handleSelectSemester(row)"
             >
-              <el-icon><View /></el-icon>
               查看班级
             </el-button>
           </template>
@@ -60,6 +71,22 @@ import { formatDate } from "@/utils/date";
 const router = useRouter();
 const semesters = ref([]);
 const loading = ref(false);
+
+// 获取状态类型
+const getStatusType = (cycle) => {
+  if (cycle.is_scoring) return "success";
+  if (cycle.scoring_end_time && new Date() > new Date(cycle.scoring_end_time))
+    return "disabled";
+  return null;
+};
+
+// 获取状态文本
+const getStatusText = (cycle) => {
+  if (cycle.is_scoring) return "已开始";
+  if (cycle.scoring_end_time && new Date() > new Date(cycle.scoring_end_time))
+    return "已结束";
+  else return "未开始";
+};
 
 const fetchSemesters = async () => {
   loading.value = true;

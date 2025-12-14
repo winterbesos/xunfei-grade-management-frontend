@@ -1,7 +1,15 @@
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 
-export const formatDate = (date, format = 'YYYY-MM-DD HH:mm:ss') => {
-  if (!date) return '';
-  const d = dayjs(date);
-  return d.isValid() ? d.format(format) : date;
+dayjs.extend(utc);
+
+export const formatUtcToLocal = (date, fmt = "YYYY-MM-DD HH:mm:ss") =>
+  date ? dayjs.utc(date).local().format(fmt) : "";
+
+export const formatDate = (date, format = "YYYY-MM-DD HH:mm:ss") => {
+  if (!date) return "";
+  return dayjs.utc(date).local().format(format);
 };
+
+export const toISODate = (date) =>
+  date ? dayjs(date).utc().toISOString() : null;
