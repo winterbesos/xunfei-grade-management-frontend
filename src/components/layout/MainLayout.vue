@@ -105,7 +105,7 @@
                 <el-icon><User /></el-icon>
                 <span class="username"
                   >{{ authStore.realname }} ({{
-                    authStore.userInfo.school_name
+                    authStore.userInfo?.school_name
                   }}
                   - {{ roleText }})</span
                 >

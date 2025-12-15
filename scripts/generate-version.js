@@ -26,6 +26,7 @@ VITE_API_BASE_URL=https://grades-api.xsalo.com
 # 是否使用 Mock 数据（true 或 false）
 VITE_USE_MOCK=false
 VITE_SHOW_VERSION=false
+SHOW_PASSWORD_LOGIN=false
 
 # 版本信息
 VITE_APP_VERSION=v${version}
@@ -42,6 +43,7 @@ VITE_API_BASE_URL=https://grades-test.xsalo.com
 # 是否使用 Mock 数据（true 或 false）
 VITE_USE_MOCK=false
 VITE_SHOW_VERSION=true
+SHOW_PASSWORD_LOGIN=true
 
 # 版本信息
 VITE_APP_VERSION=v${version}

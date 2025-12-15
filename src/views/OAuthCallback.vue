@@ -22,80 +22,80 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { Loading, CircleClose } from '@element-plus/icons-vue'
-import { authAPI } from '@/api/auth'
-import { useAuthStore } from '@/stores/auth'
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import { Loading, CircleClose } from "@element-plus/icons-vue";
+import { authAPI } from "@/api/auth";
+import { useAuthStore } from "@/stores/auth";
 
-const route = useRoute()
-const router = useRouter()
-const authStore = useAuthStore()
+const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
 
-const error = ref('')
+const error = ref("");
 
 const handleOAuthCallback = async () => {
   try {
     // 提取URL参数
-    const query = route.query
+    const query = route.query;
 
     // 验证必要参数
     if (!query.state || !query.accessToken) {
-      throw new Error('缺少必要的OAuth参数')
+      throw new Error("缺少必要的OAuth参数");
     }
 
     // 准备提交数据
     const oauthData = {
       state: query.state,
       accessToken: query.accessToken,
-      expiresIn: query.expires_in || 2592000
-    }
+      expiresIn: query.expires_in || 2592000,
+    };
 
     // 提交到后端验证
-    const response = await authAPI.oauthCallback('jyyun', {
+    const response = await authAPI.oauthCallback("jyyun", {
       code: oauthData.accessToken,
       state: oauthData.state,
-    })
+    });
 
     if (response.status === 200 && response.data.access_token) {
       // 存储token
-      authStore.login(response.data.access_token, null)
+      authStore.login(response.data.access_token, null);
 
       // 获取用户信息
-      const userInfoResponse = await authAPI.getUserInfo()
+      const userInfoResponse = await authAPI.getUserInfo();
       if (userInfoResponse.status === 200) {
-        authStore.updateUserInfo(userInfoResponse.data)
-        ElMessage.success('登录成功')
+        authStore.updateUserInfo(userInfoResponse.data);
+        ElMessage.success("登录成功");
 
         // 跳转到对应角色的首页
-        const role = userInfoResponse.data.role
+        const role = userInfoResponse.data.role;
         const routeMap = {
-          admin: '/admin/settings',
-          teacher: '/teacher/grade-management',
-          student: '/student/grades',
-          maintenance: '/maintenance/system-status'
-        }
-        router.push(routeMap[role] || '/dashboard')
+          admin: "/admin/settings",
+          teacher: "/teacher/grade-management",
+          student: "/student/grades",
+          maintenance: "/maintenance/system-status",
+        };
+        router.push(routeMap[role] || "/dashboard");
       } else {
-        throw new Error('获取用户信息失败')
+        throw new Error("获取用户信息失败");
       }
     } else {
-      throw new Error(response.data?.message || 'OAuth认证失败')
+      throw new Error(response.data?.message || "OAuth认证失败");
     }
   } catch (err) {
-    console.error('OAuth callback error:', err)
-    error.value = err.message || '认证失败，请重试'
+    console.error("OAuth callback error:", err);
+    error.value = err.message || "认证失败，请重试";
   }
-}
+};
 
 const goToLogin = () => {
-  router.push('/login')
-}
+  router.push("/login");
+};
 
 onMounted(() => {
-  handleOAuthCallback()
-})
+  handleOAuthCallback();
+});
 </script>
 
 <style scoped>
@@ -123,13 +123,17 @@ onMounted(() => {
 }
 
 .loading-icon {
-  color: #409EFF;
+  color: #409eff;
   animation: spin 2s linear infinite;
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text {
@@ -139,7 +143,7 @@ onMounted(() => {
 }
 
 .error-message {
-  color: #F56C6C;
+  color: #f56c6c;
 }
 
 .error-message .el-icon {

@@ -10,7 +10,7 @@
       <el-tabs v-model="activeTab" v-if="showTabs">
         <!-- 账号密码登录 -->
         <el-tab-pane
-          v-if="settingsStore.systemConfig.enablePasswordLogin"
+          v-if="showPasswordLogin"
           label="账号密码登录"
           name="password"
         >
@@ -137,12 +137,15 @@ import { useAuthStore } from "@/stores/auth";
 import { useSettingsStore } from "@/stores/settings";
 import { authAPI } from "@/api/auth";
 
+const SHOW_PASSWORD_LOGIN = import.meta.env.VITE_SHOW_PASSWORD_LOGIN === "true";
+
+const showPasswordLogin = ref(SHOW_PASSWORD_LOGIN);
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 const settingsStore = useSettingsStore();
 
-const activeTab = ref("password");
+const activeTab = ref("oauth");
 const loading = ref(false);
 const loginFormRef = ref(null);
 
