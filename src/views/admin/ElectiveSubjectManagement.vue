@@ -469,7 +469,7 @@ const loadSubjectStudents = async () => {
   if (!currentSubjectId.value) return;
   studentLoading.value = true;
   try {
-    const response = await adminAPI.getElectiveSubjectStudents(
+    const response = await adminAPI.getElectiveSubjectGrades(
       currentSubjectId.value,
     );
     if (response.status === 200) {
@@ -531,7 +531,7 @@ const handleAddStudent = async () => {
 const handleRemoveStudent = async (row) => {
   try {
     await ElMessageBox.confirm(
-      `确定要将学生 "${row.name}" 从该选修课中移除吗？`,
+      `确定要将学生 "${row.student_name}" 从该选修课中移除吗？`,
       "确认移除",
       {
         confirmButtonText: "确定",
@@ -562,7 +562,7 @@ const handleExportStudents = () => {
   const header = ["学号", "姓名", "班级"];
   const data = subjectStudents.value.map((s) => ({
     学号: s.student_id,
-    姓名: s.name,
+    姓名: s.student_name,
     班级: s.class_name,
   }));
 

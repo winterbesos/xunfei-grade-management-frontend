@@ -65,7 +65,6 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { teacherAPI } from "@/api/teacher";
 import { ElMessage } from "element-plus";
-import { View } from "@element-plus/icons-vue";
 import { formatDate } from "@/utils/date";
 
 const router = useRouter();

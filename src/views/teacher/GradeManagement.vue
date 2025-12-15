@@ -72,7 +72,7 @@ import { ref, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import { teacherAPI } from "@/api/teacher";
-import { formatDate, toISODate } from "@/utils/date";
+import { formatDate } from "@/utils/date";
 
 const router = useRouter();
 const loading = ref(false);

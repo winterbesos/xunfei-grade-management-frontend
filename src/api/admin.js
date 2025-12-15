@@ -190,7 +190,7 @@ export const adminAPI = {
   // 获取选修课学生成绩列表
   getElectiveSubjectGrades(subjectId) {
     return request({
-      url: `/api/admin/elective-subjects/${subjectId}/grades`,
+      url: `/api/admin/elective-subjects/${subjectId}/students`,
       method: "get",
     });
   },

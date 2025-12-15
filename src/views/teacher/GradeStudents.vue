@@ -117,7 +117,7 @@
       >
         <el-table-column type="selection" width="55" />
         <el-table-column type="index" label="序号" width="60" />
-        <el-table-column prop="user_name" label="姓名" width="80" />
+        <el-table-column prop="user_name" label="姓名" min-width="80" />
         <el-table-column
           prop="midterm_score"
           label="期中成绩"
@@ -176,7 +176,7 @@
             <span v-else class="no-score">未录入</span>
           </template>
         </el-table-column>
-        <el-table-column label="等级" width="80" align="center">
+        <el-table-column label="等第" width="80" align="center">
           <template #default="{ row }">
             <el-tag :type="getGradeTagType(row)">
               {{ getGradeLevel(row) }}
@@ -289,6 +289,9 @@ const handleExport = () => {
     "期末成绩",
     "平时成绩",
     "学时",
+    "学时学分",
+    "学期总评",
+    "等第",
   ];
   const keys = [
     "user_id",
@@ -297,12 +300,33 @@ const handleExport = () => {
     "final_score",
     "usual_score",
     "credits_hours",
+
+    "credits",
+    "score",
+    "level",
   ];
 
   // Generate data array
   const data = students.value.map((student) => {
     return keys.map((key) => {
       const val = student[key];
+      if (key === "credits") {
+        return student.credits_hours
+          ? (student.credits_hours / 18).toFixed(1)
+          : "0.0";
+      } else if (key === "score") {
+        return val !== null && val !== undefined ? `${val}分` : "未录入";
+      } else if (key === "level") {
+        if (val) return val;
+        const score = student.score;
+        if (score === null || score === undefined) return "未录入";
+        if (score >= 90) return "A";
+        if (score >= 80) return "B";
+        if (score >= 70) return "C";
+        if (score >= 60) return "D";
+        return "E";
+      }
+
       return val === null || val === undefined ? "" : val;
     });
   });
@@ -549,8 +573,8 @@ const handleScoreChange = async (row) => {
         {
           identifier: String(row.user_id),
           usual_score: String(row.usual_score),
-          midterm_score: row.midterm_score ? String(row.midterm_score) : "0",
-          final_score: row.final_score ? String(row.final_score) : "0",
+          midterm_score: row.midterm_score ? String(row.midterm_score) : null,
+          final_score: row.final_score ? String(row.final_score) : null,
         },
       ],
     };

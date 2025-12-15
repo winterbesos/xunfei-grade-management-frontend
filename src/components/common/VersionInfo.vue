@@ -1,11 +1,7 @@
 <template>
-  <div class="version-info">
+  <div v-if="showVersion" class="version-info">
     <div class="logo-section">
-      <img
-        :src="logoUrl"
-        alt="eitsh logo"
-        class="logo-image"
-      />
+      <img :src="logoUrl" alt="eitsh logo" class="logo-image" />
     </div>
 
     <div class="info-section">
@@ -28,13 +24,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import logoUrl from '@/assets/logo-white.png'
+import { ref } from "vue";
+import logoUrl from "@/assets/logo-white.png";
+
+const SHOW_VERSION = import.meta.env.VITE_SHOW_VERSION === "true";
 
 // 版本信息 - 在构建时自动注入
-const version = ref(__APP_VERSION__)
-const commitHash = ref(__COMMIT_HASH__)
-const lastUpdate = ref(__BUILD_TIME__)
+const version = ref(__APP_VERSION__);
+const commitHash = ref(__COMMIT_HASH__);
+const lastUpdate = ref(__BUILD_TIME__);
+const showVersion = ref(SHOW_VERSION);
 </script>
 
 <style scoped>
@@ -107,7 +106,7 @@ const lastUpdate = ref(__BUILD_TIME__)
 }
 
 .value.commit {
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   font-size: 10px;
   background-color: rgba(255, 255, 255, 0.15);
   padding: 1px 4px;

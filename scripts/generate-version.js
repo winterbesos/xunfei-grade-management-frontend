@@ -21,10 +21,11 @@ try {
 
   // 生成 .env.production 文件
   const envContent = `# API 基础 URL
-VITE_API_BASE_URL=https://grades-test.xsalo.com
+VITE_API_BASE_URL=https://grades-api.xsalo.com
 
 # 是否使用 Mock 数据（true 或 false）
 VITE_USE_MOCK=false
+VITE_SHOW_VERSION=false
 
 # 版本信息
 VITE_APP_VERSION=v${version}
@@ -33,6 +34,22 @@ VITE_BUILD_TIME=${buildTime}
 `;
 
   fs.writeFileSync(path.resolve(__dirname, "../.env.production"), envContent);
+
+  // 生成 .env.test 文件
+  const testEnvContent = `# API 基础 URL
+VITE_API_BASE_URL=https://grades-test.xsalo.com
+
+# 是否使用 Mock 数据（true 或 false）
+VITE_USE_MOCK=false
+VITE_SHOW_VERSION=true
+
+# 版本信息
+VITE_APP_VERSION=v${version}
+VITE_COMMIT_HASH=${commitHash}
+VITE_BUILD_TIME=${buildTime}
+`;
+
+  fs.writeFileSync(path.resolve(__dirname, "../.env.test"), testEnvContent);
 
   console.log("✅ 版本信息已生成:");
   console.log(`   版本号: v${version}`);

@@ -388,10 +388,38 @@ const loadStudents = async () => {
 
 // 保存单个
 const handleSaveSingle = async (row) => {
+  const student = row;
   if (row.comment.length > 200) {
     ElMessage.error("品格评语不能超过200个字符");
     return;
   }
+
+  if (
+    student.abilities.study_ability === null ||
+    student.abilities.logical_thinking === null ||
+    student.abilities.creativity === null ||
+    student.abilities.teamwork === null ||
+    student.abilities.responsibility === null ||
+    student.abilities.study_ability < 0 ||
+    student.abilities.study_ability > 10 ||
+    student.abilities.logical_thinking < 0 ||
+    student.abilities.logical_thinking > 10 ||
+    student.abilities.creativity < 0 ||
+    student.abilities.creativity > 10 ||
+    student.abilities.teamwork < 0 ||
+    student.abilities.teamwork > 10 ||
+    student.abilities.responsibility < 0 ||
+    student.abilities.responsibility > 10
+  ) {
+    ElMessage.error(`学生[${student.student_name}]的能力评分必须在0到10之间`);
+    return;
+  }
+
+  if (!gradeOptions.includes(student.grade)) {
+    ElMessage.error(`请选择学生[${student.student_name}]的品格等第`);
+    return;
+  }
+
   try {
     const response = await teacherAPI.saveCharacterComment(
       semesterId,
@@ -428,6 +456,32 @@ const handleBatchSave = async () => {
   for (const student of modifiedStudents) {
     if (student.comment.length > 200) {
       ElMessage.error(`学生[${student.student_name}]品格评语不能超过200个字符`);
+      return;
+    }
+
+    if (
+      student.abilities.study_ability === null ||
+      student.abilities.logical_thinking === null ||
+      student.abilities.creativity === null ||
+      student.abilities.teamwork === null ||
+      student.abilities.responsibility === null ||
+      student.abilities.study_ability < 0 ||
+      student.abilities.study_ability > 10 ||
+      student.abilities.logical_thinking < 0 ||
+      student.abilities.logical_thinking > 10 ||
+      student.abilities.creativity < 0 ||
+      student.abilities.creativity > 10 ||
+      student.abilities.teamwork < 0 ||
+      student.abilities.teamwork > 10 ||
+      student.abilities.responsibility < 0 ||
+      student.abilities.responsibility > 10
+    ) {
+      ElMessage.error(`学生[${student.student_name}]的能力评分必须在0到10之间`);
+      return;
+    }
+
+    if (!gradeOptions.includes(student.grade)) {
+      ElMessage.error(`请选择学生[${student.student_name}]的品格等第`);
       return;
     }
   }
