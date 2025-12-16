@@ -139,8 +139,6 @@ import {
   Document,
   User,
   ArrowDown,
-  Monitor,
-  Download,
   School,
   Trophy,
   Fold,

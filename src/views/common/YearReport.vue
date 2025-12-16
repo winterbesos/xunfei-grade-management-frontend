@@ -308,9 +308,9 @@ const audioRef = ref(null);
 const swiperRef = ref(null);
 
 // --- 3. 计算属性 ---
-const comments = computed(() => reportData.character_comments || {});
+const comments = computed(() => reportData.value.character_comments || {});
 const hasAwards = computed(
-  () => reportData.awards && reportData.awards.length > 0,
+  () => reportData.value.awards && reportData.value.awards.length > 0,
 );
 
 // 格式化日期
