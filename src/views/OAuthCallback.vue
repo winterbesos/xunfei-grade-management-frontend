@@ -74,7 +74,7 @@ const handleOAuthCallback = async () => {
           admin: "/admin/settings",
           teacher: "/teacher/grade-management",
           student: "/student/grades",
-          maintenance: "/maintenance/system-status",
+          maintenance: "/maintenance/schools",
         };
         router.push(routeMap[role] || "/dashboard");
       } else {

@@ -1,53 +1,7 @@
 import request from "@/utils/request";
 import { mockAPI } from "@/utils/mock";
 
-// 是否使用 Mock 数据
-const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
-
 export const studentAPI = {
-  // 更新学生信息
-  async updateStudent(id, student) {
-    if (USE_MOCK) {
-      return mockAPI.updateStudent(id, student);
-    }
-    return request({
-      url: `/api/students/${id}`,
-      method: "put",
-      data: student,
-    });
-  },
-
-  // 获取学校列表
-  async getSchools() {
-    return request({
-      url: "/api/schools",
-      method: "get",
-    });
-  },
-
-  // 获取班级列表
-  async getClasses(params = {}) {
-    if (USE_MOCK) {
-      return mockAPI.getClasses(params);
-    }
-    return request({
-      url: "/api/classes",
-      method: "get",
-      params,
-    });
-  },
-
-  // 根据学校获取班级
-  async getClassesBySchool(schoolId) {
-    if (USE_MOCK) {
-      return mockAPI.getClassesBySchool(schoolId);
-    }
-    return request({
-      url: `/api/schools/${schoolId}/classes`,
-      method: "get",
-    });
-  },
-
   // 获取我的成绩
   getMyGrades(semesterId, params) {
     return request({
@@ -66,9 +20,6 @@ export const studentAPI = {
 
   // 获取学期列表
   getSemesters(params) {
-    if (USE_MOCK) {
-      return mockAPI.getSemesters(params);
-    }
     return request({
       url: "/api/student/semesters",
       method: "get",
@@ -88,9 +39,6 @@ export const studentAPI = {
 
   // 提交奖项
   submitAward(data) {
-    if (USE_MOCK) {
-      return mockAPI.submitAward(data);
-    }
     return request({
       url: "/api/student/awards",
       method: "post",
@@ -100,9 +48,6 @@ export const studentAPI = {
 
   // 更新奖项
   updateAward(id, data) {
-    if (USE_MOCK) {
-      return mockAPI.updateAward(id, data);
-    }
     return request({
       url: `/api/student/awards/${id}`,
       method: "put",

@@ -332,7 +332,7 @@ router.beforeEach((to, from, next) => {
       admin: "/admin/semesters",
       teacher: "/teacher/grade-management",
       student: "/student/grades",
-      maintenance: "/maintenance/system-status",
+      maintenance: "/maintenance/schools",
     };
     next(redirectMap[authStore.userRole] || "/login");
     return;
@@ -344,7 +344,7 @@ router.beforeEach((to, from, next) => {
       admin: "/admin/semesters",
       teacher: "/teacher/grade-management",
       student: "/student/grades",
-      maintenance: "/maintenance/system-status",
+      maintenance: "/maintenance/schools",
     };
     next(redirectMap[authStore.userRole] || "/dashboard");
     return;

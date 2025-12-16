@@ -265,7 +265,7 @@ const getDefaultRoute = () => {
     admin: "/admin/semesters",
     teacher: "/teacher/grade-management",
     student: "/student/grades",
-    maintenance: "/maintenance/system-status",
+    maintenance: "/maintenance/schools",
   };
   return routeMap[role] || "/dashboard";
 };

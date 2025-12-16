@@ -1112,35 +1112,6 @@ export const mockAPI = {
     };
   },
 
-  async createStudent(student) {
-    await delay();
-    const newStudent = {
-      id: Date.now(),
-      ...student,
-      createdAt: new Date().toLocaleString("zh-CN"),
-    };
-    return {
-      status: 200,
-      data: newStudent,
-    };
-  },
-
-  async updateStudent(id, student) {
-    await delay();
-    return {
-      status: 200,
-      data: { id, ...student },
-    };
-  },
-
-  async deleteStudent(id) {
-    await delay();
-    return {
-      status: 200,
-      message: "学生删除成功",
-    };
-  },
-
   // 教师专用：根据班级获取学生列表
   // Added getTeacherClasses to mock for previous task
   async getTeacherClasses(params = {}) {
@@ -1215,48 +1186,168 @@ export const mockAPI = {
 
   // 获取成绩趋势
   async getGradeTrend(studentId) {
-    await delay()
-    
+    await delay();
+
     // 生成扁平化的 SemesterGradeItem 列表
     const dataList = [
       // 2022年秋季 (202202)
-      { semester_id: '202202', semester_name: '2022年秋季', subject_name: '高等数学', score: '82' },
-      { semester_id: '202202', semester_name: '2022年秋季', subject_name: '大学英语', score: '75' },
-      { semester_id: '202202', semester_name: '2022年秋季', subject_name: '计算机科学导论', score: '88' },
+      {
+        semester_id: "202202",
+        semester_name: "2022年秋季",
+        subject_name: "高等数学",
+        score: "82",
+      },
+      {
+        semester_id: "202202",
+        semester_name: "2022年秋季",
+        subject_name: "大学英语",
+        score: "75",
+      },
+      {
+        semester_id: "202202",
+        semester_name: "2022年秋季",
+        subject_name: "计算机科学导论",
+        score: "88",
+      },
 
       // 2023年春季 (202301)
-      { semester_id: '202301', semester_name: '2023年春季', subject_name: '高等数学', score: '85' },
-      { semester_id: '202301', semester_name: '2023年春季', subject_name: '大学英语', score: '78' },
-      { semester_id: '202301', semester_name: '2023年春季', subject_name: '计算机科学导论', score: '90' },
-      { semester_id: '202301', semester_name: '2023年春季', subject_name: '数据结构', score: '80' },
+      {
+        semester_id: "202301",
+        semester_name: "2023年春季",
+        subject_name: "高等数学",
+        score: "85",
+      },
+      {
+        semester_id: "202301",
+        semester_name: "2023年春季",
+        subject_name: "大学英语",
+        score: "78",
+      },
+      {
+        semester_id: "202301",
+        semester_name: "2023年春季",
+        subject_name: "计算机科学导论",
+        score: "90",
+      },
+      {
+        semester_id: "202301",
+        semester_name: "2023年春季",
+        subject_name: "数据结构",
+        score: "80",
+      },
 
       // 2023年秋季 (202302)
-      { semester_id: '202302', semester_name: '2023年秋季', subject_name: '高等数学', score: '88' },
-      { semester_id: '202302', semester_name: '2023年秋季', subject_name: '大学英语', score: '80' },
-      { semester_id: '202302', semester_name: '2023年秋季', subject_name: '计算机科学导论', score: '92' },
-      { semester_id: '202302', semester_name: '2023年秋季', subject_name: '数据结构', score: '85' },
-      { semester_id: '202302', semester_name: '2023年秋季', subject_name: '操作系统', score: '78' },
+      {
+        semester_id: "202302",
+        semester_name: "2023年秋季",
+        subject_name: "高等数学",
+        score: "88",
+      },
+      {
+        semester_id: "202302",
+        semester_name: "2023年秋季",
+        subject_name: "大学英语",
+        score: "80",
+      },
+      {
+        semester_id: "202302",
+        semester_name: "2023年秋季",
+        subject_name: "计算机科学导论",
+        score: "92",
+      },
+      {
+        semester_id: "202302",
+        semester_name: "2023年秋季",
+        subject_name: "数据结构",
+        score: "85",
+      },
+      {
+        semester_id: "202302",
+        semester_name: "2023年秋季",
+        subject_name: "操作系统",
+        score: "78",
+      },
 
       // 2024年春季 (202401)
-      { semester_id: '202401', semester_name: '2024年春季', subject_name: '高等数学', score: '90' },
-      { semester_id: '202401', semester_name: '2024年春季', subject_name: '大学英语', score: '82' },
-      { semester_id: '202401', semester_name: '2024年春季', subject_name: '计算机科学导论', score: '95' },
-      { semester_id: '202401', semester_name: '2024年春季', subject_name: '数据结构', score: '88' },
-      { semester_id: '202401', semester_name: '2024年春季', subject_name: '操作系统', score: '82' },
-      { semester_id: '202401', semester_name: '2024年春季', subject_name: '计算机网络', score: '80' },
+      {
+        semester_id: "202401",
+        semester_name: "2024年春季",
+        subject_name: "高等数学",
+        score: "90",
+      },
+      {
+        semester_id: "202401",
+        semester_name: "2024年春季",
+        subject_name: "大学英语",
+        score: "82",
+      },
+      {
+        semester_id: "202401",
+        semester_name: "2024年春季",
+        subject_name: "计算机科学导论",
+        score: "95",
+      },
+      {
+        semester_id: "202401",
+        semester_name: "2024年春季",
+        subject_name: "数据结构",
+        score: "88",
+      },
+      {
+        semester_id: "202401",
+        semester_name: "2024年春季",
+        subject_name: "操作系统",
+        score: "82",
+      },
+      {
+        semester_id: "202401",
+        semester_name: "2024年春季",
+        subject_name: "计算机网络",
+        score: "80",
+      },
 
       // 2024年秋季 (202402)
-      { semester_id: '202402', semester_name: '2024年秋季', subject_name: '高等数学', score: '88' },
-      { semester_id: '202402', semester_name: '2024年秋季', subject_name: '大学英语', score: '85' },
-      { semester_id: '202402', semester_name: '2024年秋季', subject_name: '计算机科学导论', score: '93' },
-      { semester_id: '202402', semester_name: '2024年秋季', subject_name: '数据结构', score: '90' },
-      { semester_id: '202402', semester_name: '2024年秋季', subject_name: '操作系统', score: '85' },
-      { semester_id: '202402', semester_name: '2024年秋季', subject_name: '计算机网络', score: '84' }
-    ]
+      {
+        semester_id: "202402",
+        semester_name: "2024年秋季",
+        subject_name: "高等数学",
+        score: "88",
+      },
+      {
+        semester_id: "202402",
+        semester_name: "2024年秋季",
+        subject_name: "大学英语",
+        score: "85",
+      },
+      {
+        semester_id: "202402",
+        semester_name: "2024年秋季",
+        subject_name: "计算机科学导论",
+        score: "93",
+      },
+      {
+        semester_id: "202402",
+        semester_name: "2024年秋季",
+        subject_name: "数据结构",
+        score: "90",
+      },
+      {
+        semester_id: "202402",
+        semester_name: "2024年秋季",
+        subject_name: "操作系统",
+        score: "85",
+      },
+      {
+        semester_id: "202402",
+        semester_name: "2024年秋季",
+        subject_name: "计算机网络",
+        score: "84",
+      },
+    ];
 
     return {
       status: 200,
-      data: dataList
-    }
-  }
-}
+      data: dataList,
+    };
+  },
+};
