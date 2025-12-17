@@ -152,8 +152,8 @@
               <el-input-number
                 v-model="row.credits_hours"
                 :min="0"
-                :precision="1"
-                :step="0.5"
+                :precision="0"
+                :step="1"
                 controls-position="right"
                 style="width: 110px"
                 @change="row.modified = true"

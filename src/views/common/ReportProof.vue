@@ -95,12 +95,8 @@ const gradeProofData = ref(null);
 // 获取数据的函数
 
 const fetchData = (id) => {
-  console.log("Fetching data for studentId:", id);
-
   teacherAPI
-
     .getStudentGradeProof(id)
-
     .then((response) => {
       if (response.status !== 200) {
         ElMessage.error("加载学生列表失败");
@@ -192,7 +188,6 @@ const scores = computed(() => {
       });
     }
 
-    console.log(row);
     return row;
   });
 });
