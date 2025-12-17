@@ -32,7 +32,11 @@
           width="150"
           show-overflow-tooltip
         />
-        <el-table-column prop="class_name" label="班级名称" min-width="150" />
+        <el-table-column label="班级名称" min-width="150">
+          <template #default="{ row }">
+            {{ row.year_name }}{{ row.class_name }}
+          </template>
+        </el-table-column>
         <el-table-column
           prop="student_count"
           label="学生数"
