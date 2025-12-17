@@ -1,6 +1,6 @@
 <template>
   <div class="subject-management-container">
-    <el-card>
+    <el-card class="mt-4">
       <template #header>
         <div class="card-header">
           <div class="header-left" v-if="!props.embedded">
@@ -267,5 +267,9 @@ onMounted(() => {
   margin: 0;
   font-size: 18px;
   font-weight: 500;
+}
+
+.mt-4 {
+  margin-top: 16px;
 }
 </style>

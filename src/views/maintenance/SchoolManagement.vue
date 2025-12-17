@@ -65,7 +65,11 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="创建时间" width="180" />
+        <el-table-column prop="createdAt" label="创建时间" width="180">
+          <template #default="{ row }">
+            <span>{{ formatDate(row.createdAt) }}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="250" fixed="right">
           <template #default="{ row }">
             <el-button size="small" type="primary" @click="viewDetail(row)">
@@ -120,6 +124,13 @@
           </el-input>
         </el-form-item>
 
+        <el-form-item label="学校ID" prop="id">
+          <el-input
+            v-model="schoolForm.schoolShortId"
+            placeholder="请输入学校短ID"
+          />
+        </el-form-item>
+
         <el-form-item label="学校名称" prop="name">
           <el-input v-model="schoolName" disabled />
         </el-form-item>
@@ -156,6 +167,7 @@ import { useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Plus, Search } from "@element-plus/icons-vue";
 import { maintenanceAPI } from "@/api/maintenance";
+import { formatDate } from "@/utils/date";
 
 const router = useRouter();
 
@@ -178,6 +190,7 @@ const schoolFormRef = ref();
 const schoolForm = ref({
   id: null,
   schoolId: null,
+  schoolShortId: null,
   adminId: null,
   status: "active",
 });
@@ -296,6 +309,7 @@ const editSchool = (school) => {
   schoolForm.value = {
     id: school.id,
     schoolId: school.schoolId,
+    schoolShortId: school.schoolShortId,
     name: school.name,
     code: school.code,
     adminId: school.adminId,
@@ -358,6 +372,7 @@ const submitSchool = async () => {
     try {
       const schoolData = {
         school_id: schoolForm.value.schoolId,
+        school_short_id: schoolForm.value.schoolShortId,
         is_enabled: schoolForm.value.status === "active",
       };
 
