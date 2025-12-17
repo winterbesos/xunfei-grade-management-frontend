@@ -345,9 +345,37 @@ const updateChart = () => {
 const handlePrint = () => {
   const printContent = document.getElementById("print-area");
   if (printContent) {
+    replaceChartsWithImages(printContent);
     printElement(printContent);
   }
 };
+
+function replaceChartsWithImages(root = document) {
+  // 假设每个图表容器都有 class="echart"
+  const chartEls = root.querySelectorAll(".chart-container");
+  chartEls.forEach((el) => {
+    const chart = echarts.getInstanceByDom(el);
+    if (!chart) return;
+
+    // 关键：先确保尺寸正确
+    chart.resize();
+
+    const dataURL = chart.getDataURL({
+      type: "png",
+      pixelRatio: 2,
+      backgroundColor: "#fff",
+    });
+
+    const img = new Image();
+    img.src = dataURL;
+    img.style.width = el.clientWidth + "px";
+    img.style.height = el.clientHeight + "px";
+
+    // 用 img 替换掉原容器（或 append 到容器里并隐藏 canvas）
+    el.innerHTML = "";
+    el.appendChild(img);
+  });
+}
 
 onMounted(() => {
   if (chartRef.value) {
@@ -370,7 +398,7 @@ onUnmounted(() => {
 <style scoped>
 /* 引入宋体，模拟公文/成绩单风格 */
 @import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap");
-/* @import "./print.css"; - Removed or handled by print utility/scoped styles */
+@import "./print.css";
 
 .page-wrapper {
   background-color: #f0f0f0;
@@ -409,6 +437,9 @@ button:hover {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
   position: relative;
+  /* Ensure font persists when printed in isolation */
+  font-family: "SimSun", "Songti SC", "Noto Serif SC", serif;
+  color: #000;
 }
 
 /* 通用排版 */
