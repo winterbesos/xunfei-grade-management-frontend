@@ -130,13 +130,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed, defineProps } from "vue";
 import { ElMessage } from "element-plus";
 import * as echarts from "echarts";
 import { useRoute } from "vue-router";
 import { printElement } from "@/utils/print.js";
 import { teacherAPI } from "@/api/teacher";
 import { studentAPI } from "@/api/student";
+
+const props = defineProps({
+  studentId: {
+    type: [String, Number],
+    default: null,
+  },
+  semesterId: {
+    type: [String, Number],
+    default: null,
+  },
+});
 
 const route = useRoute();
 
@@ -182,10 +193,17 @@ const abilities = ref({
 
 // 品格评语
 const moralComment = ref("");
-const semesterId = route.params.semesterId;
-const studentId = route.params.studentId;
+
+const getEffectiveParams = () => {
+  return {
+    semesterId: props.semesterId || route.params.semesterId,
+    studentId: props.studentId || route.params.studentId,
+  };
+};
 
 const loadReportData = async () => {
+  const { semesterId, studentId } = getEffectiveParams();
+
   let promise = null;
   if (studentId) {
     promise = teacherAPI.getStudentSemesterReport(studentId, semesterId);
@@ -497,7 +515,8 @@ td {
 }
 
 .radar-box {
-  width: 40%;
+  width: 272px;
+  height: 250px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -514,8 +533,8 @@ td {
 }
 
 .chart-container {
-  width: 100%;
-  height: 100%;
+  width: 272px;
+  height: 250px;
 }
 
 /* 按钮样式 */

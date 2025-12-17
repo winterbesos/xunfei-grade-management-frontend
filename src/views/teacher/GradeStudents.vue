@@ -219,21 +219,19 @@
       />
     </el-card>
 
-    <!-- 历史记录对话框 -->
+    <!-- 成绩报告对话框 -->
     <el-dialog
-      v-model="historyDialogVisible"
-      title="成绩历史记录"
-      width="600px"
+      v-model="reportDialogVisible"
+      title="学生成绩单"
+      width="900px"
+      top="5vh"
+      destroy-on-close
     >
-      <el-table :data="gradeHistory" style="width: 100%">
-        <el-table-column prop="date" label="录入时间" width="160" />
-        <el-table-column prop="score" label="成绩" width="80" />
-        <el-table-column prop="teacher" label="录入教师" width="120" />
-        <el-table-column prop="remarks" label="评语" />
-      </el-table>
-      <template #footer>
-        <el-button @click="historyDialogVisible = false">关闭</el-button>
-      </template>
+      <Report
+        v-if="reportDialogVisible"
+        :student-id="currentStudentId"
+        :semester-id="semesterId"
+      />
     </el-dialog>
   </div>
 </template>
@@ -245,6 +243,7 @@ import { ArrowLeft, Check, Download, Upload } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
 import { teacherAPI } from "@/api/teacher";
 import * as XLSX from "xlsx";
+import Report from "@/views/common/Report.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -263,9 +262,10 @@ const loading = ref(false);
 const saveLoading = ref(false);
 const students = ref([]);
 const selectedStudents = ref([]);
-const historyDialogVisible = ref(false);
-const gradeHistory = ref([]);
 const fileInput = ref(null);
+
+const reportDialogVisible = ref(false);
+const currentStudentId = ref(null);
 
 // 快速设置
 const quickScore = ref("");
@@ -735,21 +735,8 @@ const handleBatchSave = async () => {
 };
 
 const handleViewReport = (row) => {
-  router.push({
-    name: "TeacherGradeReport",
-    params: {
-      studentId: row.user_id,
-      semesterId: semesterId,
-      classId: classId,
-      subjectCode: subjectCode,
-    },
-    query: {
-      studentName: row.user_name,
-      semesterName: semesterName,
-      className: className,
-      subjectName: subjectName,
-    },
-  });
+  currentStudentId.value = row.user_id;
+  reportDialogVisible.value = true;
 };
 
 onMounted(() => {
