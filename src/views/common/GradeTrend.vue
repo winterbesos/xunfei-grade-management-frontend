@@ -64,7 +64,7 @@ const loadData = async () => {
       return;
     }
 
-    const res = await studentAPI.getGradeTrend(studentId);
+    const res = await studentAPI.getOriginGradeTrend(studentId);
     if (res.status === 200) {
       // 转换后端返回的 list 数据为图表所需格式
       const transformedData = transformGradeTrendData(res.data);
@@ -80,7 +80,7 @@ const loadData = async () => {
 
 const initChart = () => {
   if (!chartRef.value) return;
-  
+
   // Dispose existing instance if any
   if (myChart) {
     myChart.dispose();
@@ -100,7 +100,7 @@ const updateChart = () => {
   if (!myChart || !trendData.value.semesters) return;
 
   const { semesters, series } = trendData.value;
-  
+
   // Filter series based on selection
   const filteredSeries = selectedSubject.value
     ? series.filter((s) => s.name === selectedSubject.value)

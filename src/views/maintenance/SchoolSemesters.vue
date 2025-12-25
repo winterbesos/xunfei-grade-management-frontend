@@ -25,17 +25,25 @@
         <el-table-column
           prop="semester_id"
           label="学期ID"
-          width="200"
+          width="100"
           show-overflow-tooltip
         />
-        <el-table-column
-          prop="semester_name"
-          label="学期名称"
-          min-width="150"
-        />
-        <el-table-column prop="begin_time" label="开始时间" width="200" />
-        <el-table-column prop="end_time" label="结束时间" width="200" />
-        <el-table-column label="操作" width="200" align="center" fixed="right">
+        <el-table-column prop="semester_name" label="学期名称" min-width="180">
+          <template #default="{ row }">
+            <span>{{ row.academic_year_name + row.term_name }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="begin_time" label="开始时间" width="180">
+          <template #default="{ row }">
+            {{ formatDate(row.begin_time) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="end_time" label="结束时间" width="180">
+          <template #default="{ row }">
+            {{ formatDate(row.end_time) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="140" align="center" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="openSyncDialog(row)">
               同步考试成绩
@@ -72,6 +80,7 @@
             placeholder="请选择考试类型"
             style="width: 100%"
           >
+            <el-option label="月考" :value="3"></el-option>
             <el-option label="期中考试" :value="1"></el-option>
             <el-option label="期末考试" :value="2"></el-option>
           </el-select>
@@ -98,6 +107,7 @@ import { ref, reactive, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { maintenanceAPI } from "@/api/maintenance";
 import { ElMessage } from "element-plus";
+import { formatDate } from "@/utils/date";
 
 const props = defineProps({
   embedded: {

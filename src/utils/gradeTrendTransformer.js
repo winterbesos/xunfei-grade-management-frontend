@@ -8,16 +8,16 @@ export function transformGradeTrendData(dataList) {
   // 这里我们建立一个 Map: semester_id -> semester_name
   const semesterMap = new Map();
   const subjectSet = new Set();
-  
+
   // 用于快速查找成绩: `${semester_id}_${subject_name}` -> score
   const scoreMap = new Map();
 
-  dataList.forEach(item => {
+  dataList.forEach((item) => {
     if (!semesterMap.has(item.semester_id)) {
-      semesterMap.set(item.semester_id, item.semester_name);
+      semesterMap.set(item.exam_id, item.exam_name);
     }
     subjectSet.add(item.subject_name);
-    
+
     // 解析分数为数字
     const scoreVal = parseFloat(item.score);
     // 只有有效数字才存入，或者保留 null
@@ -30,27 +30,27 @@ export function transformGradeTrendData(dataList) {
   // 如果后端返回的就是时间顺序，可以直接用 Array.from(semesterMap.keys())
   // 这里简单的按 id 排序
   const sortedSemesterIds = Array.from(semesterMap.keys()).sort();
-  const semesters = sortedSemesterIds.map(id => semesterMap.get(id));
+  const semesters = sortedSemesterIds.map((id) => semesterMap.get(id));
 
   // 2. 生成 Subjects 列表
   const subjects = Array.from(subjectSet);
 
   // 3. 构建 Series
-  const series = subjects.map(subject => {
-    const data = sortedSemesterIds.map(semId => {
+  const series = subjects.map((subject) => {
+    const data = sortedSemesterIds.map((semId) => {
       const key = `${semId}_${subject}`;
       return scoreMap.has(key) ? scoreMap.get(key) : null;
     });
 
     return {
       name: subject,
-      data: data
+      data: data,
     };
   });
 
   return {
     semesters,
     subjects,
-    series
+    series,
   };
 }

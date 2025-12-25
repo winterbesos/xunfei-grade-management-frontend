@@ -55,7 +55,7 @@
         <!-- OAuth 登录 -->
         <el-tab-pane
           v-if="settingsStore.systemConfig.enableOAuthLogin"
-          label="OAuth 登录"
+          label="讯飞星枢登录"
           name="oauth"
         >
           <div class="oauth-container">
@@ -65,7 +65,7 @@
               style="width: 100%"
               @click="handleOAuthLogin"
             >
-              使用 OAuth 登录
+              使用讯飞星枢登录
             </el-button>
           </div>
         </el-tab-pane>
@@ -121,7 +121,7 @@
             style="width: 100%"
             @click="handleOAuthLogin"
           >
-            使用 OAuth 登录
+            使用讯飞星枢登录
           </el-button>
         </div>
       </div>

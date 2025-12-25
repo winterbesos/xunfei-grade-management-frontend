@@ -87,6 +87,13 @@ export const studentAPI = {
     });
   },
 
+  getOriginGradeTrend(studentId) {
+    return request({
+      url: `/api/teacher/students/${studentId}/origin-grades`,
+      method: "get",
+    });
+  },
+
   getYearReport(studentId, academicYearId) {
     return request({
       url: `/api/student/year-reports`,

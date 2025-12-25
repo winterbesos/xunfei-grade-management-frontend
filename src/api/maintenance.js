@@ -18,6 +18,13 @@ export const maintenanceAPI = {
     });
   },
 
+  async getSchoolDetails(schoolId) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}`,
+      method: "get",
+    });
+  },
+
   async getMaintenanceSemesters() {
     return request({
       url: "/api/maintenance/semesters",

@@ -27,12 +27,12 @@
               <span class="ellipsis-id">{{ school.schoolId }}</span>
             </el-tooltip>
           </el-descriptions-item>
-          <el-descriptions-item label="管理员">{{
-            school.adminName
+          <el-descriptions-item label="短ID">{{
+            school.schoolShortId
           }}</el-descriptions-item>
-          <el-descriptions-item label="创建时间">{{
-            school.createdAt
-          }}</el-descriptions-item>
+          <el-descriptions-item label="创建时间">
+            {{ formatDate(school.createdAt) }}
+          </el-descriptions-item>
           <el-descriptions-item label="状态">
             <el-tag :type="school.status === 'active' ? 'success' : 'danger'">
               {{ school.status === "active" ? "启用" : "禁用" }}
@@ -95,15 +95,31 @@ import SchoolStudents from "./SchoolStudents.vue";
 import SubjectManagement from "./SubjectManagement.vue";
 import SchoolTeachers from "./SchoolTeachers.vue";
 import SchoolSemesters from "./SchoolSemesters.vue";
+import { maintenanceAPI } from "@/api/maintenance";
+import { useRoute } from "vue-router";
+import { formatDate } from "@/utils/date";
 
 const school = ref(null);
 const activeTab = ref("classes");
 
+const routes = useRoute();
+const schoolId = routes.params.schoolId;
+
 onMounted(() => {
-  if (history.state.schoolData) {
-    school.value = JSON.parse(history.state.schoolData);
-  }
+  fetchSchoolDetails(schoolId);
 });
+
+const fetchSchoolDetails = async (schoolId) => {
+  const response = await maintenanceAPI.getSchoolDetails(schoolId);
+  school.value = {
+    name: response.data.school_name,
+    schoolId: response.data.school_id,
+    schoolShortId: response.data.school_short_id,
+    adminName: response.data.admin_name,
+    createdAt: response.data.created_at,
+    status: response.data.is_enabled ? "active" : "disabled",
+  };
+};
 </script>
 
 <style scoped>

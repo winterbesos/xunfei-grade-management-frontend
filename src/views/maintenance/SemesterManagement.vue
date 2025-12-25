@@ -82,12 +82,16 @@
         <el-descriptions-item label="学校名称">{{
           currentSemester.schoolName
         }}</el-descriptions-item>
-        <el-descriptions-item label="开始时间">{{
-          currentSemester.startDate
-        }}</el-descriptions-item>
-        <el-descriptions-item label="结束时间">{{
-          currentSemester.endDate
-        }}</el-descriptions-item>
+        <el-descriptions-item label="开始时间">
+          <template #default="{ row }">
+            {{ formatDate(row.startDate) }}
+          </template>
+        </el-descriptions-item>
+        <el-descriptions-item label="结束时间">
+          <template #default="{ row }">
+            {{ formatDate(row.endDate) }}
+          </template>
+        </el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="getStatusType(currentSemester.status)">
             {{ getStatusText(currentSemester.status) }}
@@ -112,6 +116,7 @@
 import { ref, reactive, computed, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { maintenanceAPI } from "@/api/maintenance";
+import { formatDate } from "@/utils/date";
 
 const loading = ref(false);
 const semesters = ref([]);
