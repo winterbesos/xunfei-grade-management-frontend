@@ -41,9 +41,11 @@
 import { ref, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { useSettingsStore } from "@/stores/settings";
+import { useAuthStore } from "@/stores/auth";
 import { adminAPI } from "@/api/admin";
 
 const settingsStore = useSettingsStore();
+const authStore = useAuthStore();
 const formRef = ref(null);
 const loading = ref(false);
 
@@ -84,6 +86,11 @@ const handleSave = async () => {
     .then((response) => {
       if (response.status === 200) {
         settingsStore.updateConfig(form.value);
+        // Also update authStore's user info to refresh the theme color in the layout
+        authStore.updateUserInfo({
+          ...authStore.userInfo,
+          theme_color: form.value.themeColor,
+        });
         ElMessage.success("设置保存成功");
       } else {
         ElMessage.error("保存失败");

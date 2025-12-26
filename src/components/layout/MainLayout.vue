@@ -1,7 +1,7 @@
 <template>
   <el-container class="main-container">
-    <el-aside :width="isCollapse ? '64px' : '200px'" class="aside-transition">
-      <div class="logo">
+    <el-aside :width="isCollapse ? '64px' : '200px'" class="aside-transition" :style="{ backgroundColor: authStore.themeColor }">
+      <div class="logo" :style="{ backgroundColor: authStore.themeColor }">
         <h3 v-show="!isCollapse">{{ settingsStore.systemConfig.siteName }}</h3>
       </div>
       <el-menu
@@ -9,7 +9,7 @@
         :router="true"
         :collapse="isCollapse"
         :collapse-transition="false"
-        background-color="#304156"
+        :background-color="authStore.themeColor"
         text-color="#bfcbd9"
         active-text-color="#409EFF"
       >
@@ -261,7 +261,6 @@ onMounted(() => {
 }
 
 .el-aside {
-  background-color: #304156;
   color: #fff;
   transition: width 0.3s;
   overflow-x: hidden;
@@ -272,8 +271,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #2b3849;
-  border-bottom: 1px solid #1f2d3d;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   white-space: nowrap;
   overflow: hidden;
 }

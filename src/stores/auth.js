@@ -9,6 +9,7 @@ export const useAuthStore = defineStore('auth', () => {
   const userRole = computed(() => userInfo.value?.role || '')
   const userName = computed(() => userInfo.value?.name || '')
   const realname = computed(() => userInfo.value?.realname || '')
+  const themeColor = computed(() => userInfo.value?.theme_color || '#304156')
 
   // 登录
   function login(tokenValue, userInfoValue) {
@@ -44,6 +45,7 @@ export const useAuthStore = defineStore('auth', () => {
     userRole,
     userName,
     realname,
+    themeColor,
     login,
     updateUserInfo,
     logout,
