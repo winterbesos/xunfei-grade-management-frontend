@@ -37,6 +37,7 @@
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column prop="credit" label="学分" width="80" />
         <el-table-column label="所属学期" min-width="250">
           <template #default="{ row }">
             {{ row.academic_year_name }}{{ row.term_name
@@ -106,6 +107,17 @@
               :value="item.value"
             />
           </el-select>
+        </el-form-item>
+
+        <el-form-item label="学分">
+          <el-input-number
+            v-model="form.credit"
+            :min="0"
+            :precision="1"
+            :step="0.5"
+            placeholder="请输入学分 (可选)"
+            style="width: 100%"
+          />
         </el-form-item>
 
         <el-form-item label="荣誉奖项" required>
@@ -183,6 +195,7 @@ const form = reactive({
   semesterId: null,
   activityName: "",
   level: 1,
+  credit: null, // Make credit optional by initializing to null
   awards: [""],
 });
 
@@ -243,6 +256,7 @@ const handleAdd = () => {
   form.semesterId = null;
   form.activityName = "";
   form.level = 1;
+  form.credit = null; // Reset credit to null for optional
   form.awards = [""];
   dialogVisible.value = true;
 };
@@ -274,6 +288,7 @@ const handleSubmit = async () => {
         semester_id: form.semesterId,
         name: form.activityName,
         level: form.level,
+        credit: form.credit, // Include credit in the payload
         awards: validAwards,
       };
 
