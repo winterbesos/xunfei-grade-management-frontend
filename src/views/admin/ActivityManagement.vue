@@ -18,7 +18,25 @@
         stripe
         style="width: 100%; margin-top: 20px"
       >
+        <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="name" label="活动名称" min-width="150" />
+        <el-table-column label="级别" width="100">
+          <template #default="{ row }">
+            <el-tag
+              :type="
+                row.level === 1
+                  ? 'info'
+                  : row.level === 2
+                    ? 'success'
+                    : row.level === 3
+                      ? 'warning'
+                      : 'danger'
+              "
+            >
+              {{ getLevelText(row.level) }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="所属学期" min-width="250">
           <template #default="{ row }">
             {{ row.academic_year_name }}{{ row.term_name
@@ -43,6 +61,13 @@
             {{ formatDate(row.created_at) }}
           </template>
         </el-table-column>
+        <el-table-column label="操作" width="100" fixed="right">
+          <template #default="{ row }">
+            <el-button type="danger" link @click="handleDelete(row.id)"
+              >删除</el-button
+            >
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
 
@@ -58,7 +83,7 @@
             <el-option
               v-for="item in semesterOptions"
               :key="item.semester_id"
-              :label="item.semester_name"
+              :label="item.academic_year_name + item.term_name"
               :value="item.semester_id"
             />
           </el-select>
@@ -66,6 +91,21 @@
 
         <el-form-item label="活动名称" prop="activityName">
           <el-input v-model="form.activityName" placeholder="请输入活动名称" />
+        </el-form-item>
+
+        <el-form-item label="活动级别" required>
+          <el-select
+            v-model="form.level"
+            placeholder="请选择活动级别"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="item in levelOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
         </el-form-item>
 
         <el-form-item label="荣誉奖项" required>
@@ -120,8 +160,8 @@
 
 <script setup>
 import { ref, reactive, onMounted } from "vue";
-import { ElMessage } from "element-plus";
-import { Plus, Minus } from "@element-plus/icons-vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { Plus, Minus, Delete } from "@element-plus/icons-vue";
 import { adminAPI } from "@/api/admin";
 import { formatDate } from "@/utils/date";
 
@@ -142,8 +182,21 @@ const pagination = reactive({
 const form = reactive({
   semesterId: null,
   activityName: "",
+  level: 1,
   awards: [""],
 });
+
+const levelOptions = [
+  { label: "校级", value: 1 },
+  { label: "市级", value: 2 },
+  { label: "省级", value: 3 },
+  { label: "国家级", value: 4 },
+];
+
+const getLevelText = (level) => {
+  const option = levelOptions.find((opt) => opt.value === level);
+  return option ? option.label : "未知";
+};
 
 const rules = {
   semesterId: [
@@ -189,6 +242,7 @@ const loadSemesters = async () => {
 const handleAdd = () => {
   form.semesterId = null;
   form.activityName = "";
+  form.level = 1;
   form.awards = [""];
   dialogVisible.value = true;
 };
@@ -219,6 +273,7 @@ const handleSubmit = async () => {
       const data = {
         semester_id: form.semesterId,
         name: form.activityName,
+        level: form.level,
         awards: validAwards,
       };
 
@@ -234,6 +289,24 @@ const handleSubmit = async () => {
       submitLoading.value = false;
     }
   });
+};
+
+const handleDelete = async (activityId) => {
+  try {
+    await ElMessageBox.confirm("确定要删除此活动吗？", "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
+    });
+
+    await adminAPI.deleteActivity(activityId);
+    ElMessage.success("活动删除成功");
+    loadActivities();
+  } catch (error) {
+    if (error !== "cancel") {
+      ElMessage.error("删除活动失败");
+    }
+  }
 };
 
 onMounted(() => {

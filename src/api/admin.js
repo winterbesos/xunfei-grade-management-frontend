@@ -136,6 +136,14 @@ export const adminAPI = {
     });
   },
 
+  // 删除活动
+  deleteActivity(id) {
+    return request({
+      url: `/api/admin/activities/${id}`,
+      method: "delete",
+    });
+  },
+
   getStudentStatusCard(studentId) {
     return request({
       url: `/api/teacher/students/${studentId}/status_card`,
