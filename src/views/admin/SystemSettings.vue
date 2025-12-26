@@ -20,6 +20,13 @@
           />
         </el-form-item>
 
+        <el-form-item label="主题颜色">
+          <el-color-picker
+            v-model="form.themeColor"
+            color-format="hex"
+            predefined
+          />
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" :loading="loading" @click="handleSave">
             保存设置
@@ -32,7 +39,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElMessage } from "element-plus";
 import { useSettingsStore } from "@/stores/settings";
 import { adminAPI } from "@/api/admin";
 
@@ -42,6 +49,7 @@ const loading = ref(false);
 
 const form = ref({
   reportSignature: "",
+  themeColor: "#409EFF",
 });
 
 const loadSchoolInfo = async () => {
@@ -49,7 +57,10 @@ const loadSchoolInfo = async () => {
     .getSchoolInfo()
     .then((response) => {
       if (response.status === 200) {
-        form.value = { reportSignature: response.data.signature };
+        form.value = {
+          reportSignature: response.data.signature,
+          themeColor: response.data.theme_color || "#409EFF",
+        };
       }
     })
     .catch(() => {
@@ -66,7 +77,10 @@ onMounted(() => {
 const handleSave = async () => {
   loading.value = true;
   adminAPI
-    .updateSchoolInfo({ signature: form.value.reportSignature })
+    .updateSchoolInfo({
+      signature: form.value.reportSignature,
+      theme_color: form.value.themeColor,
+    })
     .then((response) => {
       if (response.status === 200) {
         settingsStore.updateConfig(form.value);

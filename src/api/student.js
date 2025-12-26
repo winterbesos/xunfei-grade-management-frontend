@@ -1,5 +1,4 @@
 import request from "@/utils/request";
-import { mockAPI } from "@/utils/mock";
 
 export const studentAPI = {
   // 获取我的成绩

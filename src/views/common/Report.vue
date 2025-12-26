@@ -64,7 +64,6 @@
             <th>平时成绩</th>
             <th>学期总评</th>
             <th>学时学分</th>
-            <th>等第</th>
           </tr>
         </thead>
         <tbody>
@@ -75,7 +74,6 @@
             <td>{{ item.usual_score }}</td>
             <td>{{ item.score }}</td>
             <td>{{ item.credits }}</td>
-            <td>{{ item.grade_level }}</td>
           </tr>
         </tbody>
       </table>
