@@ -1,6 +1,10 @@
 <template>
   <el-container class="main-container">
-    <el-aside :width="isCollapse ? '64px' : '200px'" class="aside-transition" :style="{ backgroundColor: authStore.themeColor }">
+    <el-aside
+      :width="isCollapse ? '64px' : '200px'"
+      class="aside-transition"
+      :style="{ backgroundColor: authStore.themeColor }"
+    >
       <div class="logo" :style="{ backgroundColor: authStore.themeColor }">
         <h3 v-show="!isCollapse">{{ settingsStore.systemConfig.siteName }}</h3>
       </div>
@@ -114,20 +118,28 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item
-                    v-if="authStore.originalRole === 'admin' && authStore.userRole === 'admin'"
+                    v-if="
+                      authStore.originalRole === 'admin' &&
+                      authStore.userRole === 'admin'
+                    "
                     command="switch-to-teacher"
                   >
                     <el-icon><User /></el-icon>
                     切换为教师
                   </el-dropdown-item>
                   <el-dropdown-item
-                    v-if="authStore.originalRole === 'admin' && authStore.userRole === 'teacher'"
+                    v-if="
+                      authStore.originalRole === 'admin' &&
+                      authStore.userRole === 'teacher'
+                    "
                     command="switch-to-admin"
                   >
                     <el-icon><Setting /></el-icon>
                     切换回管理员
                   </el-dropdown-item>
-                  <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+                  <el-dropdown-item divided command="logout"
+                    >退出登录</el-dropdown-item
+                  >
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -234,12 +246,12 @@ const fetchUserInfo = async () => {
       } else {
         ElMessage.error("获取用户信息失败");
         authStore.logout();
-        router.push("/login");
+        router.push("/autologin");
       }
     } catch (error) {
       ElMessage.error("获取用户信息失败");
       authStore.logout();
-      router.push("/login");
+      router.push("/autologin");
     }
   }
 };

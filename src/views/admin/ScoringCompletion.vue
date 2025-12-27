@@ -150,17 +150,12 @@ const getProgressStatus = (val) => {
   return "exception";
 };
 
-const getYearName = (code) => {
-  const found = years.value.find((y) => y.year_code === code);
-  return found ? found.year_name : code;
-};
-
 // 获取基础数据
 const fetchBasicData = async () => {
   try {
     const [yearsRes, subjectsRes] = await Promise.all([
       adminAPI.getSchoolYears(),
-      adminAPI.getCourses(),
+      adminAPI.getActiveSubjects(),
     ]);
 
     if (yearsRes.status === 200) {

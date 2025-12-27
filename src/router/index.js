@@ -9,6 +9,12 @@ const routes = [
     meta: { requiresAuth: false },
   },
   {
+    path: "/autologin",
+    name: "AutoLogin",
+    component: () => import("@/views/AutoLogin.vue"),
+    meta: { requiresAuth: false },
+  },
+  {
     path: "/",
     redirect: "/dashboard",
   },
@@ -309,7 +315,7 @@ router.beforeEach((to, from, next) => {
 
   // 检查是否需要登录
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
-    next({ name: "Login", query: { redirect: to.fullPath } });
+    next({ name: "AutoLogin", query: { redirect: to.fullPath } });
     return;
   }
 
@@ -322,7 +328,7 @@ router.beforeEach((to, from, next) => {
       student: "/student/grades",
       maintenance: "/maintenance/schools",
     };
-    next(redirectMap[authStore.userRole] || "/login");
+    next(redirectMap[authStore.userRole] || "/autologin");
     return;
   }
 

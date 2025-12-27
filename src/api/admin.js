@@ -47,6 +47,13 @@ export const adminAPI = {
     });
   },
 
+  getActiveSubjects() {
+    return request({
+      url: "/api/admin/subjects?active=true",
+      method: "get",
+    });
+  },
+
   // 获取课程列表
   getCourses() {
     return request({
