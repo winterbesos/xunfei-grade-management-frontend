@@ -206,7 +206,7 @@
             <span v-else class="no-score">未录入</span>
           </template>
         </el-table-column>
-        <el-table-column label="等第" width="80" align="center">
+        <el-table-column label="等级" width="80" align="center">
           <template #default="{ row }">
             <el-tag :type="getGradeTagType(row)">
               {{ getGradeLevel(row) }}
