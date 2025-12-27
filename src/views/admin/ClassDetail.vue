@@ -167,6 +167,19 @@
         </el-button>
       </template>
     </el-dialog>
+
+    <el-dialog
+      v-model="gradeTrendDialogVisible"
+      title="学生成绩趋势"
+      width="900px"
+      top="5vh"
+      destroy-on-close
+      append-to-body
+    >
+      <div class="dialog-center">
+        <GradeTrend v-if="gradeTrendDialogVisible" :student-id="currentStudentId" />
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -178,6 +191,7 @@ import { ElMessage } from "element-plus";
 import { ArrowLeft } from "@element-plus/icons-vue";
 import ReportProof from "@/views/common/ReportProof.vue";
 import StatusCard from "@/views/common/StatusCard.vue";
+import GradeTrend from "@/views/common/GradeTrend.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -188,6 +202,7 @@ const classInfo = ref({
 
 const proofDialogVisible = ref(false);
 const statusCardDialogVisible = ref(false);
+const gradeTrendDialogVisible = ref(false);
 const currentStudentId = ref(null);
 const statusCardRef = ref(null);
 
@@ -220,11 +235,8 @@ const handleViewStatusCard = (row) => {
 };
 
 const handleViewGradeTrend = (row) => {
-  router.push({
-    name: "AdminStudentGradeTrend",
-    params: { studentId: row.user_id },
-    query: { studentId: row.user_id },
-  });
+  currentStudentId.value = row.user_id;
+  gradeTrendDialogVisible.value = true;
 };
 
 const handleViewYearReport = (row) => {

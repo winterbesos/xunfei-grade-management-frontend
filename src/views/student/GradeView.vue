@@ -4,6 +4,9 @@
       <template #header>
         <div class="card-header">
           <span>我的成绩</span>
+          <el-button type="primary" link @click="viewGradeTrend"
+            >查看成绩趋势</el-button
+          >
         </div>
       </template>
 
@@ -97,6 +100,16 @@
         description="暂无成绩数据"
       />
     </el-card>
+
+    <!-- 成绩趋势 Dialog -->
+    <el-dialog
+      title="成绩趋势"
+      v-model="gradeTrendVisible"
+      width="80%"
+      :destroy-on-close="true"
+    >
+      <GradeTrend />
+    </el-dialog>
   </div>
 </template>
 
@@ -104,10 +117,12 @@
 import { ref, computed, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { studentAPI } from "@/api/student";
+import GradeTrend from "@/views/common/GradeTrend.vue";
 
 const loading = ref(false);
 const semesters = ref([]);
 const grades = ref([]);
+const gradeTrendVisible = ref(false);
 
 const queryForm = ref({
   semesterId: null,
@@ -181,6 +196,10 @@ const handleQuery = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const viewGradeTrend = () => {
+  gradeTrendVisible.value = true;
 };
 
 // 获取成绩颜色

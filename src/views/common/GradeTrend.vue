@@ -1,48 +1,42 @@
 <template>
   <div class="grade-trend-container">
-    <el-card>
-      <template #header>
-        <div class="card-header">
-          <span>学生成绩历史趋势</span>
-          <!-- 暂时只针对当前登录用户或传入的studentId，如果是教师查看，可能需要传入ID -->
-        </div>
-      </template>
+    <!-- 过滤条件 -->
+    <div class="filter-container">
+      <span class="label">科目筛选：</span>
+      <el-select
+        v-model="selectedSubject"
+        style="width: 200px"
+        @change="updateChart"
+      >
+        <el-option
+          v-for="subject in subjects"
+          :key="subject"
+          :label="subject"
+          :value="subject"
+        />
+      </el-select>
+    </div>
 
-      <!-- 过滤条件 -->
-      <div class="filter-container">
-        <span class="label">科目筛选：</span>
-        <el-select
-          v-model="selectedSubject"
-          placeholder="全部科目"
-          clearable
-          style="width: 200px"
-          @change="updateChart"
-        >
-          <el-option
-            v-for="subject in subjects"
-            :key="subject"
-            :label="subject"
-            :value="subject"
-          />
-        </el-select>
-      </div>
-
-      <!-- 图表容器 -->
-      <div ref="chartRef" class="chart-container"></div>
-    </el-card>
+    <!-- 图表容器 -->
+    <div ref="chartRef" class="chart-container"></div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from "vue";
-import { useRoute } from "vue-router";
+import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
 import * as echarts from "echarts";
 import { studentAPI } from "@/api/student";
 import { useAuthStore } from "@/stores/auth";
 import { ElMessage } from "element-plus";
 import { transformGradeTrendData } from "@/utils/gradeTrendTransformer";
 
-const route = useRoute();
+const props = defineProps({
+  studentId: {
+    type: [String, Number],
+    default: null,
+  },
+});
+
 const authStore = useAuthStore();
 const chartRef = ref(null);
 let myChart = null;
@@ -57,19 +51,21 @@ const trendData = ref({
 
 const loadData = async () => {
   try {
-    // 优先从路由参数获取 studentId (针对教师/管理员查看)，否则使用当前登录用户ID
-    const studentId = route.query.studentId || authStore.userInfo.id;
-    if (!studentId) {
+    // 优先从 prop 获取 studentId，否则使用当前登录用户ID
+    const targetStudentId = props.studentId || authStore.userInfo.id;
+    if (!targetStudentId) {
       ElMessage.warning("未找到学生信息");
       return;
     }
 
-    const res = await studentAPI.getOriginGradeTrend(studentId);
+    const res = await studentAPI.getOriginGradeTrend(targetStudentId);
     if (res.status === 200) {
       // 转换后端返回的 list 数据为图表所需格式
       const transformedData = transformGradeTrendData(res.data);
       trendData.value = transformedData;
       subjects.value = transformedData.subjects;
+      selectedSubject.value =
+        subjects.value.length > 0 ? subjects.value[0] : "";
       initChart();
     }
   } catch (error) {
@@ -78,7 +74,8 @@ const loadData = async () => {
   }
 };
 
-const initChart = () => {
+const initChart = async () => {
+  await nextTick();
   if (!chartRef.value) return;
 
   // Dispose existing instance if any
@@ -89,28 +86,37 @@ const initChart = () => {
   myChart = echarts.init(chartRef.value);
   updateChart();
 
-  window.addEventListener("resize", handleResize);
+  // 确保图表渲染
+  myChart.resize();
 };
 
 const handleResize = () => {
   myChart && myChart.resize();
 };
 
+const computeMaxStandardScore = (subjectDatas) => {
+  const items = subjectDatas.map((s) => s.data).flat();
+  const standardScores = items.map((s) => parseInt(s.standard_score));
+  return Math.max(...standardScores, 100);
+};
+
 const updateChart = () => {
   if (!myChart || !trendData.value.semesters) return;
 
-  const { semesters, series } = trendData.value;
+  const { semesters, series, datas } = trendData.value;
 
   // Filter series based on selection
   const filteredSeries = selectedSubject.value
     ? series.filter((s) => s.name === selectedSubject.value)
     : series;
 
+  const filteredDatas = selectedSubject.value
+    ? datas.filter((s) => s.name === selectedSubject.value)
+    : datas;
+
+  const maxStandardScore = computeMaxStandardScore(filteredDatas);
+
   const option = {
-    title: {
-      text: "成绩趋势图",
-      left: "center",
-    },
     tooltip: {
       trigger: "axis",
     },
@@ -132,7 +138,7 @@ const updateChart = () => {
     yAxis: {
       type: "value",
       min: 0,
-      max: 100, // Assuming 100 is max score
+      max: maxStandardScore,
     },
     series: filteredSeries.map((item) => ({
       name: item.name,
@@ -148,11 +154,22 @@ const updateChart = () => {
     })),
   };
 
-  myChart.setOption(option, true); // true = not merge, clear others
+  myChart.setOption(option, true);
 };
+
+// 监听 studentId 变化
+watch(
+  () => props.studentId,
+  (newVal) => {
+    if (newVal) {
+      loadData();
+    }
+  },
+);
 
 onMounted(() => {
   loadData();
+  window.addEventListener("resize", handleResize);
 });
 
 onUnmounted(() => {
@@ -165,10 +182,8 @@ onUnmounted(() => {
 
 <style scoped>
 .grade-trend-container {
-  padding: 20px;
-}
-.card-header {
-  font-weight: bold;
+  width: 100%;
+  padding: 10px;
 }
 .filter-container {
   margin-bottom: 20px;
@@ -181,6 +196,6 @@ onUnmounted(() => {
 }
 .chart-container {
   width: 100%;
-  height: 500px;
+  height: 400px; /* 稍微调小一点，适应弹窗 */
 }
 </style>

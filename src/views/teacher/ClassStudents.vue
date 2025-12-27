@@ -34,6 +34,12 @@
               @click="viewReportProof(row.user_id)"
               >成绩证明</el-button
             >
+            <el-button
+              type="warning"
+              size="small"
+              @click="viewGradeTrend(row.user_id)"
+              >成绩趋势</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -62,6 +68,18 @@
         <ReportProof v-if="selectedStudentId" :student-id="selectedStudentId" />
       </div>
     </el-dialog>
+
+    <!-- 成绩趋势 Dialog -->
+    <el-dialog
+      title="成绩趋势"
+      v-model="gradeTrendVisible"
+      width="80%"
+      :destroy-on-close="true"
+    >
+      <div class="dialog-content-wrapper">
+        <GradeTrend v-if="selectedStudentId" :student-id="selectedStudentId" />
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -72,6 +90,7 @@ import { teacherAPI } from "@/api/teacher";
 import { ElMessage } from "element-plus";
 import StatusCard from "@/views/common/StatusCard.vue";
 import ReportProof from "@/views/common/ReportProof.vue";
+import GradeTrend from "@/views/common/GradeTrend.vue";
 import { ArrowLeft } from "@element-plus/icons-vue";
 
 const route = useRoute();
@@ -82,6 +101,7 @@ const classId = ref(route.params.classId);
 
 const statusCardVisible = ref(false);
 const reportProofVisible = ref(false);
+const gradeTrendVisible = ref(false);
 const selectedStudentId = ref(null);
 
 const fetchStudents = async () => {
@@ -108,6 +128,11 @@ const viewStatusCard = (studentId) => {
 const viewReportProof = (studentId) => {
   selectedStudentId.value = studentId;
   reportProofVisible.value = true;
+};
+
+const viewGradeTrend = (studentId) => {
+  selectedStudentId.value = studentId;
+  gradeTrendVisible.value = true;
 };
 
 onMounted(() => {

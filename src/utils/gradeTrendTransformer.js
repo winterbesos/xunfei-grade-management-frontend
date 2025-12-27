@@ -11,9 +11,10 @@ export function transformGradeTrendData(dataList) {
 
   // 用于快速查找成绩: `${semester_id}_${subject_name}` -> score
   const scoreMap = new Map();
+  const dataMap = new Map();
 
   dataList.forEach((item) => {
-    if (!semesterMap.has(item.semester_id)) {
+    if (!semesterMap.has(item.exam_id)) {
       semesterMap.set(item.exam_id, item.exam_name);
     }
     subjectSet.add(item.subject_name);
@@ -22,7 +23,8 @@ export function transformGradeTrendData(dataList) {
     const scoreVal = parseFloat(item.score);
     // 只有有效数字才存入，或者保留 null
     if (!isNaN(scoreVal)) {
-      scoreMap.set(`${item.semester_id}_${item.subject_name}`, scoreVal);
+      scoreMap.set(`${item.exam_id}_${item.subject_name}`, scoreVal);
+      dataMap.set(`${item.exam_id}_${item.subject_name}`, item);
     }
   });
 
@@ -48,9 +50,23 @@ export function transformGradeTrendData(dataList) {
     };
   });
 
+  // 4. 构建 datas
+  const datas = subjects.map((subject) => {
+    const data = sortedSemesterIds.map((semId) => {
+      const key = `${semId}_${subject}`;
+      return dataMap.has(key) ? dataMap.get(key) : null;
+    });
+
+    return {
+      name: subject,
+      data: data,
+    };
+  });
+
   return {
     semesters,
     subjects,
     series,
+    datas,
   };
 }
