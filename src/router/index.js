@@ -27,6 +27,12 @@ const routes = [
         meta: { requiresAuth: true, roles: ["admin"] },
       },
       {
+        path: "/admin/semesters/:semesterId/scoring-completion",
+        name: "AdminScoringCompletion",
+        component: () => import("@/views/admin/ScoringCompletion.vue"),
+        meta: { requiresAuth: true, roles: ["admin"] },
+      },
+      {
         path: "/admin/classes",
         name: "AdminClasses",
         component: () => import("@/views/admin/ClassManagement.vue"),

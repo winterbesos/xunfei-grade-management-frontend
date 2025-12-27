@@ -244,4 +244,12 @@ export const adminAPI = {
       method: "get",
     });
   },
+
+  // 获取班级评分进度
+  getClassProcesses(semesterId, yearCode, subjectCode) {
+    return request({
+      url: `/api/admin/semesters/${semesterId}/years/${yearCode}/subjects/${subjectCode}/classe-processes`,
+      method: "get",
+    });
+  },
 };

@@ -55,7 +55,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="120" fixed="right">
+        <el-table-column label="操作" width="220" fixed="right">
           <template #default="{ row }">
             <el-button
               type="primary"
@@ -64,6 +64,14 @@
               @click="handleSetScoringTime(row)"
             >
               设置打分时间
+            </el-button>
+            <el-button
+              type="primary"
+              size="small"
+              link
+              @click="handleScoringCompletion(row)"
+            >
+              评分完成情况
             </el-button>
           </template>
         </el-table-column>
@@ -122,10 +130,12 @@
 
 <script setup>
 import { ref, reactive, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { adminAPI } from "@/api/admin";
 import { formatDate, toISODate } from "@/utils/date";
 
+const router = useRouter();
 const loading = ref(false);
 const semesters = ref([]);
 
@@ -154,6 +164,13 @@ const handleSetScoringTime = (row) => {
   scoringTimeForm.scoringBeginTime = formatDate(row.scoring_begin_time) || "";
   scoringTimeForm.scoringEndTime = formatDate(row.scoring_end_time) || "";
   scoringTimeDialogVisible.value = true;
+};
+
+const handleScoringCompletion = (row) => {
+  router.push({
+    name: "AdminScoringCompletion",
+    params: { semesterId: row.semester_id },
+  });
 };
 
 // 提交打分时间设置
