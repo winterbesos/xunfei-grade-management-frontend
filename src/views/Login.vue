@@ -230,27 +230,6 @@ const handleOAuthLogin = async () => {
       );
       window.location.href = response.data.authorization_url;
     }
-
-    // // 模拟 OAuth 登录
-    // const response = await authAPI.loginByOAuth(oauthProvider.value, 'mock_code')
-    // if (response.code === 200) {
-    //   const token = response.data.token
-
-    //   // 存储token
-    //   authStore.login(token, null)
-
-    //   // 获取用户信息
-    //   const userInfoResponse = await authAPI.getUserInfo()
-    //   if (userInfoResponse.code === 200) {
-    //     authStore.updateUserInfo(userInfoResponse.data)
-    //     ElMessage.success('OAuth 登录成功')
-
-    //     const redirect = route.query.redirect || getDefaultRoute()
-    //     router.push(redirect)
-    //   } else {
-    //     throw new Error('获取用户信息失败')
-    //   }
-    // }
   } catch (error) {
     ElMessage.error(error.message || "OAuth 登录失败");
   } finally {

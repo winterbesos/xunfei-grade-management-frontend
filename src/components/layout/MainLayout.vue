@@ -113,7 +113,21 @@
               </span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+                  <el-dropdown-item
+                    v-if="authStore.originalRole === 'admin' && authStore.userRole === 'admin'"
+                    command="switch-to-teacher"
+                  >
+                    <el-icon><User /></el-icon>
+                    切换为教师
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-if="authStore.originalRole === 'admin' && authStore.userRole === 'teacher'"
+                    command="switch-to-admin"
+                  >
+                    <el-icon><Setting /></el-icon>
+                    切换回管理员
+                  </el-dropdown-item>
+                  <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -246,6 +260,14 @@ const handleCommand = async (command) => {
     } catch {
       // 用户取消
     }
+  } else if (command === "switch-to-teacher") {
+    authStore.switchRole("teacher");
+    ElMessage.success("已切换为教师视角");
+    router.push("/teacher/grade-management");
+  } else if (command === "switch-to-admin") {
+    authStore.switchRole("admin");
+    ElMessage.success("已切换回管理员视角");
+    router.push("/admin/semesters");
   }
 };
 

@@ -36,6 +36,7 @@
             >
               <el-radio label="1">分数 (百分制)</el-radio>
               <el-radio label="2">等级 (ABCD)</el-radio>
+              <el-radio label="3">合格/不合格</el-radio>
             </el-radio-group>
           </template>
         </el-table-column>
