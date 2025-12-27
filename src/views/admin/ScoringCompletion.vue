@@ -1,17 +1,14 @@
 <template>
   <div class="scoring-completion">
-    <div class="page-header">
-      <el-page-header @back="goBack">
-        <template #content>
-          <span class="text-large font-600 mr-3"> 评分完成情况 </span>
-        </template>
-      </el-page-header>
-    </div>
-
-    <el-card class="mt-4">
+    <el-card>
       <template #header>
         <div class="card-header">
-          <span>筛选条件</span>
+          <div class="header-left">
+            <el-button @click="goBack" :icon="ArrowLeft" circle />
+            <span style="margin-left: 10px" class="text-large font-600">
+              评分完成情况
+            </span>
+          </div>
         </div>
       </template>
       <el-form :inline="true" :model="filters" class="demo-form-inline">
@@ -114,6 +111,7 @@ import { ref, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { adminAPI } from "@/api/admin";
 import { ElMessage } from "element-plus";
+import { ArrowLeft } from "@element-plus/icons-vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -239,6 +237,10 @@ onMounted(() => {
 .card-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+.header-left {
+  display: flex;
   align-items: center;
 }
 .mt-4 {
