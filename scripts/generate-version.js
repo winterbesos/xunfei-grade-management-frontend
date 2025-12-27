@@ -23,8 +23,6 @@ try {
   const envContent = `# API 基础 URL
 VITE_API_BASE_URL=https://grades-api.xsalo.com
 
-# 是否使用 Mock 数据（true 或 false）
-VITE_USE_MOCK=false
 VITE_SHOW_VERSION=false
 VITE_SHOW_PASSWORD_LOGIN=false
 
@@ -40,8 +38,6 @@ VITE_BUILD_TIME=${buildTime}
   const testEnvContent = `# API 基础 URL
 VITE_API_BASE_URL=https://grades-test.xsalo.com
 
-# 是否使用 Mock 数据（true 或 false）
-VITE_USE_MOCK=false
 VITE_SHOW_VERSION=true
 VITE_SHOW_PASSWORD_LOGIN=true
 
@@ -65,9 +61,6 @@ VITE_BUILD_TIME=${buildTime}
   const buildTime = new Date().toLocaleDateString("zh-CN");
   const envContent = `# API 基础 URL
 VITE_API_BASE_URL=/api
-
-# 是否使用 Mock 数据（true 或 false）
-VITE_USE_MOCK=false
 
 # 版本信息
 VITE_APP_VERSION=v1.0.0

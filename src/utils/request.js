@@ -32,7 +32,7 @@ request.interceptors.response.use(
   error => {
     const response = error.response
 
-    if (response.status >= 400 && response.status < 500) {
+    if (response && response.status >= 400 && response.status < 500) {
       ElMessage({
         message: response.data.detail || 'Error',
         type: 'error',
