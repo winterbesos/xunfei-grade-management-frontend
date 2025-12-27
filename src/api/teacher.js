@@ -1,14 +1,8 @@
 import request from "@/utils/request";
-import { mockAPI } from "@/utils/mock";
-
-const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
 
 export const teacherAPI = {
   // 获取成绩列表
   getGrades(params) {
-    if (USE_MOCK) {
-      return mockAPI.getGrades(params);
-    }
     return request({
       url: "/teacher/grades",
       method: "get",
@@ -18,9 +12,6 @@ export const teacherAPI = {
 
   // 录入/更新成绩
   saveGrade(data) {
-    if (USE_MOCK) {
-      return mockAPI.saveGrade(data);
-    }
     return request({
       url: "/teacher/grades",
       method: "post",
@@ -39,9 +30,6 @@ export const teacherAPI = {
 
   // 获取课程列表
   getCourses() {
-    if (USE_MOCK) {
-      return mockAPI.getCourses();
-    }
     return request({
       url: "/teacher/courses",
       method: "get",
@@ -89,17 +77,6 @@ export const teacherAPI = {
     });
   },
 
-  // class GradeRequestItem(BaseModel):
-  //     student_id: str
-  //     usual_score: Optional[float] = None
-  //     remark: Optional[str] = None
-  //
-  // class SemesterSubjectGradeRequest(BaseModel):
-  //     semester_id: str
-  //     class_id: str
-  //     subject_code: str
-  //     grades: list[GradeRequestItem]
-
   // 保存单个学生成绩
   saveStudentGrade(semesterId, classId, subjectCode, data) {
     return request({
@@ -127,9 +104,6 @@ export const teacherAPI = {
 
   // 批量保存学生成绩
   batchSaveGrades(data) {
-    if (USE_MOCK) {
-      return mockAPI.batchSaveGrades(data);
-    }
     return request({
       url: "/teacher/grades/batch",
       method: "post",
@@ -160,9 +134,6 @@ export const teacherAPI = {
 
   // 获取奖项审核列表
   getAwards(params) {
-    if (USE_MOCK) {
-      return mockAPI.getTeacherAwards(params);
-    }
     return request({
       url: "/api/teacher/awards",
       method: "get",
@@ -220,6 +191,14 @@ export const teacherAPI = {
       url: "/api/teacher/students",
       method: "get",
       params,
+    });
+  },
+
+  // 获取学生平时成绩列表
+  getStudentDailyScores(studentId, semesterId, subjectCode) {
+    return request({
+      url: `/api/teacher/students/${studentId}/semesters/${semesterId}/subjects/${subjectCode}/daily-scores`,
+      method: "get",
     });
   },
 };

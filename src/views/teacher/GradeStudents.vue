@@ -132,18 +132,48 @@
         />
         <el-table-column label="平时成绩" width="120">
           <template #default="{ row }">
-            <div class="grade-input-group">
-              <el-input-number
-                v-model="row.usual_score"
-                :min="0"
-                :max="100"
-                :precision="1"
-                :step="0.5"
-                controls-position="right"
-                style="width: 100px"
-                @change="handleScoreChange(row)"
-              />
-            </div>
+            <el-popover
+              placement="top"
+              :width="350"
+              trigger="hover"
+              @show="handleDailyScoresShow(row.user_id)"
+            >
+              <template #reference>
+                <div class="grade-input-group">
+                  <el-input-number
+                    v-model="row.usual_score"
+                    :min="0"
+                    :max="100"
+                    :precision="1"
+                    :step="0.5"
+                    controls-position="right"
+                    style="width: 100px"
+                    @change="handleScoreChange(row)"
+                  />
+                </div>
+              </template>
+              <div v-loading="loadingScores.get(row.user_id)">
+                <el-table
+                  v-if="(dailyScoresCache.get(row.user_id) || []).length > 0"
+                  :data="dailyScoresCache.get(row.user_id)"
+                  size="small"
+                  border
+                  stripe
+                >
+                  <el-table-column
+                    prop="exam_name"
+                    width="220"
+                    label="考试名称"
+                  />
+                  <el-table-column prop="score" label="成绩" align="center" />
+                </el-table>
+                <el-empty
+                  v-else
+                  :image-size="40"
+                  description="暂无平时成绩记录"
+                />
+              </div>
+            </el-popover>
           </template>
         </el-table-column>
         <el-table-column label="学时" width="110">
@@ -266,6 +296,31 @@ const fileInput = ref(null);
 
 const reportDialogVisible = ref(false);
 const currentStudentId = ref(null);
+
+// 平时成绩缓存
+const dailyScoresCache = reactive(new Map());
+const loadingScores = reactive(new Map());
+
+const handleDailyScoresShow = async (studentId) => {
+  if (dailyScoresCache.has(studentId)) return;
+
+  loadingScores.set(studentId, true);
+  try {
+    const res = await teacherAPI.getStudentDailyScores(
+      studentId,
+      semesterId,
+      subjectCode,
+    );
+    if (res.status === 200) {
+      dailyScoresCache.set(studentId, res.data || []);
+    }
+  } catch (error) {
+    console.error("Failed to fetch daily scores", error);
+    dailyScoresCache.set(studentId, []);
+  } finally {
+    loadingScores.set(studentId, false);
+  }
+};
 
 // 快速设置
 const quickScore = ref("");

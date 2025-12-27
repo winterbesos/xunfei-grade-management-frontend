@@ -1184,6 +1184,19 @@ export const mockAPI = {
     };
   },
 
+  // 获取学生平时成绩
+  async getStudentDailyScores(studentId, semesterId, subjectCode) {
+    await delay();
+    return {
+      status: 200,
+      data: [
+        { exam_name: "课堂测验1", score: 85, date: "2024-03-10" },
+        { exam_name: "期中模拟", score: 78, date: "2024-04-15" },
+        { exam_name: "小组作业", score: 92, date: "2024-05-20" },
+      ],
+    };
+  },
+
   // 获取成绩趋势
   async getGradeTrend(studentId) {
     await delay();
