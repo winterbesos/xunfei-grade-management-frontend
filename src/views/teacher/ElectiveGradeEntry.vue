@@ -5,7 +5,9 @@
         <div class="card-header">
           <div class="header-left">
             <el-button @click="handleBack" :icon="ArrowLeft" circle />
-            <span style="margin-left: 10px">选修成绩录入</span>
+            <span style="margin-left: 10px; font-weight: 600; font-size: 16px"
+              >选修成绩录入</span
+            >
           </div>
           <div class="header-info">
             <el-tag type="info">{{ semesterName }}</el-tag>

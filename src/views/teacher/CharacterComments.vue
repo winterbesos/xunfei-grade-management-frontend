@@ -5,7 +5,9 @@
         <div class="card-header">
           <div class="header-left">
             <el-button @click="$router.back()" :icon="ArrowLeft" circle />
-            <span style="margin-left: 10px">品格评语</span>
+            <span style="margin-left: 10px; font-weight: 600; font-size: 16px"
+              >品格评语</span
+            >
           </div>
           <div class="header-right">
             <el-button @click="handleExport">

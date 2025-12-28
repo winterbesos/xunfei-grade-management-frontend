@@ -4,10 +4,8 @@
       <template #header>
         <div class="card-header">
           <div class="header-left">
-            <el-button link @click="goBack">
-              <el-icon><ArrowLeft /></el-icon> 返回
-            </el-button>
-            <span style="margin-left: 10px"
+            <el-button @click="goBack" :icon="ArrowLeft" circle />
+            <span style="margin-left: 10px; font-weight: 600; font-size: 16px"
               >选修科目列表 - {{ semesterName }}</span
             >
           </div>

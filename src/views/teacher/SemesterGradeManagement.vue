@@ -4,10 +4,11 @@
       <template #header>
         <div class="card-header">
           <div class="header-left">
-            <el-button link @click="handleBack">
-              <el-icon><ArrowLeft /></el-icon> 返回
-            </el-button>
-            <span style="margin-left: 10px">{{ semesterName }} - 成绩管理</span>
+            <el-button @click="handleBack" :icon="ArrowLeft" circle />
+            <span
+              style="margin-left: 10px; font-weight: 600; font-size: 16px"
+              >{{ semesterName }} - 成绩管理</span
+            >
           </div>
         </div>
       </template>

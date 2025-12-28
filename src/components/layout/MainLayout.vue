@@ -55,10 +55,6 @@
             <el-icon><User /></el-icon>
             <template #title>学生管理</template>
           </el-menu-item>
-          <el-menu-item index="/teacher/character-comments">
-            <el-icon><Edit /></el-icon>
-            <template #title>品格评语</template>
-          </el-menu-item>
           <el-menu-item index="/teacher/awards">
             <el-icon><Trophy /></el-icon>
             <template #title>获奖审核</template>

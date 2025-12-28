@@ -5,7 +5,9 @@
         <div class="card-header">
           <div class="header-left">
             <el-button @click="handleBack" :icon="ArrowLeft" circle />
-            <span style="margin-left: 10px">班级列表 - {{ semesterName }}</span>
+            <span style="margin-left: 10px; font-weight: 600; font-size: 16px"
+              >班级列表 - {{ semesterName }}</span
+            >
           </div>
           <div class="header-right">
             <span class="semester-info">学期: {{ semesterName }}</span>

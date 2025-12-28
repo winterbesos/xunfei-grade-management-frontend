@@ -123,7 +123,7 @@
                   link
                   @click="handleViewYearReport(row)"
                 >
-                  年度账单
+                  学年旅程
                 </el-button>
               </template>
             </el-table-column>
@@ -177,7 +177,10 @@
       append-to-body
     >
       <div class="dialog-center">
-        <GradeTrend v-if="gradeTrendDialogVisible" :student-id="currentStudentId" />
+        <GradeTrend
+          v-if="gradeTrendDialogVisible"
+          :student-id="currentStudentId"
+        />
       </div>
     </el-dialog>
   </div>
