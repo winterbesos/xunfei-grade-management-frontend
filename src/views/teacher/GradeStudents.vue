@@ -136,7 +136,7 @@
           <template #default="{ row }">
             <el-popover
               placement="top"
-              :width="350"
+              :width="420"
               trigger="hover"
               @show="handleDailyScoresShow(row.user_id)"
             >
@@ -168,6 +168,11 @@
                     label="考试名称"
                   />
                   <el-table-column prop="score" label="成绩" align="center" />
+                  <el-table-column
+                    prop="standard_score"
+                    label="满分"
+                    align="center"
+                  />
                 </el-table>
                 <el-empty
                   v-else
