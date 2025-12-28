@@ -89,6 +89,52 @@
             description="该学期暂无选修学科"
           />
         </el-tab-pane>
+
+        <el-tab-pane label="品格评语" name="comments">
+          <el-table
+            v-loading="loadingCommentsClasses"
+            :data="commentsClasses"
+            stripe
+            style="width: 100%; margin-top: 20px"
+          >
+            <el-table-column
+              prop="class_id"
+              label="班级ID"
+              width="150"
+              show-overflow-tooltip
+            />
+            <el-table-column prop="class_name" label="班级名称" min-width="150">
+              <template #default="{ row }">
+                <el-tooltip :content="row.class_name" placement="top">
+                  <span>{{ row.year_name + row.class_name }}</span>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="student_count"
+              label="学生数"
+              width="120"
+              align="center"
+            />
+            <el-table-column label="操作" width="150" fixed="right">
+              <template #default="{ row }">
+                <el-button
+                  type="primary"
+                  size="small"
+                  link
+                  @click="handleEnterComments(row)"
+                >
+                  <el-icon><Edit /></el-icon>
+                  评价
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-empty
+            v-if="!loadingCommentsClasses && commentsClasses.length === 0"
+            description="暂无班级数据"
+          />
+        </el-tab-pane>
       </el-tabs>
     </el-card>
   </div>
@@ -99,7 +145,7 @@ import { ref, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter, useRoute } from "vue-router";
 import { teacherAPI } from "@/api/teacher";
-import { ArrowLeft } from "@element-plus/icons-vue";
+import { ArrowLeft, Edit } from "@element-plus/icons-vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -116,6 +162,39 @@ const currentCompulsorySubjects = ref([]);
 // 选修课学科列表
 const loadingElectiveSubjects = ref(false);
 const currentElectiveSubjects = ref([]);
+
+// 品格评语班级列表
+const loadingCommentsClasses = ref(false);
+const commentsClasses = ref([]);
+
+// 加载品格评语班级
+const loadCommentsClasses = async () => {
+  loadingCommentsClasses.value = true;
+  try {
+    const response = await teacherAPI.getTeacherClasses();
+    if (response.status === 200) {
+      commentsClasses.value = response.data.list || response.data;
+    }
+  } catch (error) {
+    ElMessage.error("加载班级列表失败");
+  } finally {
+    loadingCommentsClasses.value = false;
+  }
+};
+
+// 进入品格评语评价
+const handleEnterComments = (row) => {
+  router.push({
+    name: "TeacherCharacterComments",
+    params: {
+      classId: row.class_id,
+      semesterId: semesterId,
+    },
+    query: {
+      className: row.year_name + row.class_name,
+    },
+  });
+};
 
 // 返回上一页
 const handleBack = () => {
@@ -136,6 +215,8 @@ const handleTabChange = (tabName) => {
     currentElectiveSubjects.value.length === 0
   ) {
     loadElectiveSubjects();
+  } else if (tabName === "comments" && commentsClasses.value.length === 0) {
+    loadCommentsClasses();
   }
 };
 
