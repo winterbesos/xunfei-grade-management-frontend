@@ -128,6 +128,65 @@
             inactive-text="禁用"
           />
         </el-form-item>
+
+        <el-divider content-position="left">能力评分标准</el-divider>
+        <el-row :gutter="10">
+          <el-col :span="12">
+            <el-form-item label="学习能力">
+              <el-input-number
+                v-model="subjectForm.study_ability"
+                :min="0"
+                :max="10"
+                :step="0.5"
+                style="width: 100%"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="思维逻辑">
+              <el-input-number
+                v-model="subjectForm.logical_thinking"
+                :min="0"
+                :max="10"
+                :step="0.5"
+                style="width: 100%"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="创新创造">
+              <el-input-number
+                v-model="subjectForm.creativity"
+                :min="0"
+                :max="10"
+                :step="0.5"
+                style="width: 100%"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="团队协作">
+              <el-input-number
+                v-model="subjectForm.teamwork"
+                :min="0"
+                :max="10"
+                :step="0.5"
+                style="width: 100%"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="责任心">
+              <el-input-number
+                v-model="subjectForm.responsibility"
+                :min="0"
+                :max="10"
+                :step="0.5"
+                style="width: 100%"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -264,6 +323,11 @@ const subjectForm = reactive({
   teacher_id: "",
   semester_id: "",
   enabled: true,
+  study_ability: 0,
+  logical_thinking: 0,
+  creativity: 0,
+  teamwork: 0,
+  responsibility: 0,
 });
 
 const subjectRules = {
@@ -355,6 +419,11 @@ const editSubject = (row) => {
   subjectForm.teacher_id = row.teacher_id;
   subjectForm.semester_id = row.semester_id;
   subjectForm.enabled = row.enabled;
+  subjectForm.study_ability = row.abilities.study_ability || 0;
+  subjectForm.logical_thinking = row.abilities.logical_thinking || 0;
+  subjectForm.creativity = row.abilities.creativity || 0;
+  subjectForm.teamwork = row.abilities.teamwork || 0;
+  subjectForm.responsibility = row.abilities.responsibility || 0;
 
   // 确保列表包含当前教师
   if (teacherList.value.length === 0) {
@@ -422,6 +491,11 @@ const submitSubject = async () => {
           teacher_id: subjectForm.teacher_id,
           semester_id: subjectForm.semester_id,
           enabled: subjectForm.enabled,
+          study_ability: subjectForm.study_ability,
+          logical_thinking: subjectForm.logical_thinking,
+          creativity: subjectForm.creativity,
+          teamwork: subjectForm.teamwork,
+          responsibility: subjectForm.responsibility,
         };
         response = await adminAPI.createElectiveSubject(createPayload);
       }
@@ -446,6 +520,11 @@ const resetForm = () => {
   subjectForm.teacher_id = "";
   subjectForm.semester_id = "";
   subjectForm.enabled = true;
+  subjectForm.study_ability = 0;
+  subjectForm.logical_thinking = 0;
+  subjectForm.creativity = 0;
+  subjectForm.teamwork = 0;
+  subjectForm.responsibility = 0;
   isEdit.value = false;
 };
 
