@@ -193,7 +193,7 @@ const handlePasswordLogin = async () => {
         const token = response.data.access_token;
 
         // 存储token
-        authStore.login(token, null);
+        authStore.login(token, null, 'password');
 
         // 获取用户信息
         const userInfoResponse = await authAPI.getUserInfo();

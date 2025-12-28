@@ -133,7 +133,10 @@
                     <el-icon><Setting /></el-icon>
                     切换回管理员
                   </el-dropdown-item>
-                  <el-dropdown-item divided command="logout"
+                  <el-dropdown-item
+                    v-if="authStore.loginType === 'password'"
+                    divided
+                    command="logout"
                     >退出登录</el-dropdown-item
                   >
                 </el-dropdown-menu>

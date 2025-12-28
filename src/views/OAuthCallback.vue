@@ -60,7 +60,7 @@ const handleOAuthCallback = async () => {
 
     if (response.status === 200 && response.data.access_token) {
       // 存储token
-      authStore.login(response.data.access_token, null);
+      authStore.login(response.data.access_token, null, "oauth");
 
       // 获取用户信息
       const userInfoResponse = await authAPI.getUserInfo();

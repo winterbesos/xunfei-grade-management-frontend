@@ -7,6 +7,7 @@ export const useAuthStore = defineStore("auth", () => {
   const activeRole = ref(
     localStorage.getItem("activeRole") || userInfo.value?.role || "",
   );
+  const loginType = ref(localStorage.getItem("loginType") || "password");
 
   const isLoggedIn = computed(() => !!token.value);
   const userRole = computed(() => activeRole.value);
@@ -16,12 +17,14 @@ export const useAuthStore = defineStore("auth", () => {
   const themeColor = computed(() => userInfo.value?.theme_color || "#304156");
 
   // 登录
-  function login(tokenValue, userInfoValue) {
+  function login(tokenValue, userInfoValue, type = "password") {
     token.value = tokenValue;
     userInfo.value = userInfoValue;
     activeRole.value = userInfoValue?.role;
+    loginType.value = type;
     localStorage.setItem("token", tokenValue);
     localStorage.setItem("userInfo", JSON.stringify(userInfoValue));
+    localStorage.setItem("loginType", type);
     localStorage.removeItem("activeRole");
   }
 
@@ -45,9 +48,11 @@ export const useAuthStore = defineStore("auth", () => {
     token.value = "";
     userInfo.value = null;
     activeRole.value = "";
+    loginType.value = "password";
     localStorage.removeItem("token");
     localStorage.removeItem("userInfo");
     localStorage.removeItem("activeRole");
+    localStorage.removeItem("loginType");
   }
 
   // 检查权限
@@ -59,6 +64,7 @@ export const useAuthStore = defineStore("auth", () => {
     token,
     userInfo,
     activeRole,
+    loginType,
     isLoggedIn,
     userRole,
     originalRole,
