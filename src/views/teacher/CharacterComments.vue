@@ -116,23 +116,6 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="品格等第" width="90">
-          <template #default="{ row }">
-            <el-select
-              v-model="row.grade"
-              placeholder="请选择"
-              @change="row.modified = true"
-            >
-              <el-option
-                v-for="item in gradeOptions"
-                :key="item"
-                :label="item"
-                :value="item"
-              />
-            </el-select>
-          </template>
-        </el-table-column>
-
         <el-table-column label="品格评语">
           <template #default="{ row }">
             <el-input

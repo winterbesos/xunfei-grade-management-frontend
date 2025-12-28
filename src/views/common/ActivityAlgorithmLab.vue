@@ -1,11 +1,9 @@
 <template>
   <div class="algo-visualizer">
-    <h1 class="page-title">🔍 综合评分算法交互实验室</h1>
-
     <el-row :gutter="20">
       <!-- 左侧：控制面板 -->
       <el-col :span="9" :xs="24">
-        <el-scrollbar height="calc(100vh - 120px)">
+        <el-scrollbar>
           <!-- 1. 算法参数配置 -->
           <el-card class="control-section">
             <template #header>
@@ -294,7 +292,7 @@ import * as echarts from "echarts";
 
 // --- 1. 状态定义 ---
 const params = reactive({
-  s_max: 5,
+  s_max: 10,
   prior_mean: null, // 将在逻辑中处理默认值
   prior_strength: 5.0,
   k: 6.0,
@@ -446,6 +444,10 @@ const updateAll = () => {
       yAxis: singleResult.value.rawAvg.toFixed(1), // 近似匹配Y轴字符串
       value: "当前",
       itemStyle: { color: "#fff", borderColor: "#333", borderWidth: 1 },
+      // 携带真实数据供 tooltip 使用
+      _realN: singleResult.value.n,
+      _realAvg: singleResult.value.rawAvg.toFixed(2),
+      _realScore: singleResult.value.total.toFixed(4),
     });
   }
 
@@ -510,11 +512,35 @@ const initCharts = () => {
     tooltip: {
       position: "top",
       formatter: (p) => {
-        return `次数: ${p.data[0]}<br/>均分: ${p.data[1]}<br/><b>得分: ${p.data[2]}</b>`;
+        console.log(p);
+        // 判断当前悬停的是 MarkPoint 还是 热力图格子
+        if (p.componentType === "markPoint") {
+          // 如果是 MarkPoint，从我们刚才存的自定义字段里取值
+          // 注意：MarkPoint 的数据在 p.data 中
+          return `
+            <div style="text-align:center;font-weight:bold;margin-bottom:5px">您的位置</div>
+            次数: ${p.data._realN}<br/>
+            均分: ${p.data._realAvg}<br/>
+            <b>得分: ${p.data._realScore}</b>
+          `;
+        } else {
+          // 如果是热力图，p.data 是数组 [x, y, value]
+          return `
+            次数: ${p.data[0]}<br/>
+            均分: ${p.data[1]}<br/>
+            <b>得分: ${p.data[2]}</b>
+          `;
+        }
       },
     },
     animation: false,
-    grid: { height: "80%", top: "10%", right: "5%" },
+    grid: {
+      top: "5%",
+      right: "5%",
+      left: "5%",
+      bottom: "15%",
+      containLabel: true,
+    },
     xAxis: {
       type: "category",
       name: "次数 N",
@@ -543,7 +569,13 @@ const initCharts = () => {
   const lineOption = {
     tooltip: { trigger: "axis" },
     legend: { data: ["满分用户 (100%)", "及格用户 (60%)", "低分用户 (20%)"] },
-    grid: { left: "3%", right: "4%", bottom: "3%", containLabel: true },
+    grid: {
+      top: "5%",
+      left: "5%",
+      right: "5%",
+      bottom: "15%",
+      containLabel: true,
+    },
     xAxis: { type: "category", boundaryGap: false },
     yAxis: { type: "value", min: 0, max: 1 },
     series: [
@@ -588,18 +620,13 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .algo-visualizer {
-  padding: 20px;
-  background: #f0f2f5;
-  min-height: 100vh;
+  padding: 0;
+  background: transparent;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", Arial, sans-serif;
 }
 
 .page-title {
-  text-align: center;
-  color: #303133;
-  margin-bottom: 20px;
-  font-weight: 300;
-  font-size: 24px;
+  display: none;
 }
 
 .card-header {
@@ -621,6 +648,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
 }
 
 .quick-actions {
@@ -671,7 +699,7 @@ onUnmounted(() => {
 
 .result-box {
   text-align: center;
-  padding: 15px 5px;
+  padding: 10px 2px;
   background: #ffffff;
   border: 1px solid #ebeef5;
   border-radius: 8px;
@@ -691,26 +719,29 @@ onUnmounted(() => {
 }
 
 .result-val {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
   color: #409eff;
   line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   &.highlight-dark {
     color: #303133;
-    font-size: 20px;
+    font-size: 18px;
   }
   &.highlight-green {
     color: #67c23a;
-    font-size: 18px;
+    font-size: 16px;
   }
   &.highlight-orange {
     color: #e6a23c;
-    font-size: 18px;
+    font-size: 16px;
   }
   &.highlight-gray {
     color: #909399;
-    font-size: 18px;
+    font-size: 16px;
   }
 }
 

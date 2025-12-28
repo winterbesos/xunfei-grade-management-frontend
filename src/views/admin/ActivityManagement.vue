@@ -217,7 +217,7 @@
                 style="margin-bottom: 5px"
               >
                 <el-input-number
-                  v-model="award.learning_ability"
+                  v-model="award.study_ability"
                   :min="0"
                   :max="10"
                   :step="0.5"
@@ -243,7 +243,7 @@
                 style="margin-bottom: 5px"
               >
                 <el-input-number
-                  v-model="award.innovation"
+                  v-model="award.creativity"
                   :min="0"
                   :max="10"
                   :step="0.5"
@@ -256,7 +256,7 @@
                 style="margin-bottom: 5px"
               >
                 <el-input-number
-                  v-model="award.team_collaboration"
+                  v-model="award.teamwork"
                   :min="0"
                   :max="10"
                   :step="0.5"
@@ -304,7 +304,7 @@
     <el-dialog
       v-model="labDialogVisible"
       title="能力值算法试算"
-      width="800px"
+      width="1200px"
       append-to-body
     >
       <ActivityAlgorithmLab />
@@ -315,7 +315,14 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { Plus, Minus, Delete, Download, Upload, QuestionFilled } from "@element-plus/icons-vue";
+import {
+  Plus,
+  Minus,
+  Delete,
+  Download,
+  Upload,
+  QuestionFilled,
+} from "@element-plus/icons-vue";
 import { adminAPI } from "@/api/admin";
 import { formatDate } from "@/utils/date";
 import * as XLSX from "xlsx";
@@ -345,10 +352,10 @@ const form = reactive({
   awards: [
     {
       name: "",
-      learning_ability: 0,
+      study_ability: 0,
       logical_thinking: 0,
-      innovation: 0,
-      team_collaboration: 0,
+      creativity: 0,
+      teamwork: 0,
       responsibility: 0,
     },
   ],
@@ -449,9 +456,7 @@ const handleExport = () => {
     getLevelText(item.level),
     item.credit || "",
     item.academic_year_name + item.term_name + (item.semester_name || ""),
-    item.awards
-      .map((a) => (typeof a === "string" ? a : a.name))
-      .join("，"),
+    item.awards.map((a) => (typeof a === "string" ? a : a.name)).join("，"),
   ]);
 
   data.unshift(headers);
@@ -522,10 +527,10 @@ const handleImport = (event) => {
               .split(/[,，|]/)
               .map((s) => ({
                 name: s.trim(),
-                learning_ability: 0,
+                study_ability: 0,
                 logical_thinking: 0,
-                innovation: 0,
-                team_collaboration: 0,
+                creativity: 0,
+                teamwork: 0,
                 responsibility: 0,
               }))
               .filter((s) => s.name)
@@ -574,10 +579,10 @@ const handleAdd = () => {
   form.awards = [
     {
       name: "",
-      learning_ability: 0,
+      study_ability: 0,
       logical_thinking: 0,
-      innovation: 0,
-      team_collaboration: 0,
+      creativity: 0,
+      teamwork: 0,
       responsibility: 0,
     },
   ];
@@ -587,10 +592,10 @@ const handleAdd = () => {
 const addAward = () => {
   form.awards.push({
     name: "",
-    learning_ability: 0,
+    study_ability: 0,
     logical_thinking: 0,
-    innovation: 0,
-    team_collaboration: 0,
+    creativity: 0,
+    teamwork: 0,
     responsibility: 0,
   });
 };
