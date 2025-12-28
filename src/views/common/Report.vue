@@ -69,11 +69,15 @@
         <tbody>
           <tr v-for="item in grades" :key="item.subject_code">
             <td class="subject-name">{{ item.subject_name }}</td>
-            <td>{{ item.midterm_score }}</td>
-            <td>{{ item.finalterm_score }}</td>
-            <td>{{ item.usual_score }}</td>
-            <td>{{ item.score }}</td>
-            <td>{{ item.credits }}</td>
+            <td>
+              {{ formatReportGrade(item.midterm_score, item.grades_type) }}
+            </td>
+            <td>
+              {{ formatReportGrade(item.finalterm_score, item.grades_type) }}
+            </td>
+            <td>{{ formatReportGrade(item.usual_score, item.grades_type) }}</td>
+            <td>{{ formatReportGrade(item.score, item.grades_type) }}</td>
+            <td>{{ formatReportGrade(item.credits, item.grades_type) }}</td>
           </tr>
         </tbody>
       </table>
@@ -135,6 +139,7 @@ import { useRoute } from "vue-router";
 import { printElement } from "@/utils/print.js";
 import { teacherAPI } from "@/api/teacher";
 import { studentAPI } from "@/api/student";
+import { formatReportGrade } from "@/utils/grades.js";
 
 const props = defineProps({
   studentId: {

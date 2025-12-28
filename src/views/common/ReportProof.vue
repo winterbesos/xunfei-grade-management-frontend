@@ -51,12 +51,12 @@
         <tbody>
           <tr v-for="(row, index) in scores" :key="index">
             <td class="subject-name">{{ row.subject }}</td>
-            <td>{{ row.g1_1 }}</td>
-            <td>{{ row.g1_2 }}</td>
-            <td>{{ row.g2_1 }}</td>
-            <td>{{ row.g2_2 }}</td>
-            <td>{{ row.g3_1 }}</td>
-            <td>{{ row.g3_2 }}</td>
+            <td>{{ formatProofGrade(row.g1_1, row.type) }}</td>
+            <td>{{ formatProofGrade(row.g1_2, row.type) }}</td>
+            <td>{{ formatProofGrade(row.g2_1, row.type) }}</td>
+            <td>{{ formatProofGrade(row.g2_2, row.type) }}</td>
+            <td>{{ formatProofGrade(row.g3_1, row.type) }}</td>
+            <td>{{ formatProofGrade(row.g3_2, row.type) }}</td>
           </tr>
         </tbody>
       </table>
@@ -78,6 +78,7 @@ import { ref, computed, onMounted, defineProps, watch } from "vue";
 import { printElement } from "@/utils/print";
 import { teacherAPI } from "@/api/teacher";
 import { ElMessage } from "element-plus";
+import { formatProofGrade } from "@/utils/grades";
 
 // --- 组件Props ---
 const props = defineProps({
@@ -161,29 +162,22 @@ const scores = computed(() => {
   return gradeProofData.value.subject_grades.map((subjectItem) => {
     const row = {
       subject: subjectItem.subject_name,
-
-      g1_1: "—",
-
-      g1_2: "—",
-
-      g2_1: "—",
-
-      g2_2: "—",
-
-      g3_1: "—",
-
-      g3_2: "—",
+      type: subjectItem.grades_type, // 传递学科类型以便格式化
+      g1_1: null,
+      g1_2: null,
+      g2_1: null,
+      g2_2: null,
+      g3_1: null,
+      g3_2: null,
     };
-
-    // 假设 year_grades 顺序为 高一, 高二, 高三
-
-    // 假设 term_grades 顺序为 第一学期, 第二学期
 
     if (subjectItem.year_grades) {
       subjectItem.year_grades.forEach((yearItem, yearIndex) => {
         if (yearIndex < 3 && yearItem.term_grades) {
-          row[`g${yearIndex + 1}_1`] = yearItem.term_grades.term_1_score || "—";
-          row[`g${yearIndex + 1}_2`] = yearItem.term_grades.term_2_score || "—";
+          row[`g${yearIndex + 1}_1`] =
+            yearItem.term_grades.term_1_score || null;
+          row[`g${yearIndex + 1}_2`] =
+            yearItem.term_grades.term_2_score || null;
         }
       });
     }

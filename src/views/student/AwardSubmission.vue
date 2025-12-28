@@ -71,9 +71,9 @@
           >
             <el-option
               v-for="reward in availableRewards"
-              :key="reward"
-              :label="reward"
-              :value="reward"
+              :key="reward.name"
+              :label="reward.name"
+              :value="reward.name"
             ></el-option>
           </el-select>
         </el-form-item>
