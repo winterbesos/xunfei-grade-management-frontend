@@ -11,12 +11,34 @@
         </div>
       </template>
 
+      <!-- 筛选 -->
+      <div style="margin-bottom: 20px">
+        <el-form :inline="true" class="demo-form-inline">
+          <el-form-item label="学期">
+            <el-select
+              v-model="filterSemesterId"
+              placeholder="全部学期"
+              style="width: 200px"
+              clearable
+              @change="handleFilterChange"
+            >
+              <el-option
+                v-for="item in semesterOptions"
+                :key="item.semester_id"
+                :label="item.academic_year_name + item.term_name"
+                :value="item.semester_id"
+              />
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </div>
+
       <!-- 活动列表 -->
       <el-table
         v-loading="loading"
         :data="activities"
         stripe
-        style="width: 100%; margin-top: 20px"
+        style="width: 100%"
       >
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="name" label="活动名称" min-width="150" />
@@ -183,6 +205,7 @@ const activities = ref([]);
 const semesterOptions = ref([]);
 const dialogVisible = ref(false);
 const formRef = ref(null);
+const filterSemesterId = ref(null);
 
 // 分页配置
 const pagination = reactive({
@@ -227,6 +250,7 @@ const loadActivities = async () => {
     const params = {
       page: pagination.currentPage,
       pageSize: pagination.pageSize,
+      semester_id: filterSemesterId.value,
     };
     const response = await adminAPI.getActivities(params);
     if (response.status === 200) {
@@ -238,6 +262,11 @@ const loadActivities = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const handleFilterChange = () => {
+  pagination.currentPage = 1;
+  loadActivities();
 };
 
 // 加载学期选项
