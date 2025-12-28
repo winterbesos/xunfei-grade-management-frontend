@@ -4,10 +4,30 @@
       <template #header>
         <div class="card-header">
           <span>活动管理</span>
-          <el-button type="primary" @click="handleAdd">
-            <el-icon><Plus /></el-icon>
-            发布活动
-          </el-button>
+          <div class="header-actions">
+            <el-button @click="handleDownloadTemplate" type="info" link>
+              下载导入模板
+            </el-button>
+            <el-button @click="handleExport">
+              <el-icon><Download /></el-icon>
+              导出
+            </el-button>
+            <el-button @click="triggerImport">
+              <el-icon><Upload /></el-icon>
+              导入
+            </el-button>
+            <input
+              type="file"
+              ref="fileInput"
+              style="display: none"
+              accept=".csv,.xlsx,.xls"
+              @change="handleImport"
+            />
+            <el-button type="primary" @click="handleAdd">
+              <el-icon><Plus /></el-icon>
+              发布活动
+            </el-button>
+          </div>
         </div>
       </template>
 
@@ -75,7 +95,7 @@
               size="small"
               style="margin-right: 5px; margin-bottom: 5px"
             >
-              {{ award }}
+              {{ typeof award === "string" ? award : award.name }}
             </el-tag>
           </template>
         </el-table-column>
@@ -142,39 +162,129 @@
           />
         </el-form-item>
 
-        <el-form-item label="荣誉奖项" required>
+        <el-form-item required>
+          <template #label>
+            <div style="display: flex; align-items: center">
+              <span>荣誉奖项</span>
+              <el-tooltip
+                content="学生学期能力项会综合学期内的所有活动和选修课的能力评分计算综合能力评分，点击进入试算页面"
+                placement="top"
+              >
+                <el-icon
+                  style="margin-left: 4px; cursor: pointer; color: #909399"
+                  @click.stop="labDialogVisible = true"
+                >
+                  <QuestionFilled />
+                </el-icon>
+              </el-tooltip>
+            </div>
+          </template>
           <div
             v-for="(award, index) in form.awards"
             :key="index"
-            class="award-item"
+            class="award-item-container"
           >
-            <el-input
-              v-model="form.awards[index]"
-              placeholder="请输入奖项名称"
-              style="width: 80%"
+            <div class="award-header">
+              <el-input
+                v-model="award.name"
+                placeholder="请输入奖项名称"
+                style="width: 200px; margin-right: 10px"
+              />
+              <el-button
+                v-if="form.awards.length > 1"
+                type="danger"
+                circle
+                size="small"
+                @click="removeAward(index)"
+              >
+                <el-icon><Minus /></el-icon>
+              </el-button>
+              <el-button
+                v-if="index === form.awards.length - 1"
+                type="primary"
+                circle
+                size="small"
+                @click="addAward"
+                style="margin-left: 5px"
+              >
+                <el-icon><Plus /></el-icon>
+              </el-button>
+            </div>
+            <div class="award-scores">
+              <el-form-item
+                label="学习能力"
+                label-width="80px"
+                style="margin-bottom: 5px"
+              >
+                <el-input-number
+                  v-model="award.learning_ability"
+                  :min="0"
+                  :max="10"
+                  :step="0.5"
+                  size="small"
+                />
+              </el-form-item>
+              <el-form-item
+                label="思维逻辑"
+                label-width="80px"
+                style="margin-bottom: 5px"
+              >
+                <el-input-number
+                  v-model="award.logical_thinking"
+                  :min="0"
+                  :max="10"
+                  :step="0.5"
+                  size="small"
+                />
+              </el-form-item>
+              <el-form-item
+                label="创新创造"
+                label-width="80px"
+                style="margin-bottom: 5px"
+              >
+                <el-input-number
+                  v-model="award.innovation"
+                  :min="0"
+                  :max="10"
+                  :step="0.5"
+                  size="small"
+                />
+              </el-form-item>
+              <el-form-item
+                label="团队协作"
+                label-width="80px"
+                style="margin-bottom: 5px"
+              >
+                <el-input-number
+                  v-model="award.team_collaboration"
+                  :min="0"
+                  :max="10"
+                  :step="0.5"
+                  size="small"
+                />
+              </el-form-item>
+              <el-form-item
+                label="责任心"
+                label-width="80px"
+                style="margin-bottom: 0"
+              >
+                <el-input-number
+                  v-model="award.responsibility"
+                  :min="0"
+                  :max="10"
+                  :step="0.5"
+                  size="small"
+                />
+              </el-form-item>
+            </div>
+            <el-divider
+              v-if="index !== form.awards.length - 1"
+              style="margin: 10px 0"
             />
-            <el-button
-              v-if="form.awards.length > 1"
-              type="danger"
-              circle
-              size="small"
-              @click="removeAward(index)"
-              style="margin-left: 10px"
-            >
-              <el-icon><Minus /></el-icon>
-            </el-button>
-            <el-button
-              v-if="index === form.awards.length - 1"
-              type="primary"
-              circle
-              size="small"
-              @click="addAward"
-              style="margin-left: 5px"
-            >
-              <el-icon><Plus /></el-icon>
-            </el-button>
           </div>
-          <div class="form-tip">请添加该活动包含的所有荣誉奖项</div>
+          <div class="form-tip">
+            请添加该活动包含的所有荣誉奖项及对应能力分值
+          </div>
         </el-form-item>
       </el-form>
 
@@ -189,21 +299,34 @@
         </el-button>
       </template>
     </el-dialog>
+
+    <!-- 算法试算实验室对话框 -->
+    <el-dialog
+      v-model="labDialogVisible"
+      title="能力值算法试算"
+      width="800px"
+      append-to-body
+    >
+      <ActivityAlgorithmLab />
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { Plus, Minus, Delete } from "@element-plus/icons-vue";
+import { Plus, Minus, Delete, Download, Upload, QuestionFilled } from "@element-plus/icons-vue";
 import { adminAPI } from "@/api/admin";
 import { formatDate } from "@/utils/date";
+import * as XLSX from "xlsx";
+import ActivityAlgorithmLab from "@/views/common/ActivityAlgorithmLab.vue";
 
 const loading = ref(false);
 const submitLoading = ref(false);
 const activities = ref([]);
 const semesterOptions = ref([]);
 const dialogVisible = ref(false);
+const labDialogVisible = ref(false);
 const formRef = ref(null);
 const filterSemesterId = ref(null);
 
@@ -219,7 +342,16 @@ const form = reactive({
   activityName: "",
   level: 1,
   credit: null, // Make credit optional by initializing to null
-  awards: [""],
+  awards: [
+    {
+      name: "",
+      learning_ability: 0,
+      logical_thinking: 0,
+      innovation: 0,
+      team_collaboration: 0,
+      responsibility: 0,
+    },
+  ],
 });
 
 const levelOptions = [
@@ -281,17 +413,186 @@ const loadSemesters = async () => {
   }
 };
 
+const fileInput = ref(null);
+
+// 下载导入模板
+const handleDownloadTemplate = () => {
+  const headers = ["活动名称", "级别", "学分", "所属学期", "荣誉奖项"];
+  const sampleData = [
+    [
+      "校园艺术节",
+      "校级",
+      1.0,
+      "2023-2024学年第一学期",
+      "一等奖，二等奖，三等奖",
+    ],
+    ["市物理竞赛", "市级", 2.0, "2023-2024学年第一学期", "优胜奖"],
+  ];
+  const data = [headers, ...sampleData];
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "导入模板");
+  XLSX.writeFile(wb, "活动导入模板.xlsx");
+};
+
+// 导出 Excel
+const handleExport = () => {
+  if (activities.value.length === 0) {
+    ElMessage.warning("没有数据可导出");
+    return;
+  }
+
+  const headers = ["活动名称", "级别", "学分", "所属学期", "荣誉奖项"];
+  const data = activities.value.map((item) => [
+    item.name,
+    getLevelText(item.level),
+    item.credit || "",
+    item.academic_year_name + item.term_name + (item.semester_name || ""),
+    item.awards
+      .map((a) => (typeof a === "string" ? a : a.name))
+      .join("，"),
+  ]);
+
+  data.unshift(headers);
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "活动列表");
+  XLSX.writeFile(wb, "活动列表.xlsx");
+};
+
+// 触发导入
+const triggerImport = () => {
+  fileInput.value.click();
+};
+
+// 处理导入
+const handleImport = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      const results = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+      // remove header
+      results.shift();
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const row of results) {
+        if (!row || row.length === 0) continue;
+
+        // format: Name, LevelStr, Credit, SemesterName, AwardsStr
+        const [name, levelStr, credit, semesterName, awardsStr] = row;
+
+        if (!name || !semesterName) {
+          failCount++;
+          continue;
+        }
+
+        // Find Semester ID
+        const semester = semesterOptions.value.find(
+          (s) =>
+            s.academic_year_name + s.term_name === semesterName ||
+            s.academic_year_name + s.term_name + (s.semester_name || "") ===
+              semesterName,
+        );
+
+        if (!semester) {
+          failCount++;
+          continue;
+        }
+
+        // Find Level
+        const levelOpt = levelOptions.find((l) => l.label === levelStr);
+        const level = levelOpt ? levelOpt.value : 1;
+
+        // Parse Awards
+        // Import logic will default scores to 0 since Excel format doesn't specify them
+        const awards = awardsStr
+          ? String(awardsStr)
+              .split(/[,，|]/)
+              .map((s) => ({
+                name: s.trim(),
+                learning_ability: 0,
+                logical_thinking: 0,
+                innovation: 0,
+                team_collaboration: 0,
+                responsibility: 0,
+              }))
+              .filter((s) => s.name)
+          : [];
+
+        if (awards.length === 0) {
+          failCount++;
+          continue;
+        }
+
+        try {
+          await adminAPI.createActivity(semester.semester_id, {
+            name: name,
+            level: level,
+            credit: credit ? parseFloat(credit) : null,
+            awards: awards,
+          });
+          successCount++;
+        } catch (err) {
+          console.error(err);
+          failCount++;
+        }
+      }
+
+      if (successCount > 0) {
+        ElMessage.success(`成功导入 ${successCount} 个活动`);
+        loadActivities();
+      }
+      if (failCount > 0) {
+        ElMessage.warning(`${failCount} 个活动导入失败 (学期不匹配或格式错误)`);
+      }
+    } catch (error) {
+      console.error(error);
+      ElMessage.error("导入失败");
+    }
+    event.target.value = "";
+  };
+  reader.readAsArrayBuffer(file);
+};
+
 const handleAdd = () => {
   form.semesterId = null;
   form.activityName = "";
   form.level = 1;
-  form.credit = null; // Reset credit to null for optional
-  form.awards = [""];
+  form.credit = null;
+  form.awards = [
+    {
+      name: "",
+      learning_ability: 0,
+      logical_thinking: 0,
+      innovation: 0,
+      team_collaboration: 0,
+      responsibility: 0,
+    },
+  ];
   dialogVisible.value = true;
 };
 
 const addAward = () => {
-  form.awards.push("");
+  form.awards.push({
+    name: "",
+    learning_ability: 0,
+    logical_thinking: 0,
+    innovation: 0,
+    team_collaboration: 0,
+    responsibility: 0,
+  });
 };
 
 const removeAward = (index) => {
@@ -305,7 +606,7 @@ const handleSubmit = async () => {
     if (!valid) return;
 
     // 验证奖项
-    const validAwards = form.awards.filter((a) => a.trim() !== "");
+    const validAwards = form.awards.filter((a) => a.name.trim() !== "");
     if (validAwards.length === 0) {
       ElMessage.warning("请至少添加一个荣誉奖项");
       return;
@@ -370,10 +671,34 @@ onMounted(() => {
   align-items: center;
 }
 
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
 .award-item {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
+}
+
+.award-item-container {
+  border: 1px solid #eee;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.award-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.award-scores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
 }
 
 .form-tip {
