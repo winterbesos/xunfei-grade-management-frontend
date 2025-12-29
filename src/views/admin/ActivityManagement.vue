@@ -221,6 +221,7 @@
                   :min="0"
                   :max="10"
                   :step="1"
+                  :precision="0"
                   size="small"
                 />
               </el-form-item>
@@ -234,6 +235,7 @@
                   :min="0"
                   :max="10"
                   :step="1"
+                  :precision="0"
                   size="small"
                 />
               </el-form-item>
@@ -247,6 +249,7 @@
                   :min="0"
                   :max="10"
                   :step="1"
+                  :precision="0"
                   size="small"
                 />
               </el-form-item>
@@ -260,6 +263,7 @@
                   :min="0"
                   :max="10"
                   :step="1"
+                  :precision="0"
                   size="small"
                 />
               </el-form-item>
@@ -273,6 +277,7 @@
                   :min="0"
                   :max="10"
                   :step="1"
+                  :precision="0"
                   size="small"
                 />
               </el-form-item>
