@@ -220,7 +220,7 @@
                   v-model="award.study_ability"
                   :min="0"
                   :max="10"
-                  :step="0.5"
+                  :step="1"
                   size="small"
                 />
               </el-form-item>
@@ -233,7 +233,7 @@
                   v-model="award.logical_thinking"
                   :min="0"
                   :max="10"
-                  :step="0.5"
+                  :step="1"
                   size="small"
                 />
               </el-form-item>
@@ -246,7 +246,7 @@
                   v-model="award.creativity"
                   :min="0"
                   :max="10"
-                  :step="0.5"
+                  :step="1"
                   size="small"
                 />
               </el-form-item>
@@ -259,7 +259,7 @@
                   v-model="award.teamwork"
                   :min="0"
                   :max="10"
-                  :step="0.5"
+                  :step="1"
                   size="small"
                 />
               </el-form-item>
@@ -272,7 +272,7 @@
                   v-model="award.responsibility"
                   :min="0"
                   :max="10"
-                  :step="0.5"
+                  :step="1"
                   size="small"
                 />
               </el-form-item>
