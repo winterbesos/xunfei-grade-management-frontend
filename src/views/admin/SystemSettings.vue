@@ -25,6 +25,9 @@
             v-model="form.themeColor"
             color-format="hex"
             predefined
+            :rules="[
+              { required: true, message: '请选择主题颜色', trigger: 'change' },
+            ]"
           />
         </el-form-item>
         <el-form-item>
@@ -77,6 +80,12 @@ onMounted(() => {
 
 // 保存设置
 const handleSave = async () => {
+  const regex = /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/;
+  if (!regex.test(form.value.themeColor)) {
+    ElMessage.error("请选择主题颜色");
+    return;
+  }
+
   loading.value = true;
   adminAPI
     .updateSchoolInfo({

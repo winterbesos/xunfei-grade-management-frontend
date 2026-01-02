@@ -155,8 +155,8 @@
           <el-input-number
             v-model="form.credit"
             :min="0"
-            :precision="1"
-            :step="0.5"
+            :precision="0"
+            :step="1"
             placeholder="请输入学分 (可选)"
             style="width: 100%"
           />
