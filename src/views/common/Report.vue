@@ -77,7 +77,7 @@
             </td>
             <td>{{ formatReportGrade(item.usual_score, item.grades_type) }}</td>
             <td>{{ formatReportGrade(item.score, item.grades_type) }}</td>
-            <td>{{ formatReportGrade(item.credits, item.grades_type) }}</td>
+            <td>{{ item.credits }}</td>
           </tr>
         </tbody>
       </table>

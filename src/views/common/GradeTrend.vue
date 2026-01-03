@@ -125,8 +125,8 @@ const updateChart = () => {
       bottom: 0,
     },
     grid: {
-      left: "3%",
-      right: "4%",
+      left: "6%",
+      right: "6%",
       bottom: "10%",
       containLabel: true,
     },
@@ -134,6 +134,14 @@ const updateChart = () => {
       type: "category",
       boundaryGap: false,
       data: semesters,
+      axisLabel: {
+        interval: 0,
+        formatter: function (value) {
+          return value.length > 10
+            ? value.slice(0, 10) + "\n" + value.slice(10)
+            : value;
+        },
+      },
     },
     yAxis: {
       type: "value",

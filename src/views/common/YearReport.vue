@@ -214,7 +214,7 @@ import { useRoute, useRouter } from "vue-router";
 const route = useRoute();
 
 const studentId = route.params.studentId;
-const academicYearId = route.params.academicYearId || "1500000100321807984";
+const academicYearId = route.params.academicYearId;
 
 // --- 1. 数据模拟 (对应 StudentYearReportResponse) ---
 const reportData = ref({

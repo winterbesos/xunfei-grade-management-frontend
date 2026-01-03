@@ -400,11 +400,6 @@ const handleSaveSingle = async (row) => {
     return;
   }
 
-  if (!gradeOptions.includes(student.grade)) {
-    ElMessage.error(`请选择学生[${student.student_name}]的品格等第`);
-    return;
-  }
-
   try {
     const response = await teacherAPI.saveCharacterComment(
       semesterId,
@@ -462,11 +457,6 @@ const handleBatchSave = async () => {
       student.abilities.responsibility > 10
     ) {
       ElMessage.error(`学生[${student.student_name}]的能力评分必须在0到10之间`);
-      return;
-    }
-
-    if (!gradeOptions.includes(student.grade)) {
-      ElMessage.error(`请选择学生[${student.student_name}]的品格等第`);
       return;
     }
   }
