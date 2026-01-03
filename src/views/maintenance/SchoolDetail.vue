@@ -84,6 +84,13 @@
                 v-if="school.schoolId"
               />
             </el-tab-pane>
+            <el-tab-pane label="考试管理" name="exams">
+              <SchoolExams
+                :embedded="true"
+                :school-id="school.schoolId"
+                v-if="school.schoolId"
+              />
+            </el-tab-pane>
           </el-tabs>
         </div>
       </div>
@@ -103,6 +110,7 @@ import SubjectManagement from "./SubjectManagement.vue";
 import SchoolTeachers from "./SchoolTeachers.vue";
 import SchoolSemesters from "./SchoolSemesters.vue";
 import ElectiveSubjectManagement from "./ElectiveSubjectManagement.vue";
+import SchoolExams from "./SchoolExams.vue";
 import { maintenanceAPI } from "@/api/maintenance";
 import { useRoute } from "vue-router";
 import { formatDate } from "@/utils/date";

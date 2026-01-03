@@ -221,4 +221,20 @@ export const maintenanceAPI = {
       method: "delete",
     });
   },
+
+  // 获取学校下的考试列表
+  async getSchoolExams(schoolId) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/exams`,
+      method: "get",
+    });
+  },
+
+  // 重新同步考试事件
+  async resyncExamEvents(schoolId, examId) {
+    return request({
+      url: `/api/schools/${schoolId}/exams/${examId}/resync-events`,
+      method: "post",
+    });
+  },
 };
