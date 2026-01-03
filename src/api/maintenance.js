@@ -161,4 +161,64 @@ export const maintenanceAPI = {
       data: subjectData,
     });
   },
+
+  // 获取学校下的选修课列表
+  async getSchoolElectiveSubjects(schoolId, params = {}) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/elective-subjects`,
+      method: "get",
+      params,
+    });
+  },
+
+  // 创建选修课
+  async createSchoolElectiveSubject(schoolId, data) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/elective-subjects`,
+      method: "post",
+      data,
+    });
+  },
+
+  // 更新选修课
+  async updateSchoolElectiveSubject(schoolId, subjectId, data) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/elective-subjects/${subjectId}`,
+      method: "put",
+      data,
+    });
+  },
+
+  // 删除选修课 (Standard REST, adding just in case needed)
+  async deleteSchoolElectiveSubject(schoolId, subjectId) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/elective-subjects/${subjectId}`,
+      method: "delete",
+    });
+  },
+
+  // 获取选修课下的学生
+  async getSchoolElectiveSubjectStudents(schoolId, subjectId) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/elective-subjects/${subjectId}/students`,
+      method: "get",
+    });
+  },
+
+  // 添加学生到选修课
+  async addStudentToSchoolElectiveSubject(schoolId, subjectId, studentId) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/elective-subjects/${subjectId}/students`,
+      method: "post",
+      data: { student_id: studentId },
+    });
+  },
+
+  // 从选修课移除学生
+  async removeStudentFromSchoolElectiveSubject(schoolId, subjectId, studentId) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/elective-subjects/${subjectId}/students/${studentId}`,
+      method: "delete",
+    });
+  },
 };

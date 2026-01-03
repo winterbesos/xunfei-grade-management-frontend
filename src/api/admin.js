@@ -143,6 +143,15 @@ export const adminAPI = {
     });
   },
 
+  // 更新活动
+  updateActivity(id, data) {
+    return request({
+      url: `/api/admin/activities/${id}`,
+      method: "put",
+      data,
+    });
+  },
+
   // 删除活动
   deleteActivity(id) {
     return request({

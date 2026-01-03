@@ -104,24 +104,96 @@
             {{ formatDate(row.created_at) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="100" fixed="right">
+        <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
-            <el-button type="danger" link @click="handleDelete(row.id)"
-              >删除</el-button
-            >
+            <el-button type="primary" link @click="handleView(row)">
+              查看
+            </el-button>
+            <el-button type="primary" link @click="handleEdit(row)">
+              编辑
+            </el-button>
+            <el-button type="danger" link @click="handleDelete(row.id)">
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
 
-    <!-- 发布活动对话框 -->
-    <el-dialog v-model="dialogVisible" title="发布活动" width="600px">
+    <!-- 查看详情对话框 -->
+    <el-dialog v-model="viewDialogVisible" title="活动详情" width="800px">
+      <div v-if="currentViewActivity">
+        <el-descriptions title="基本信息" :column="2" border>
+          <el-descriptions-item label="活动名称">{{
+            currentViewActivity.name
+          }}</el-descriptions-item>
+          <el-descriptions-item label="级别">
+            <el-tag
+              :type="
+                currentViewActivity.level === 1
+                  ? 'info'
+                  : currentViewActivity.level === 2
+                    ? 'success'
+                    : currentViewActivity.level === 3
+                      ? 'warning'
+                      : 'danger'
+              "
+            >
+              {{ getLevelText(currentViewActivity.level) }}
+            </el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="学分">{{
+            currentViewActivity.credit
+          }}</el-descriptions-item>
+          <el-descriptions-item label="所属学期">
+            {{ currentViewActivity.academic_year_name }}
+            {{ currentViewActivity.term_name }}
+            {{ currentViewActivity.semester_name }}
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <div style="margin-top: 20px">
+          <div class="award-title">荣誉奖项及能力值</div>
+          <el-table :data="currentViewActivity.awards" border stripe>
+            <el-table-column prop="name" label="奖项名称" width="150" />
+            <el-table-column
+              prop="study_ability"
+              label="学习能力"
+              align="center"
+            />
+            <el-table-column
+              prop="logical_thinking"
+              label="思维逻辑"
+              align="center"
+            />
+            <el-table-column prop="creativity" label="创新创造" align="center" />
+            <el-table-column prop="teamwork" label="团队协作" align="center" />
+            <el-table-column
+              prop="responsibility"
+              label="责任心"
+              align="center"
+            />
+          </el-table>
+        </div>
+      </div>
+      <template #footer>
+        <el-button @click="viewDialogVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 发布/编辑活动对话框 -->
+    <el-dialog
+      v-model="dialogVisible"
+      :title="isEdit ? '编辑活动' : '发布活动'"
+      width="600px"
+    >
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="所属学期" prop="semesterId">
           <el-select
             v-model="form.semesterId"
             placeholder="请选择学期"
             style="width: 100%"
+            :disabled="isEdit"
           >
             <el-option
               v-for="item in semesterOptions"
@@ -338,9 +410,14 @@ const submitLoading = ref(false);
 const activities = ref([]);
 const semesterOptions = ref([]);
 const dialogVisible = ref(false);
+const viewDialogVisible = ref(false);
+const currentViewActivity = ref(null);
 const labDialogVisible = ref(false);
 const formRef = ref(null);
 const filterSemesterId = ref(null);
+
+const isEdit = ref(false);
+const currentActivityId = ref(null);
 
 // 分页配置
 const pagination = reactive({
@@ -365,6 +442,30 @@ const form = reactive({
     },
   ],
 });
+
+const handleView = (row) => {
+  currentViewActivity.value = row;
+  viewDialogVisible.value = true;
+};
+
+const handleEdit = (row) => {
+  isEdit.value = true;
+  currentActivityId.value = row.id;
+  form.semesterId = row.semester_id;
+  form.activityName = row.name;
+  form.level = row.level;
+  form.credit = row.credit;
+  // Deep copy awards to avoid modifying the original row directly before saving
+  form.awards = row.awards.map((award) => ({
+    name: typeof award === "string" ? award : award.name,
+    study_ability: typeof award === "string" ? 0 : award.study_ability,
+    logical_thinking: typeof award === "string" ? 0 : award.logical_thinking,
+    creativity: typeof award === "string" ? 0 : award.creativity,
+    teamwork: typeof award === "string" ? 0 : award.teamwork,
+    responsibility: typeof award === "string" ? 0 : award.responsibility,
+  }));
+  dialogVisible.value = true;
+};
 
 const levelOptions = [
   { label: "校级", value: 1 },
@@ -577,6 +678,8 @@ const handleImport = (event) => {
 };
 
 const handleAdd = () => {
+  isEdit.value = false;
+  currentActivityId.value = null;
   form.semesterId = null;
   form.activityName = "";
   form.level = 1;
@@ -632,14 +735,23 @@ const handleSubmit = async () => {
         awards: validAwards,
       };
 
-      const response = await adminAPI.createActivity(form.semesterId, data);
+      let response;
+      if (isEdit.value) {
+        response = await adminAPI.updateActivity(
+          currentActivityId.value,
+          data,
+        );
+      } else {
+        response = await adminAPI.createActivity(form.semesterId, data);
+      }
+
       if (response.status === 200) {
-        ElMessage.success("发布成功");
+        ElMessage.success(isEdit.value ? "更新成功" : "发布成功");
         dialogVisible.value = false;
         loadActivities();
       }
     } catch (error) {
-      ElMessage.error(error.message || "发布失败");
+      ElMessage.error(error.message || (isEdit.value ? "更新失败" : "发布失败"));
     } finally {
       submitLoading.value = false;
     }
@@ -709,6 +821,13 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 5px;
+}
+
+.award-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #303133;
 }
 
 .form-tip {

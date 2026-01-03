@@ -37,7 +37,6 @@ const props = defineProps({
   },
 });
 
-const authStore = useAuthStore();
 const chartRef = ref(null);
 let myChart = null;
 
@@ -52,13 +51,16 @@ const trendData = ref({
 const loadData = async () => {
   try {
     // 优先从 prop 获取 studentId，否则使用当前登录用户ID
-    const targetStudentId = props.studentId || authStore.userInfo.id;
+    const targetStudentId = props.studentId;
+
+    var promise;
     if (!targetStudentId) {
-      ElMessage.warning("未找到学生信息");
-      return;
+      promise = studentAPI.getMyOriginGradeTrend();
+    } else {
+      promise = studentAPI.getOriginGradeTrend(targetStudentId);
     }
 
-    const res = await studentAPI.getOriginGradeTrend(targetStudentId);
+    const res = await promise;
     if (res.status === 200) {
       // 转换后端返回的 list 数据为图表所需格式
       const transformedData = transformGradeTrendData(res.data);

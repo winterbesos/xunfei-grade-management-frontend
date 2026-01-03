@@ -61,13 +61,6 @@
           label="班主任"
           align="center"
         />
-        <el-table-column label="操作" width="150" align="center">
-          <template #default="{ row }">
-            <el-button type="primary" link @click="handleGenerateData(row)">
-              生成测试数据
-            </el-button>
-          </template>
-        </el-table-column>
       </el-table>
     </el-card>
 
