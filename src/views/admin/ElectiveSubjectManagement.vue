@@ -4,10 +4,6 @@
       <template #header>
         <div class="card-header">
           <h3>选修课管理</h3>
-          <el-button type="primary" @click="openAddDialog">
-            <el-icon><Plus /></el-icon>
-            添加选修课
-          </el-button>
         </div>
       </template>
 
@@ -60,6 +56,7 @@
             <el-button size="small" type="primary" @click="editSubject(row)">
               编辑
             </el-button>
+            <!--
             <el-button
               size="small"
               :type="row.enabled ? 'danger' : 'success'"
@@ -67,6 +64,7 @@
             >
               {{ row.enabled ? "禁用" : "启用" }}
             </el-button>
+            -->
           </template>
         </el-table-column>
       </el-table>
@@ -86,7 +84,11 @@
         label-width="100px"
       >
         <el-form-item label="课程名称" prop="name">
-          <el-input v-model="subjectForm.name" placeholder="请输入课程名称" />
+          <el-input
+            v-model="subjectForm.name"
+            disabled
+            placeholder="请输入课程名称"
+          />
         </el-form-item>
         <el-form-item label="学期" prop="semester_id">
           <el-select
@@ -105,6 +107,7 @@
         <el-form-item label="任课教师" prop="teacher_id">
           <el-select
             v-model="subjectForm.teacher_id"
+            disabled
             filterable
             remote
             reserve-keyword
@@ -121,6 +124,7 @@
             />
           </el-select>
         </el-form-item>
+        <!--
         <el-form-item label="状态" prop="enabled">
           <el-switch
             v-model="subjectForm.enabled"
@@ -128,6 +132,7 @@
             inactive-text="禁用"
           />
         </el-form-item>
+        -->
 
         <el-divider content-position="left">能力评分标准</el-divider>
         <el-row :gutter="10">
@@ -229,6 +234,8 @@
               :value="item.id"
             />
           </el-select>
+
+          <!--
           <el-button
             type="primary"
             @click="handleAddStudent"
@@ -249,6 +256,7 @@
             accept=".xlsx,.xls"
             @change="handleImportStudents"
           />
+          -->
         </div>
 
         <!-- 学生列表 -->
@@ -265,7 +273,12 @@
             show-overflow-tooltip
           />
           <el-table-column prop="student_name" label="姓名" width="120" />
-          <el-table-column prop="class_name" label="班级" min-width="150" />
+          <el-table-column prop="class_name" label="班级" min-width="150">
+            <template #default="{ row }">
+              <span>{{ row.year_name }} {{ row.class_name }}</span>
+            </template>
+          </el-table-column>
+          <!--
           <el-table-column label="操作" width="100" fixed="right">
             <template #default="{ row }">
               <el-button
@@ -277,6 +290,7 @@
               </el-button>
             </template>
           </el-table-column>
+          -->
         </el-table>
       </div>
     </el-dialog>
