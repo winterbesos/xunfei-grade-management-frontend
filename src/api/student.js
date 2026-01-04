@@ -110,4 +110,37 @@ export const studentAPI = {
       },
     });
   },
+
+  // 获取上传签名
+  getPostSign() {
+    return request({
+      url: "/api/student/post-sign",
+      method: "get",
+    });
+  },
+
+  // 获取课外活动申请列表
+  getActivityRequests() {
+    return request({
+      url: "/api/student/activity-requests",
+      method: "get",
+    });
+  },
+
+  // 提交课外活动申请
+  submitActivityRequest(data) {
+    return request({
+      url: "/api/student/activity-requests",
+      method: "post",
+      data,
+    });
+  },
+
+  updateActivityRequest(id, data) {
+    return request({
+      url: `/api/student/activity-requests/${id}`,
+      method: "put",
+      data,
+    });
+  },
 };

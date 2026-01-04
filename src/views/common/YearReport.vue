@@ -207,7 +207,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { studentAPI } from "@/api/student";
 import { useRoute, useRouter } from "vue-router";
 
@@ -218,11 +218,11 @@ const academicYearId = route.params.academicYearId;
 
 // --- 1. 数据模拟 (对应 StudentYearReportResponse) ---
 const reportData = ref({
-  student_id: "2023001",
+  student_id: "",
   student_name: "",
-  school_name: "上海师范大学附属虹口中学",
-  class_name: "高一(1)班",
-  year_name: "2024-2025学年",
+  school_name: "",
+  class_name: "",
+  year_name: "",
   grades: [
     {
       subject_code: "01",
