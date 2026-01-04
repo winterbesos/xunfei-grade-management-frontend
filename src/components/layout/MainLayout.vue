@@ -39,6 +39,10 @@
             <el-icon><Trophy /></el-icon>
             <template #title>活动管理</template>
           </el-menu-item>
+          <el-menu-item index="/admin/activity-requests">
+            <el-icon><Trophy /></el-icon>
+            <template #title>奖项审核</template>
+          </el-menu-item>
           <el-menu-item index="/admin/settings">
             <el-icon><Setting /></el-icon>
             <template #title>系统设置</template>

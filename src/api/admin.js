@@ -268,4 +268,58 @@ export const adminAPI = {
       method: "get",
     });
   },
+
+  // 获取申报审核列表
+  getActivityRequests(params) {
+    return request({
+      url: "/api/admin/activity-requests",
+      method: "get",
+      params,
+    });
+  },
+
+  // 更新申报审核状态
+  updateActivityRequestStatus(id, data) {
+    return request({
+      url: `/api/admin/activity-requests/${id}/status`,
+      method: "put",
+      data,
+    });
+  },
+
+  // 批量更新申报审核状态 (Optional, if needed)
+  batchUpdateActivityRequests(ids, status, comment) {
+    return request({
+      url: "/api/admin/activity-requests/batch-status",
+      method: "put",
+      data: { ids, status, comment },
+    });
+  },
+
+  // 通过并创建新活动及奖项
+  approveActivityRequestWithNewActivity(id, data) {
+    return request({
+      url: `/api/admin/activity-requests/${id}/approve-with-new-award-events`,
+      method: "post",
+      data,
+    });
+  },
+
+  // 通过并关联现有活动
+  approveActivityRequestWithActivity(id, data) {
+    return request({
+      url: `/api/admin/activity-requests/${id}/approve-with-activity-events`,
+      method: "post",
+      data,
+    });
+  },
+
+  // 拒绝申报
+  rejectActivityRequest(id, reason) {
+    return request({
+      url: `/api/admin/activity-requests/${id}/reject-events`,
+      method: "post",
+      data: { reject_reason: reason },
+    });
+  },
 };

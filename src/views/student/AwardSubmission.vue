@@ -58,7 +58,18 @@
             <el-table-column prop="award_name" label="荣誉奖项" />
             <el-table-column label="状态">
               <template #default="{ row }">
-                <el-tag :type="getStatusType(row.status_code)">{{
+                <el-tooltip
+                  v-if="row.status_code === 'rejected' && row.reject_reason"
+                  class="box-item"
+                  effect="dark"
+                  :content="'拒绝原因: ' + row.reject_reason"
+                  placement="top"
+                >
+                  <el-tag :type="getStatusType(row.status_code)">{{
+                    getStatusText(row.status_code)
+                  }}</el-tag>
+                </el-tooltip>
+                <el-tag v-else :type="getStatusType(row.status_code)">{{
                   getStatusText(row.status_code)
                 }}</el-tag>
               </template>

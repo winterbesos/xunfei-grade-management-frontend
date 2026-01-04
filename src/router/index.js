@@ -63,6 +63,12 @@ const routes = [
         meta: { requiresAuth: true, roles: ["admin"] },
       },
       {
+        path: "/admin/activity-requests",
+        name: "AdminActivityRequestAudit",
+        component: () => import("@/views/admin/ActivityRequestAudit.vue"),
+        meta: { requiresAuth: true, roles: ["admin"] },
+      },
+      {
         path: "/admin/subjects",
         name: "AdminSubjects",
         component: () => import("@/views/admin/SubjectManagement.vue"),
