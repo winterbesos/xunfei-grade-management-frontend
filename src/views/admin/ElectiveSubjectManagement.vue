@@ -37,6 +37,31 @@
         <el-table-column prop="semester_name" label="学期" width="200">
         </el-table-column>
         <el-table-column prop="teacher_name" label="任课教师" width="150" />
+        <el-table-column label="学习" width="70" align="center">
+          <template #default="{ row }">
+            {{ row.abilities?.study_ability || 0 }}
+          </template>
+        </el-table-column>
+        <el-table-column label="逻辑" width="70" align="center">
+          <template #default="{ row }">
+            {{ row.abilities?.logical_thinking || 0 }}
+          </template>
+        </el-table-column>
+        <el-table-column label="创新" width="70" align="center">
+          <template #default="{ row }">
+            {{ row.abilities?.creativity || 0 }}
+          </template>
+        </el-table-column>
+        <el-table-column label="团队" width="70" align="center">
+          <template #default="{ row }">
+            {{ row.abilities?.teamwork || 0 }}
+          </template>
+        </el-table-column>
+        <el-table-column label="责任" width="70" align="center">
+          <template #default="{ row }">
+            {{ row.abilities?.responsibility || 0 }}
+          </template>
+        </el-table-column>
         <el-table-column prop="enabled" label="状态" width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="row.enabled ? 'success' : 'danger'">
