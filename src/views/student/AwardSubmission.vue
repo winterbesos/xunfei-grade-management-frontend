@@ -361,6 +361,7 @@ const handleAdd = (type) => {
   form.activity_id = "";
   form.activity_name = "";
   form.name = "";
+  form.award_name = "";
   form.approval_teacher_id = "";
   form.image_url = "";
   dialogVisible.value = true;
