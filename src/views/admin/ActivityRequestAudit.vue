@@ -213,15 +213,6 @@
               <el-option label="国家级" :value="4" />
             </el-select>
           </el-form-item>
-          <el-form-item label="活动时间" prop="activity_date">
-            <el-date-picker
-              v-model="approveForm.activity_date"
-              type="date"
-              placeholder="选择日期"
-              style="width: 100%"
-              value-format="YYYY-MM-DD"
-            />
-          </el-form-item>
           <el-form-item label="荣誉奖项" prop="award_name">
             <el-input
               v-model="approveForm.award_name"
@@ -508,7 +499,7 @@ const handleApprove = (row) => {
   approveForm.activity_name = row.name;
   approveForm.level = 1;
   approveForm.activity_date = new Date().toISOString().split("T")[0];
-  approveForm.award_name = row.award; // Check if it's row.award or row.award_name
+  approveForm.award_name = row.award_name; // Check if it's row.award or row.award_name
 
   approveForm.study_ability = 0;
   approveForm.logical_thinking = 0;
@@ -594,7 +585,7 @@ const confirmReject = async () => {
   try {
     const res = await adminAPI.rejectActivityRequest(
       currentRejectRow.value.id,
-      rejectForm.comment
+      rejectForm.comment,
     );
     if (res.status === 200) {
       ElMessage.success("已拒绝");
