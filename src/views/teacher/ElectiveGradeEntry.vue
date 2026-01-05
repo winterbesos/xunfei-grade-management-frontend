@@ -486,13 +486,19 @@ const handleQuickSetCreditHours = () => {
     return;
   }
 
-  if (!quickCreditHours.value && quickCreditHours.value !== 0) {
+  if (quickCreditHours.value === "" || quickCreditHours.value === null || quickCreditHours.value === undefined) {
     ElMessage.warning("请输入学时");
     return;
   }
 
+  const hours = parseFloat(quickCreditHours.value);
+  if (isNaN(hours)) {
+    ElMessage.warning("请输入有效的数字学时");
+    return;
+  }
+
   selectedStudents.value.forEach((student) => {
-    student.credits_hours = parseFloat(quickCreditHours.value);
+    student.credits_hours = hours;
     student.modified = true;
   });
 

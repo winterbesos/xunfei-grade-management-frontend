@@ -666,13 +666,29 @@ const handleScoreChange = async (row) => {
 
 // 快速设置分数
 const handleQuickSet = () => {
-  if (!quickScore.value && quickScore.value !== 0) {
+  if (selectedStudents.value.length === 0) {
+    ElMessage.warning("请先勾选学生");
+    return;
+  }
+
+  if (quickScore.value === "" || quickScore.value === null || quickScore.value === undefined) {
     ElMessage.warning("请输入分数");
     return;
   }
 
+  const score = parseFloat(quickScore.value);
+  if (isNaN(score)) {
+    ElMessage.warning("请输入有效的数字分数");
+    return;
+  }
+
+  if (score > 100) {
+    ElMessage.warning("分数不能超过100");
+    return;
+  }
+
   selectedStudents.value.forEach((student) => {
-    student.usual_score = parseFloat(quickScore.value);
+    student.usual_score = score;
     student.modified = true;
   });
 
@@ -681,21 +697,29 @@ const handleQuickSet = () => {
 
 // 快速设置学时
 const handleQuickSetCreditHours = () => {
-  if (!quickCreditHours.value && quickCreditHours.value !== 0) {
+  if (selectedStudents.value.length === 0) {
+    ElMessage.warning("请先勾选学生");
+    return;
+  }
+
+  if (quickCreditHours.value === "" || quickCreditHours.value === null || quickCreditHours.value === undefined) {
     ElMessage.warning("请输入学时");
     return;
   }
 
-  const targetStudents =
-    selectedStudents.value.length > 0 ? selectedStudents.value : students.value;
+  const hours = parseFloat(quickCreditHours.value);
+  if (isNaN(hours)) {
+    ElMessage.warning("请输入有效的数字学时");
+    return;
+  }
 
-  targetStudents.forEach((student) => {
-    student.credits_hours = parseFloat(quickCreditHours.value);
+  selectedStudents.value.forEach((student) => {
+    student.credits_hours = hours;
     student.modified = true;
   });
 
   ElMessage.success(
-    `已为${targetStudents.length}个学生设置学时: ${quickCreditHours.value}`,
+    `已为选中的${selectedStudents.value.length}个学生设置学时: ${quickCreditHours.value}`,
   );
 };
 

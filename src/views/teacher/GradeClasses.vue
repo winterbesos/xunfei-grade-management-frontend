@@ -48,12 +48,6 @@
         style="width: 100%; margin-top: 20px"
       >
         <el-table-column
-          prop="class_id"
-          label="班级ID"
-          width="150"
-          show-overflow-tooltip
-        />
-        <el-table-column
           prop="class_full_name"
           label="班级名称"
           min-width="150"

@@ -39,11 +39,19 @@
       </template>
 
       <el-table v-loading="loading" :data="students" stripe style="width: 100%">
+        <!--
         <el-table-column
           prop="student_id"
           label="学生ID"
           width="120"
           show-overflow-tooltip
+        />
+        -->
+        <el-table-column
+          type="index"
+          label="序号"
+          width="60"
+          align="center"
         />
         <el-table-column prop="student_name" label="姓名" width="100" />
 
@@ -197,7 +205,6 @@ const handleExport = () => {
     "创新创造",
     "团队协作",
     "责任心",
-    "品格等第",
     "品格评语",
   ];
 
@@ -211,7 +218,6 @@ const handleExport = () => {
       student.abilities.creativity,
       student.abilities.teamwork,
       student.abilities.responsibility,
-      student.grade,
       student.comment,
     ];
   });
@@ -289,20 +295,8 @@ const handleImport = (event) => {
           updateAbility("teamwork", row[5]);
           updateAbility("responsibility", row[6]);
 
-          // Update Grade
-          const gradeVal = row[7];
-          if (
-            gradeVal &&
-            gradeOptions.includes(String(gradeVal).toUpperCase())
-          ) {
-            if (student.grade !== String(gradeVal).toUpperCase()) {
-              student.grade = String(gradeVal).toUpperCase();
-              changed = true;
-            }
-          }
-
           // Update Comment
-          const commentVal = row[8];
+          const commentVal = row[7];
           if (commentVal !== undefined) {
             // Handle conversion if it's not a string (though it likely is)
             const commentStr = String(commentVal);
