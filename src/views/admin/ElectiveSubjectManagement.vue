@@ -62,13 +62,6 @@
             {{ row.abilities?.responsibility || 0 }}
           </template>
         </el-table-column>
-        <el-table-column prop="enabled" label="状态" width="100" align="center">
-          <template #default="{ row }">
-            <el-tag :type="row.enabled ? 'success' : 'danger'">
-              {{ row.enabled ? "启用" : "禁用" }}
-            </el-tag>
-          </template>
-        </el-table-column>
         <el-table-column label="操作" width="250" fixed="right">
           <template #default="{ row }">
             <el-button

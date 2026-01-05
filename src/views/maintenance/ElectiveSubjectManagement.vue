@@ -1,29 +1,32 @@
 <template>
   <div class="elective-subject-management">
-    <el-card>
+    <div class="page-header" v-if="!props.embedded">
+      <el-page-header @back="goBack">
+        <template #content>
+          <span class="text-large font-600 mr-3"> 选修课管理 </span>
+        </template>
+      </el-page-header>
+    </div>
+
+    <el-card class="mt-4">
       <template #header>
         <div class="card-header">
-          <h3>选修课管理</h3>
-        </div>
-      </template>
-
-      <!-- 搜索和筛选 -->
-      <div class="search-section">
-        <el-row :gutter="20">
-          <el-col :span="8">
+          <span>选修课列表</span>
+          <div class="header-actions">
             <el-input
               v-model="searchKeyword"
               placeholder="搜索课程名称或教师"
               clearable
+              style="width: 250px"
               @input="handleSearch"
             >
               <template #prefix>
                 <el-icon><Search /></el-icon>
               </template>
             </el-input>
-          </el-col>
-        </el-row>
-      </div>
+          </div>
+        </div>
+      </template>
 
       <!-- 选修课列表 -->
       <el-table
@@ -60,13 +63,6 @@
             {{ row.abilities?.responsibility || 0 }}
           </template>
         </el-table-column>
-        <el-table-column prop="enabled" label="状态" width="100" align="center">
-          <template #default="{ row }">
-            <el-tag :type="row.enabled ? 'success' : 'danger'">
-              {{ row.enabled ? "启用" : "禁用" }}
-            </el-tag>
-          </template>
-        </el-table-column>
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button
@@ -92,7 +88,7 @@
         <!-- 学生列表 -->
         <el-table
           :data="subjectStudents"
-          style="width: 100%;"
+          style="width: 100%"
           v-loading="studentLoading"
           border
         >
@@ -116,7 +112,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { Search } from "@element-plus/icons-vue";
 import { maintenanceAPI } from "@/api/maintenance";
@@ -133,7 +129,12 @@ const props = defineProps({
 });
 
 const route = useRoute();
+const router = useRouter();
 const currentSchoolId = computed(() => props.schoolId || route.params.schoolId);
+
+const goBack = () => {
+  router.back();
+};
 
 // 数据
 const loading = ref(false);
@@ -166,7 +167,9 @@ const loadSubjects = async () => {
   if (!currentSchoolId.value) return;
   loading.value = true;
   try {
-    const response = await maintenanceAPI.getSchoolElectiveSubjects(currentSchoolId.value);
+    const response = await maintenanceAPI.getSchoolElectiveSubjects(
+      currentSchoolId.value,
+    );
     if (response.status === 200) {
       allElectiveSubjects.value = response.data;
     }
@@ -219,7 +222,7 @@ onMounted(() => {
   if (currentSchoolId.value) {
     loadSubjects();
   } else {
-      ElMessage.error("参数错误：缺少学校ID");
+    ElMessage.error("参数错误：缺少学校ID");
   }
 });
 </script>
@@ -237,5 +240,9 @@ onMounted(() => {
 
 .search-section {
   margin-bottom: 20px;
+}
+
+.mt-4 {
+  margin-top: 16px;
 }
 </style>

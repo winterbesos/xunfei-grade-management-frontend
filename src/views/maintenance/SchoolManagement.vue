@@ -11,39 +11,8 @@
         </div>
       </template>
 
-      <!-- 搜索和筛选 -->
-      <div class="search-section">
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <el-input
-              v-model="searchKeyword"
-              placeholder="搜索学校名称或管理员"
-              clearable
-              @clear="handleSearch"
-              @keyup.enter="handleSearch"
-            >
-              <template #prefix>
-                <el-icon><Search /></el-icon>
-              </template>
-            </el-input>
-          </el-col>
-          <el-col :span="6">
-            <el-select v-model="filterStatus" placeholder="状态筛选" clearable>
-              <el-option label="全部" value="" />
-              <el-option label="启用" value="active" />
-              <el-option label="禁用" value="inactive" />
-            </el-select>
-          </el-col>
-          <el-col :span="4">
-            <el-button type="primary" @click="handleSearch">搜索</el-button>
-            <el-button @click="resetSearch">重置</el-button>
-          </el-col>
-        </el-row>
-      </div>
-
       <!-- 学校列表 -->
       <el-table :data="filteredSchools" style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="name" label="学校名称" min-width="200" />
         <el-table-column
           prop="studentCount"
@@ -69,11 +38,12 @@
             <span>{{ formatDate(row.createdAt) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="250" fixed="right">
+        <el-table-column label="操作" width="180" fixed="right">
           <template #default="{ row }">
             <el-button size="small" type="primary" @click="viewDetail(row)">
               详情
             </el-button>
+            <!--
             <el-button
               size="small"
               :type="row.status === 'active' ? 'danger' : 'success'"
@@ -81,25 +51,14 @@
             >
               {{ row.status === "active" ? "禁用" : "启用" }}
             </el-button>
+            -->
+
             <el-button size="small" :type="'success'" @click="syncSchool(row)">
               同步
             </el-button>
           </template>
         </el-table-column>
       </el-table>
-
-      <!-- 分页 -->
-      <div class="pagination">
-        <el-pagination
-          v-model:current-page="currentPage"
-          v-model:page-size="pageSize"
-          :total="total"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
     </el-card>
 
     <!-- 添加/编辑学校对话框 -->
