@@ -251,10 +251,10 @@ const rules = computed(() => {
   } else {
     return {
       ...commonRules,
-      activity_name: [
-        { required: true, message: "请输入活动名称", trigger: "blur" },
+      name: [{ required: true, message: "请输入活动名称", trigger: "blur" }],
+      award_name: [
+        { required: true, message: "请输入荣誉奖项", trigger: "blur" },
       ],
-      name: [{ required: true, message: "请输入荣誉奖项", trigger: "blur" }],
       image_url: [
         { required: true, message: "请上传奖项证明", trigger: "change" },
       ],

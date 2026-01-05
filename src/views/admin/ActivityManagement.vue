@@ -62,6 +62,11 @@
       >
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="name" label="活动名称" min-width="150" />
+        <el-table-column
+          prop="manage_teacher_name"
+          label="负责教师"
+          width="120"
+        />
         <el-table-column label="级别" width="100">
           <template #default="{ row }">
             <el-tag
@@ -166,7 +171,11 @@
               label="思维逻辑"
               align="center"
             />
-            <el-table-column prop="creativity" label="创新创造" align="center" />
+            <el-table-column
+              prop="creativity"
+              label="创新创造"
+              align="center"
+            />
             <el-table-column prop="teamwork" label="团队协作" align="center" />
             <el-table-column
               prop="responsibility"
@@ -200,6 +209,23 @@
               :key="item.semester_id"
               :label="item.academic_year_name + item.term_name"
               :value="item.semester_id"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="负责教师" prop="manage_teacher_id">
+          <el-select
+            v-model="form.manage_teacher_id"
+            placeholder="请选择负责教师"
+            style="width: 100%"
+            filterable
+            clearable
+          >
+            <el-option
+              v-for="item in teachers"
+              :key="item.user_id"
+              :label="item.name"
+              :value="item.user_id"
             />
           </el-select>
         </el-form-item>
@@ -409,6 +435,20 @@ const loading = ref(false);
 const submitLoading = ref(false);
 const activities = ref([]);
 const semesterOptions = ref([]);
+const teachers = ref([]);
+
+// 加载教师列表
+const loadTeachers = async () => {
+  try {
+    const response = await adminAPI.getTeachers();
+    if (response.status === 200) {
+      teachers.value = response.data.list || response.data;
+    }
+  } catch (error) {
+    console.error("加载教师列表失败", error);
+  }
+};
+
 const dialogVisible = ref(false);
 const viewDialogVisible = ref(false);
 const currentViewActivity = ref(null);
@@ -428,6 +468,7 @@ const pagination = reactive({
 
 const form = reactive({
   semesterId: null,
+  manage_teacher_id: null,
   activityName: "",
   level: 1,
   credit: null, // Make credit optional by initializing to null
@@ -452,6 +493,7 @@ const handleEdit = (row) => {
   isEdit.value = true;
   currentActivityId.value = row.id;
   form.semesterId = row.semester_id;
+  form.manage_teacher_id = row.manage_teacher_id;
   form.activityName = row.name;
   form.level = row.level;
   form.credit = row.credit;
@@ -482,6 +524,9 @@ const getLevelText = (level) => {
 const rules = {
   semesterId: [
     { required: true, message: "请选择所属学期", trigger: "change" },
+  ],
+  manage_teacher_id: [
+    { required: true, message: "请选择负责教师", trigger: "change" },
   ],
   activityName: [
     { required: true, message: "请输入活动名称", trigger: "blur" },
@@ -681,6 +726,7 @@ const handleAdd = () => {
   isEdit.value = false;
   currentActivityId.value = null;
   form.semesterId = null;
+  form.manage_teacher_id = null;
   form.activityName = "";
   form.level = 1;
   form.credit = null;
@@ -729,6 +775,7 @@ const handleSubmit = async () => {
     try {
       const data = {
         semester_id: form.semesterId,
+        manage_teacher_id: form.manage_teacher_id,
         name: form.activityName,
         level: form.level,
         credit: form.credit, // Include credit in the payload
@@ -737,10 +784,7 @@ const handleSubmit = async () => {
 
       let response;
       if (isEdit.value) {
-        response = await adminAPI.updateActivity(
-          currentActivityId.value,
-          data,
-        );
+        response = await adminAPI.updateActivity(currentActivityId.value, data);
       } else {
         response = await adminAPI.createActivity(form.semesterId, data);
       }
@@ -751,7 +795,9 @@ const handleSubmit = async () => {
         loadActivities();
       }
     } catch (error) {
-      ElMessage.error(error.message || (isEdit.value ? "更新失败" : "发布失败"));
+      ElMessage.error(
+        error.message || (isEdit.value ? "更新失败" : "发布失败"),
+      );
     } finally {
       submitLoading.value = false;
     }
@@ -779,6 +825,7 @@ const handleDelete = async (activityId) => {
 onMounted(() => {
   loadActivities();
   loadSemesters();
+  loadTeachers();
 });
 </script>
 
