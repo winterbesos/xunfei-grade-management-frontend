@@ -1,5 +1,10 @@
 <template>
   <div>
+    <div class="action-bar no-print">
+      <button @click="printPage" class="action-btn print-btn">
+        <span>🖨️</span> 打印学籍卡
+      </button>
+    </div>
     <div class="print-area">
       <!-- ================= 第一页：基本信息与成绩 ================= -->
       <div class="page page-front">
@@ -540,6 +545,10 @@ const printPage = () => {
       body > * {
         display: none !important;
       }
+      /* Hide elements with no-print class */
+      .no-print {
+        display: none !important;
+      }
       /* Show the overlay and its content */
       .el-overlay {
         display: block !important;
@@ -596,19 +605,41 @@ defineExpose({
 @import url("https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap"); /* 模拟手写字体 */
 
 .action-bar {
+  display: flex;
+  gap: 15px;
   margin-bottom: 20px;
-  text-align: center;
-  color: black;
+  justify-content: center;
 }
 
-button {
+.action-btn {
   padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  background: #007bff;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.action-btn span {
+  font-size: 18px;
+}
+
+.print-btn {
+  background-color: #409eff; /* Element Plus Primary Blue */
+}
+
+.print-btn:hover {
+  background-color: #66b1ff;
 }
 
 .tips {

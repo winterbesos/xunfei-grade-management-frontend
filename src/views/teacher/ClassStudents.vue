@@ -49,8 +49,9 @@
     <el-dialog
       title="学籍卡"
       v-model="statusCardVisible"
-      width="80%"
-      :destroy-on-close="true"
+      width="1000px"
+      destroy-on-close
+      append-to-body
     >
       <div class="dialog-content-wrapper">
         <StatusCard v-if="selectedStudentId" :student-id="selectedStudentId" />

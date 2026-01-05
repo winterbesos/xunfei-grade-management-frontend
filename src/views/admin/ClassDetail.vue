@@ -147,25 +147,17 @@
 
     <el-dialog
       v-model="statusCardDialogVisible"
-      title="学籍卡预览"
+      title="学籍卡"
       width="1000px"
-      top="5vh"
       destroy-on-close
       append-to-body
     >
       <div class="dialog-center">
         <StatusCard
           v-if="statusCardDialogVisible"
-          ref="statusCardRef"
           :student-id="currentStudentId"
         />
       </div>
-      <template #footer>
-        <el-button @click="statusCardDialogVisible = false">关闭</el-button>
-        <el-button type="primary" @click="handlePrintStatusCard">
-          打印
-        </el-button>
-      </template>
     </el-dialog>
 
     <el-dialog
@@ -207,7 +199,6 @@ const proofDialogVisible = ref(false);
 const statusCardDialogVisible = ref(false);
 const gradeTrendDialogVisible = ref(false);
 const currentStudentId = ref(null);
-const statusCardRef = ref(null);
 
 const fetchClassDetail = async () => {
   const id = route.params.id;
@@ -248,12 +239,6 @@ const handleViewYearReport = (row) => {
     params: { studentId: row.user_id },
   });
   window.open(routeData.href, "_blank");
-};
-
-const handlePrintStatusCard = () => {
-  if (statusCardRef.value) {
-    statusCardRef.value.printPage();
-  }
 };
 
 onMounted(() => {
