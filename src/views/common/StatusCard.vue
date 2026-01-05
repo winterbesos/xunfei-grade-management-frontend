@@ -541,6 +541,10 @@ const printPage = () => {
   // Define the print-specific CSS
   style.innerHTML = `
     @media print {
+      @page {
+        size: A4;
+        margin: 0;
+      }
       /* Hide everything in the body by default */
       body > * {
         display: none !important;
@@ -568,6 +572,21 @@ const printPage = () => {
       }
       .el-dialog__header, .el-dialog__footer {
         display: none !important;
+      }
+      
+      /* Force page breaks */
+      .page {
+        page-break-after: always !important;
+        break-after: page !important;
+        width: 100% !important;
+        height: 297mm !important; /* Force full height to ensure break */
+        overflow: hidden !important;
+        margin: 0 !important;
+        border: none !important;
+      }
+      .page:last-of-type {
+        page-break-after: auto !important;
+        break-after: auto !important;
       }
     }
   `;
@@ -663,14 +682,16 @@ defineExpose({
 
 @media print {
   .page {
-    overflow: visible !important;
+    overflow: hidden !important;
     box-shadow: none !important;
     margin: 0 !important;
-    height: auto;
+    height: 297mm !important;
     page-break-after: always;
+    break-after: page;
   }
   .page:last-of-type {
     page-break-after: auto;
+    break-after: auto;
   }
 }
 
