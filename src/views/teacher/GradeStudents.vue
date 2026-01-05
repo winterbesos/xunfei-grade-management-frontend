@@ -701,13 +701,73 @@ const handleQuickSetCreditHours = () => {
 
 // 全部及格
 const handleSetAllPass = () => {
+  let count = 0;
   students.value.forEach((student) => {
-    if (student.score == null) {
-      student.usual_score = 60;
-      student.modified = true;
+    // 对未录入或不及格的学生进行处理
+    if (student.midterm_score === null && student.final_score === null) {
+      return; // 如果期中和期末都为空，则无法调整
+    }
+
+    if (
+      student.score === null ||
+      student.score === undefined ||
+      student.score < 60
+    ) {
+      const mid = student.midterm_score;
+      const final = student.final_score;
+
+      // 检查期中和期末成绩是否存在 (0也算存在)
+      const hasMid =
+        mid !== null && mid !== undefined && String(mid).trim() !== "";
+      const hasFinal =
+        final !== null && final !== undefined && String(final).trim() !== "";
+
+      let targetUsual = 60; // 默认给及格分
+
+      // 当期中期末成绩都存在时，按照平时成绩30% 期中成绩30% 期末成绩40%计算
+      if (hasMid && hasFinal) {
+        const midVal = parseFloat(mid);
+        const finalVal = parseFloat(final);
+
+        // 目标: 60 = sqrt(mid * 0.3 + final * 0.4 + usual * 0.3) * 10
+        // usual = ((60 / 10)^2 - mid * 0.3 - final * 0.4) / 0.3
+        let calc = (36 - midVal * 0.3 - finalVal * 0.4) / 0.3;
+
+        targetUsual = calc;
+      } else {
+        const midVal = parseFloat(mid);
+        const finalVal = parseFloat(final);
+
+        const val = hasMid ? midVal : finalVal;
+        // 目标: 60 = sqrt(val * 0.6 + usual * 0.4) * 10
+        // usual = ((60 / 10)^2 - val * 0.6) / 0.4
+        let calc = (36 - val * 0.6) / 0.4;
+
+        targetUsual = calc;
+      }
+
+      // 限制在 0-100 之间
+      if (targetUsual < 0) targetUsual = 0;
+      if (targetUsual > 100) targetUsual = 100;
+
+      // 保留一位小数
+      targetUsual = Math.round(targetUsual * 10) / 10;
+
+      // 如果有变化则更新
+      if (student.usual_score !== targetUsual) {
+        student.usual_score = targetUsual;
+        student.modified = true;
+        count++;
+        handleScoreChange(student);
+      }
     }
   });
-  ElMessage.success("已为所有未评分学生设置及格分数");
+
+  if (count > 0) {
+    ElMessage.success(`已为 ${count} 名学生调整平时成绩以确保及格`);
+  } else {
+    ElMessage.info("没有需要调整的学生");
+  }
 };
 
 // 筛选处理
