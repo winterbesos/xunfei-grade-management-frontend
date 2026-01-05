@@ -2,14 +2,10 @@
   <div class="page-wrapper">
     <!-- 操作栏：打印时会自动隐藏 -->
     <div class="action-bar no-print">
-      <button @click="handlePrint" class="print-btn">
+      <button @click="handlePrint" class="action-btn print-btn">
         <span>🖨️</span> 打印成绩单
       </button>
-      <button
-        @click="handleExportWord"
-        class="print-btn"
-        style="margin-left: 10px; background-color: #28a745"
-      >
+      <button @click="handleExportWord" class="action-btn word-btn">
         <span>💾</span> 保存为 Word
       </button>
     </div>
@@ -663,24 +659,48 @@ onUnmounted(() => {
 
 .action-bar {
   display: flex;
+  gap: 15px;
   margin-bottom: 20px;
 }
 
-button {
+.action-btn {
   padding: 10px 20px;
-  background-color: #007bff;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-button:hover {
-  background-color: #0056b3;
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* A4 纸张样式模拟 */
+.action-btn span {
+  font-size: 18px;
+}
+
+.print-btn {
+  background-color: #409eff; /* Element Plus Primary Blue */
+}
+
+.print-btn:hover {
+  background-color: #66b1ff;
+}
+
+.word-btn {
+  background-color: #67c23a; /* Element Plus Success Green */
+}
+
+.word-btn:hover {
+  background-color: #85ce61;
+}
 .a4-container {
   background: white;
   width: 210mm;
@@ -820,28 +840,5 @@ td {
   height: 250px;
 }
 
-/* 按钮样式 */
-.print-btn {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: all 0.3s ease;
-}
 
-.print-btn:hover {
-  background-color: #0056b3;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.print-btn span {
-  font-size: 18px;
-}
 </style>

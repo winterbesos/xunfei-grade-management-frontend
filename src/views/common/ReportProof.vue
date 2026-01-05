@@ -2,8 +2,12 @@
   <div class="page-wrapper">
     <!-- 打印操作栏 -->
     <div class="action-bar no-print">
-      <button @click="handlePrint">🖨️ 打印证明单</button>
-      <button @click="handleExportWord" class="ml-4">💾 保存为 Word</button>
+      <button @click="handlePrint" class="action-btn print-btn">
+        <span>🖨️</span> 打印证明单
+      </button>
+      <button @click="handleExportWord" class="action-btn word-btn">
+        <span>💾</span> 保存为 Word
+      </button>
     </div>
 
     <!-- A4 纸张容器 -->
@@ -243,24 +247,48 @@ const handleExportWord = () => {
 @import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap");
 
 .action-bar {
+  display: flex;
+  gap: 15px;
   margin-bottom: 20px;
 }
 
-.ml-4 {
-  margin-left: 16px;
-}
-
-button {
-  padding: 8px 16px;
-  background-color: #409eff;
+.action-btn {
+  padding: 10px 20px;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-button:hover {
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.action-btn span {
+  font-size: 18px;
+}
+
+.print-btn {
+  background-color: #409eff;
+}
+
+.print-btn:hover {
   background-color: #66b1ff;
+}
+
+.word-btn {
+  background-color: #67c23a;
+}
+
+.word-btn:hover {
+  background-color: #85ce61;
 }
 
 /* A4 纸张模拟 */
