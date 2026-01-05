@@ -52,3 +52,67 @@ export function printElement(element) {
     }
   }, 500); // 500ms delay to allow for rendering
 }
+
+export function printStatusCardElement(element) {
+  const iframe = document.createElement("iframe");
+  iframe.style.position = "fixed";
+  iframe.style.right = "0";
+  iframe.style.bottom = "0";
+  iframe.style.width = "1px";
+  iframe.style.height = "1px";
+  iframe.style.opacity = "0";
+  iframe.style.pointerEvents = "none";
+  iframe.style.border = "0";
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentDocument;
+
+  //const doc = window.document;
+
+  const styles = Array.from(
+    document.querySelectorAll('style, link[rel="stylesheet"]'),
+  )
+    .map((node) => node.outerHTML)
+    .join("\n");
+
+  doc.open();
+  doc.write(`
+    <!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        ${styles}
+
+        <style>
+          /* 只在这个 iframe 内生效 */
+          @page { size: A4; margin: 0; }
+
+          @media print {
+            body {
+              overflow: visible !important;
+          }
+        </style>
+      </head>
+      <body style="overflow: visible;">
+        ${element.outerHTML}
+      </body>
+    </html>
+  `);
+  doc.close();
+
+  // 等图片加载完（有照片时很关键）
+  const imgs = Array.from(doc.images);
+  const waitImgs = Promise.all(
+    imgs.map((img) =>
+      img.complete
+        ? Promise.resolve()
+        : new Promise((r) => (img.onload = img.onerror = r)),
+    ),
+  );
+
+  waitImgs.then(() => {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+    setTimeout(() => document.body.removeChild(iframe), 1000);
+  });
+}

@@ -1,11 +1,12 @@
 <template>
-  <div>
+  <div class="status-card-root">
     <div class="action-bar no-print">
-      <button @click="printPage" class="action-btn print-btn">
+      <button @click="handlePrint" class="action-btn print-btn">
         <span>🖨️</span> 打印学籍卡
       </button>
     </div>
-    <div class="print-area">
+    <!-- Add ref to target this specific element -->
+    <div class="print-area" ref="printAreaRef">
       <!-- ================= 第一页：基本信息与成绩 ================= -->
       <div class="page page-front">
         <!-- 顶部标题 -->
@@ -473,6 +474,7 @@
 <script setup>
 import { ref, onMounted, defineProps, watch, defineExpose } from "vue";
 import { adminAPI } from "@/api/admin";
+import { printStatusCardElement } from "@/utils/print.js";
 
 // --- 组件Props ---
 const props = defineProps({
@@ -481,6 +483,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+const printAreaRef = ref(null);
 
 const fillData = (data) => {
   info.value.name = data.student_name;
@@ -526,79 +530,10 @@ const info = ref({
 const subjects = ref([]);
 const character_comments = ref([]);
 
-const comments = ref({
-  g1: {
-    t1: ``,
-    t2: ``,
-  },
-});
-
-const printPage = () => {
-  // Create a style element
-  const style = document.createElement("style");
-  style.id = "printing-style";
-
-  // Define the print-specific CSS
-  style.innerHTML = `
-    @media print {
-      @page {
-        size: A4;
-        margin: 0;
-      }
-      /* Hide everything in the body by default */
-      body > * {
-        display: none !important;
-      }
-      /* Hide elements with no-print class */
-      .no-print {
-        display: none !important;
-      }
-      /* Show the overlay and its content */
-      .el-overlay {
-        display: block !important;
-      }
-      .el-overlay,
-      .el-dialog,
-      .el-dialog__body,
-      .dialog-content-wrapper {
-        position: static !important;
-        overflow: visible !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        box-shadow: none !important;
-        background-color: white !important;
-      }
-      .el-dialog__header, .el-dialog__footer {
-        display: none !important;
-      }
-      
-      /* Force page breaks */
-      .page {
-        page-break-after: always !important;
-        break-after: page !important;
-        width: 100% !important;
-        height: 297mm !important; /* Force full height to ensure break */
-        overflow: hidden !important;
-        margin: 0 !important;
-        border: none !important;
-      }
-      .page:last-of-type {
-        page-break-after: auto !important;
-        break-after: auto !important;
-      }
-    }
-  `;
-
-  // Append the style to the head
-  document.head.appendChild(style);
-
-  // Trigger the print dialog
-  window.print();
-
-  // Remove the style element after printing
-  document.head.removeChild(style);
+const handlePrint = () => {
+  if (printAreaRef.value) {
+    printStatusCardElement(printAreaRef.value);
+  }
 };
 
 onMounted(() => {
@@ -615,13 +550,12 @@ watch(
 );
 
 defineExpose({
-  printPage,
+  handlePrint, // Expose handlePrint instead
 });
 </script>
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap"); /* 模拟手写字体 */
 
 .action-bar {
   display: flex;
@@ -680,18 +614,45 @@ defineExpose({
   color: #000;
 }
 
+.print-area {
+  display: block !important; /* 确保不是 flex 布局 */
+  height: auto !important;
+}
+
 @media print {
-  .page {
-    overflow: hidden !important;
-    box-shadow: none !important;
-    margin: 0 !important;
-    height: 297mm !important;
-    page-break-after: always;
-    break-after: page;
+  @page {
+    size: A4;
+    margin: 0;
   }
+
+  body,
+  html {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .page {
+    margin: 0 !important;
+    box-shadow: none !important;
+    width: 210mm !important;
+    height: 297mm !important;
+
+    /* 核心分页属性 */
+    display: block !important;
+    float: none !important;
+    position: relative !important;
+
+    /* 强行分页 */
+    page-break-after: always !important;
+    break-after: page !important;
+
+    /* 避免在页面内部折断 */
+    page-break-inside: avoid !important;
+  }
+
   .page:last-of-type {
-    page-break-after: auto;
-    break-after: auto;
+    page-break-after: auto !important;
+    break-after: auto !important;
   }
 }
 
