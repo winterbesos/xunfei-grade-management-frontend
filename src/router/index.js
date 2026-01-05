@@ -16,7 +16,9 @@ const routes = [
   },
   {
     path: "/",
-    redirect: "/dashboard",
+    name: "AutoLogin",
+    component: () => import("@/views/AutoLogin.vue"),
+    meta: { requiresAuth: false },
   },
   {
     path: "/dashboard",
