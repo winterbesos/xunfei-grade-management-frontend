@@ -460,6 +460,11 @@ const handleScoreChange = async (row) => {
 
 // 快速设置分数
 const handleQuickSet = () => {
+  if (selectedStudents.value.length === 0) {
+    ElMessage.warning("请先勾选学生");
+    return;
+  }
+
   if (!quickScore.value) {
     ElMessage.warning("请选择评价");
     return;
@@ -476,34 +481,34 @@ const handleQuickSet = () => {
 
 // 快速设置学时
 const handleQuickSetCreditHours = () => {
+  if (selectedStudents.value.length === 0) {
+    ElMessage.warning("请先勾选学生");
+    return;
+  }
+
   if (!quickCreditHours.value && quickCreditHours.value !== 0) {
     ElMessage.warning("请输入学时");
     return;
   }
 
-  const targetStudents =
-    selectedStudents.value.length > 0 ? selectedStudents.value : students.value;
-
-  targetStudents.forEach((student) => {
+  selectedStudents.value.forEach((student) => {
     student.credits_hours = parseFloat(quickCreditHours.value);
     student.modified = true;
   });
 
   ElMessage.success(
-    `已为${targetStudents.length}个学生设置学时: ${quickCreditHours.value}`,
+    `已为选中的${selectedStudents.value.length}个学生设置学时: ${quickCreditHours.value}`,
   );
 };
 
-// 全部及格 -> 全部合格
+// 全部合格
 const handleSetAllPass = () => {
   students.value.forEach((student) => {
-    if (student.evaluation == null) {
-      student.evaluation = 1; // 1 = 合格
-      student.modified = true;
-      handleScoreChange(student);
-    }
+    student.evaluation = 1; // 1 = 合格
+    student.modified = true;
+    handleScoreChange(student);
   });
-  ElMessage.success("已为所有未评分学生设置合格");
+  ElMessage.success("已为所有学生设置合格");
 };
 
 // 筛选处理
