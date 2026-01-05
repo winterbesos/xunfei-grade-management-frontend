@@ -5,6 +5,13 @@
       <button @click="handlePrint" class="print-btn">
         <span>🖨️</span> 打印成绩单
       </button>
+      <button
+        @click="handleExportWord"
+        class="print-btn"
+        style="margin-left: 10px; background-color: #28a745"
+      >
+        <span>💾</span> 保存为 Word
+      </button>
     </div>
 
     <!-- A4 纸张容器 -->
@@ -353,6 +360,247 @@ const handlePrint = () => {
   }
 };
 
+const handleExportWord = () => {
+  // 1. 克隆 DOM 以免影响页面显示
+  const originalContent = document.getElementById("print-area");
+  if (!originalContent) return;
+
+  const clonedContent = originalContent.cloneNode(true);
+
+  // 2. 处理图表：获取原图表的 base64，插入到克隆节点中
+  if (myChart) {
+    const dataURL = myChart.getDataURL({
+      type: "png",
+      pixelRatio: 2,
+      backgroundColor: "#fff",
+    });
+
+    // 在克隆节点中找到图表容器
+    const clonedChartContainer =
+      clonedContent.querySelector(".chart-container");
+    if (clonedChartContainer) {
+      clonedChartContainer.innerHTML = "";
+      const img = new Image();
+      img.src = dataURL;
+      // 设置固定宽高，防止Word中变形
+      img.width = 272;
+      img.height = 250;
+      clonedChartContainer.appendChild(img);
+    }
+  }
+
+  // 3. 构建包含样式的 HTML
+  // Word 对 CSS 支持有限，尽量使用 inline style 或者简单的 class
+  // 关键：使用 @page 设置页边距，模拟 A4
+  const style = `
+    <style>
+      @page {
+        size: A4;
+        margin: 15mm 15mm;
+      }
+      body { 
+        font-family: 'SimSun', '宋体', serif; 
+        color: #000; 
+      }
+      .a4-container { 
+        width: 100%; 
+        box-sizing: border-box;
+      }
+      .title { 
+        text-align: center; 
+        font-size: 18pt; 
+        font-weight: bold; 
+        margin-bottom: 15px; 
+        margin-top: 10px; 
+      }
+      .section-title { 
+        text-align: center; 
+        font-size: 12pt; 
+        font-weight: bold; 
+        margin: 5px 0; 
+      }
+      
+      table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        margin-bottom: 0; 
+        font-size: 10.5pt; 
+      }
+      th, td { 
+        border: 1px solid #000; 
+        padding: 4px 2px; 
+        text-align: center; 
+        height: 24px; 
+        vertical-align: middle;
+      }
+      
+      .info-table { 
+        margin-bottom: 15px; 
+        border: 2px solid #000; 
+      }
+      /* Word有时需要对 td 明确指定边框 */
+      .info-table td { 
+        border: 1px solid #000; 
+      } 
+      .info-table .label { 
+        font-weight: bold; 
+        background-color: #ffffff; 
+      }
+      
+      .score-table th { 
+        font-weight: bold; 
+        background-color: #ffffff; 
+      }
+      .bold-text { 
+        font-weight: 800; 
+      }
+      
+      /* 底部区域改为表格布局 */
+      .footer-table { 
+        width: 100%; 
+        border: none; 
+        margin-top: 30px; /* 增加与上方选修课表格的间距 */
+      }
+      .footer-table td { 
+        border: none; 
+        vertical-align: top; 
+        padding: 0; 
+      }
+      
+      /* 专门为 Word 导出设计的品格评语表格 */
+      .comments-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #000; /* 外边框 */
+        height: 250px; /* 固定高度，与雷达图保持一致 */
+      }
+      .comments-table td {
+        border: none; /* 移除默认的单元格边框，防止双重边框 */
+        border-right: 1px solid #000; /* 确保右边框闭合，虽然 collapse 下 table border 应该够了，但在 Word 里保险起见 */
+        border-left: 1px solid #000;
+      }
+      /* 修正：collapse 模式下，table border 已经涵盖了外围，内部 td 不需要左右 border，除非是多列。
+         这里只有一列，所以 td 不需要左右 border，只需要 top/bottom 分隔线。
+      */
+      .comments-table td {
+         border: none;
+      }
+      
+      .box-header-cell {
+        height: 30px;
+        background-color: #ffffff;
+        font-weight: bold;
+        text-align: center;
+        border-bottom: 1px solid #000 !important; /* 标题栏下边框 */
+        font-size: 11pt;
+      }
+      
+      .comments-content-cell {
+        vertical-align: top;
+        padding: 10px;
+        font-size: 11pt;
+        line-height: 1.5;
+        text-indent: 2em;
+        text-align: left;
+      }
+      
+      .radar-box-inner { 
+        text-align: center; 
+        height: 250px; /* 确保高度一致 */
+      }
+      .radar-title-static { 
+        font-size: 11pt; 
+        color: #666; 
+        text-align: right; 
+        margin-bottom: 2px;
+        height: 20px;
+      }
+    </style>
+  `;
+
+  // 针对 footer 部分，由于 Word 对 flex 支持不好，我们将 clone 中的 footer-section 替换为 table 布局
+  const footerSection = clonedContent.querySelector(".footer-section");
+  if (footerSection) {
+    // const commentsBox = footerSection.querySelector(".comments-box");
+    // const radarBox = footerSection.querySelector(".radar-box");
+    // 注意：radarBox 里有 absolute 定位的 title，Word 支持不好，需要重构结构
+    const radarContainer = clonedContent.querySelector(".chart-container"); // 已经替换为 img
+
+    // 调整图片大小以适应 250px 总高度 (减去标题高度)
+    if (radarContainer) {
+      const img = radarContainer.querySelector("img");
+      if (img) {
+        img.height = 228; // 250 - 20 (title) - 2 (margin)
+        img.width = 250; // 保持比例微调
+      }
+    }
+
+    const footerTable = document.createElement("table");
+    footerTable.className = "footer-table";
+
+    // 手动构建右侧雷达图区域，避免 absolute positioning
+    const rightCellContent = `
+       <div class="radar-box-inner">
+         <div class="radar-title-static">雷达图</div>
+         ${radarContainer ? radarContainer.innerHTML : ""} 
+       </div>
+    `;
+    // 注意：上面用了 innerHTML，因为 radarContainer 本身是 div，我们只需要里面的 img
+
+    // 关键：使用 table 替换 div.comments-box 以确保 Word 中边框显示正常
+    // 获取原有的评语内容
+    const originalMoralComment = moralComment.value || "";
+
+    const leftCellContent = `
+      <table class="comments-table">
+        <tr>
+          <td class="box-header-cell">品格评语</td>
+        </tr>
+        <tr>
+          <td class="comments-content-cell">${originalMoralComment}</td>
+        </tr>
+      </table>
+    `;
+
+    footerTable.innerHTML = `
+      <tr>
+        <td style="width: 55%; padding-right: 15px;">
+          ${leftCellContent}
+        </td>
+        <td style="width: 45%; padding-left: 15px;">
+           ${rightCellContent}
+        </td>
+      </tr>
+    `;
+    footerSection.parentNode.replaceChild(footerTable, footerSection);
+  }
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <title>${school.value.school_name || "学生"}成绩单</title>
+        ${style}
+      </head>
+      <body>
+        <div class="a4-container">
+          ${clonedContent.innerHTML}
+        </div>
+      </body>
+    </html>
+  `;
+
+  const blob = new Blob([htmlContent], {
+    type: "application/msword;charset=utf-8",
+  });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `${school.value.term_name || ""}成绩单_${student.value.student_name}.doc`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+};
+
 function replaceChartsWithImages(root = document) {
   // 假设每个图表容器都有 class="echart"
   const chartEls = root.querySelectorAll(".chart-container");
@@ -414,6 +662,7 @@ onUnmounted(() => {
 }
 
 .action-bar {
+  display: flex;
   margin-bottom: 20px;
 }
 
