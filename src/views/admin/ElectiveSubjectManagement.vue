@@ -19,6 +19,11 @@
         <el-table-column prop="name" label="课程名称" min-width="180" />
         <el-table-column prop="semester_name" label="学期" width="200" />
         <el-table-column prop="teacher_name" label="任课教师" width="100" />
+        <el-table-column label="学时" width="80" align="center">
+          <template #default="{ row }">
+            {{ row.hours !== null && row.hours !== undefined ? row.hours : "—" }}
+          </template>
+        </el-table-column>
         <el-table-column label="学习" width="70" align="center">
           <template #default="{ row }">
             {{ row.abilities?.study_ability || 0 }}
@@ -124,15 +129,17 @@
             />
           </el-select>
         </el-form-item>
-        <!--
-        <el-form-item label="状态" prop="enabled">
-          <el-switch
-            v-model="subjectForm.enabled"
-            active-text="启用"
-            inactive-text="禁用"
+        <el-form-item label="学时" prop="hours">
+          <el-input-number
+            v-model="subjectForm.hours"
+            :min="0"
+            :step="1"
+            :precision="0"
+            controls-position="right"
+            style="width: 100%"
+            placeholder="可选"
           />
         </el-form-item>
-        -->
 
         <el-divider content-position="left">能力评分标准</el-divider>
         <el-row :gutter="10">
@@ -337,6 +344,7 @@ const subjectForm = reactive({
   teacher_id: "",
   semester_id: "",
   enabled: true,
+  hours: null,
   study_ability: 0,
   logical_thinking: 0,
   creativity: 0,
@@ -433,6 +441,7 @@ const editSubject = (row) => {
   subjectForm.teacher_id = row.teacher_id;
   subjectForm.semester_id = row.semester_id;
   subjectForm.enabled = row.enabled;
+  subjectForm.hours = row.hours;
   subjectForm.study_ability = row.abilities.study_ability || 0;
   subjectForm.logical_thinking = row.abilities.logical_thinking || 0;
   subjectForm.creativity = row.abilities.creativity || 0;
@@ -505,6 +514,7 @@ const submitSubject = async () => {
           teacher_id: subjectForm.teacher_id,
           semester_id: subjectForm.semester_id,
           enabled: subjectForm.enabled,
+          hours: subjectForm.hours,
           study_ability: subjectForm.study_ability,
           logical_thinking: subjectForm.logical_thinking,
           creativity: subjectForm.creativity,
@@ -534,6 +544,7 @@ const resetForm = () => {
   subjectForm.teacher_id = "";
   subjectForm.semester_id = "";
   subjectForm.enabled = true;
+  subjectForm.hours = null;
   subjectForm.study_ability = 0;
   subjectForm.logical_thinking = 0;
   subjectForm.creativity = 0;
