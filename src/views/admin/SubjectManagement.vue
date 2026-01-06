@@ -11,7 +11,6 @@
         :data="courseList"
         v-loading="loading"
         style="width: 100%"
-        border
       >
         <el-table-column
           prop="subject_code"
@@ -44,9 +43,13 @@
             <span v-else>未知</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="100" align="center">
+        <el-table-column label="操作" width="100" fixed="right" align="center">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">
+            <el-button
+              size="small"
+              type="primary"
+              @click="handleEdit(row)"
+            >
               编辑
             </el-button>
           </template>

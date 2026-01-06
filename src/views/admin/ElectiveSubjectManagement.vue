@@ -21,7 +21,9 @@
         <el-table-column prop="teacher_name" label="任课教师" width="100" />
         <el-table-column label="学时" width="80" align="center">
           <template #default="{ row }">
-            {{ row.hours !== null && row.hours !== undefined ? row.hours : "—" }}
+            {{
+              row.hours !== null && row.hours !== undefined ? row.hours : "—"
+            }}
           </template>
         </el-table-column>
         <el-table-column label="学习" width="70" align="center">
