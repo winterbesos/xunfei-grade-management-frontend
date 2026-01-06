@@ -74,16 +74,6 @@
             </el-select>
             <el-button @click="handleQuickSet">应用</el-button>
 
-            <el-input
-              v-model="quickCreditHours"
-              placeholder="快速设置学时"
-              style="width: 180px; margin-left: 20px"
-              @keyup.enter="handleQuickSetCreditHours"
-            >
-              <template #append>
-                <el-button @click="handleQuickSetCreditHours">应用</el-button>
-              </template>
-            </el-input>
             <el-button @click="handleSetAllPass" style="margin-left: 10px"
               >全部合格</el-button
             >
@@ -127,26 +117,6 @@
                 <el-option label="不合格" :value="2" />
               </el-select>
             </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="学时" width="150">
-          <template #default="{ row }">
-            <div class="grade-input-group">
-              <el-input-number
-                v-model="row.credits_hours"
-                :min="0"
-                :precision="0"
-                :step="1"
-                controls-position="right"
-                style="width: 120px"
-                @change="row.modified = true"
-              />
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="学时学分" width="100" align="center">
-          <template #default="{ row }">
-            <span>{{ (row.credits_hours / 18).toFixed(1) || "0.0" }}</span>
           </template>
         </el-table-column>
         <el-table-column label="状态" width="100" align="center">
@@ -241,7 +211,6 @@ const fileInput = ref(null);
 
 // 快速设置
 const quickScore = ref(null);
-const quickCreditHours = ref("");
 const filterScore = ref("all");
 
 // 导出 Excel (XLSX)
@@ -252,8 +221,8 @@ const handleExport = () => {
   }
 
   // Header
-  const headers = ["学生ID", "姓名", "评价", "学时"];
-  const keys = ["user_id", "user_name", "evaluation_text", "credits_hours"];
+  const headers = ["学生ID", "姓名", "评价"];
+  const keys = ["user_id", "user_name", "evaluation_text"];
 
   // Generate data array
   const data = students.value.map((student) => {
@@ -310,10 +279,9 @@ const handleImport = (event) => {
         const row = results[i];
         if (!row || row.length === 0) continue;
 
-        // Assuming order: StudentID, Name, Evaluation, CreditHours
+        // Assuming order: StudentID, Name, Evaluation
         const studentId = row[0];
         const usualScoreStr = row[2]; // Evaluation text
-        const creditHoursStr = row[3];
 
         if (!studentId) continue;
 
@@ -335,19 +303,6 @@ const handleImport = (event) => {
           if (newScore !== null && student.evaluation !== newScore) {
             student.evaluation = newScore;
             changed = true;
-          }
-
-          // Update Credit Hours
-          if (
-            creditHoursStr !== undefined &&
-            creditHoursStr !== "" &&
-            !isNaN(parseFloat(creditHoursStr))
-          ) {
-            const newCredit = parseFloat(creditHoursStr);
-            if (student.credits_hours !== newCredit) {
-              student.credits_hours = newCredit;
-              changed = true;
-            }
           }
 
           if (changed) {
@@ -439,7 +394,6 @@ const loadStudents = async () => {
     if (response.status === 200) {
       students.value = response.data.map((student) => ({
         ...student,
-        credits_hours: student.credits_hours || 0,
         modified: false,
         evaluation: student.evaluation || null,
       }));
@@ -479,34 +433,6 @@ const handleQuickSet = () => {
   ElMessage.success(`已为选中的${selectedStudents.value.length}个学生设置评价`);
 };
 
-// 快速设置学时
-const handleQuickSetCreditHours = () => {
-  if (selectedStudents.value.length === 0) {
-    ElMessage.warning("请先勾选学生");
-    return;
-  }
-
-  if (quickCreditHours.value === "" || quickCreditHours.value === null || quickCreditHours.value === undefined) {
-    ElMessage.warning("请输入学时");
-    return;
-  }
-
-  const hours = parseFloat(quickCreditHours.value);
-  if (isNaN(hours)) {
-    ElMessage.warning("请输入有效的数字学时");
-    return;
-  }
-
-  selectedStudents.value.forEach((student) => {
-    student.credits_hours = hours;
-    student.modified = true;
-  });
-
-  ElMessage.success(
-    `已为选中的${selectedStudents.value.length}个学生设置学时: ${quickCreditHours.value}`,
-  );
-};
-
 // 全部合格
 const handleSetAllPass = () => {
   students.value.forEach((student) => {
@@ -537,7 +463,6 @@ const handleSaveSingle = async (row) => {
   try {
     const payload = {
       student_id: row.user_id,
-      credits_hours: row.credits_hours,
       evaluation: row.evaluation,
     };
 
@@ -560,7 +485,7 @@ const handleSaveSingle = async (row) => {
 // 批量保存
 const handleBatchSave = async () => {
   const modifiedStudents = students.value.filter(
-    (s) => s.modified && (s.evaluation !== null || s.credits_hours !== null),
+    (s) => s.modified && s.evaluation !== null,
   );
 
   if (modifiedStudents.length === 0) {
