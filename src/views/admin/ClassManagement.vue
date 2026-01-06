@@ -27,12 +27,14 @@
         v-loading="loading"
         style="width: 100%"
       >
+        <!--
         <el-table-column
           prop="class_id"
           label="班级ID"
           width="150"
           show-overflow-tooltip
         />
+        -->
         <el-table-column prop="class_name" label="班级" />
         <el-table-column prop="year_name" label="年级" />
         <el-table-column label="操作" width="150">

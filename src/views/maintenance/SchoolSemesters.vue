@@ -200,9 +200,7 @@ const handleSyncGrades = async () => {
         syncForm.examType, // Pass examType
       );
       if (res.status === 200) {
-        ElMessage.success(
-          `学期 ${currentSemester.value.semester_name} 成绩同步任务已提交`,
-        );
+        ElMessage.success(`学期成绩同步任务已提交`);
         syncDialogVisible.value = false;
       } else {
         ElMessage.error("同步失败");

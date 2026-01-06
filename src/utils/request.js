@@ -43,7 +43,7 @@ request.interceptors.response.use(
       if (response.status === 401) {
         localStorage.removeItem("token");
         localStorage.removeItem("userInfo");
-        window.location.href = "/autologin";
+        window.location.href = "/";
       }
 
       return Promise.reject(new Error(response.data.detail || "Error"));

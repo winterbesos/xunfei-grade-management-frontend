@@ -5,8 +5,7 @@
         <div class="card-header">
           <div class="header-left">
             <el-button @click="handleBack" :icon="ArrowLeft" circle />
-            <span
-              style="margin-left: 10px; font-weight: 600; font-size: 16px"
+            <span style="margin-left: 10px; font-weight: 600; font-size: 16px"
               >{{ semesterName }} - 成绩管理</span
             >
           </div>
@@ -98,12 +97,14 @@
             stripe
             style="width: 100%; margin-top: 20px"
           >
+            <!--
             <el-table-column
               prop="class_id"
               label="班级ID"
               width="150"
               show-overflow-tooltip
             />
+            -->
             <el-table-column prop="class_name" label="班级名称" min-width="150">
               <template #default="{ row }">
                 <el-tooltip :content="row.class_name" placement="top">

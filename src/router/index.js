@@ -9,12 +9,6 @@ const routes = [
     meta: { requiresAuth: false },
   },
   {
-    path: "/autologin",
-    name: "AutoLogin",
-    component: () => import("@/views/AutoLogin.vue"),
-    meta: { requiresAuth: false },
-  },
-  {
     path: "/",
     name: "AutoLogin",
     component: () => import("@/views/AutoLogin.vue"),
@@ -336,7 +330,7 @@ router.beforeEach((to, from, next) => {
       student: "/student/grades",
       maintenance: "/maintenance/schools",
     };
-    next(redirectMap[authStore.userRole] || "/autologin");
+    next(redirectMap[authStore.userRole] || "/");
     return;
   }
 

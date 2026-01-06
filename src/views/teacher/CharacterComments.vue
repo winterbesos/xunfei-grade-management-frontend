@@ -52,8 +52,9 @@
           label="序号"
           width="60"
           align="center"
+          fixed="left"
         />
-        <el-table-column prop="student_name" label="姓名" width="100" />
+        <el-table-column prop="student_name" label="姓名" width="100" fixed="left" />
 
         <el-table-column label="学习能力" width="120">
           <template #default="{ row }">
@@ -126,7 +127,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="品格评语">
+        <el-table-column label="品格评语" min-width="220">
           <template #default="{ row }">
             <el-input
               v-model="row.comment"
@@ -137,7 +138,7 @@
             />
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="100">
+        <el-table-column label="操作" width="100" fixed="right">
           <template #default="{ row }">
             <el-button
               type="primary"

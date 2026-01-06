@@ -16,7 +16,7 @@
         <el-form-item label="成绩单签名">
           <el-input
             v-model="form.reportSignature"
-            placeholder="请输入成绩单落款签名"
+            placeholder="请输入成绩单签名"
           />
         </el-form-item>
 

@@ -7,23 +7,6 @@
         </div>
       </template>
 
-      <!-- 搜索和筛选 -->
-      <div class="search-section">
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <el-input
-              v-model="searchKeyword"
-              placeholder="搜索课程名称或教师"
-              clearable
-            >
-              <template #prefix>
-                <el-icon><Search /></el-icon>
-              </template>
-            </el-input>
-          </el-col>
-        </el-row>
-      </div>
-
       <!-- 选修课列表 -->
 
       <el-table
@@ -33,10 +16,9 @@
       >
         <el-table-column prop="id" label="ID" width="80" />
 
-        <el-table-column prop="name" label="课程名称" min-width="150" />
-        <el-table-column prop="semester_name" label="学期" width="200">
-        </el-table-column>
-        <el-table-column prop="teacher_name" label="任课教师" width="150" />
+        <el-table-column prop="name" label="课程名称" min-width="180" />
+        <el-table-column prop="semester_name" label="学期" width="200" />
+        <el-table-column prop="teacher_name" label="任课教师" width="100" />
         <el-table-column label="学习" width="70" align="center">
           <template #default="{ row }">
             {{ row.abilities?.study_ability || 0 }}
@@ -62,7 +44,7 @@
             {{ row.abilities?.responsibility || 0 }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="250" fixed="right">
+        <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
             <el-button
               size="small"
