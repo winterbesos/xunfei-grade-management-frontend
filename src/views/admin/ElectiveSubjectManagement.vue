@@ -4,6 +4,31 @@
       <template #header>
         <div class="card-header">
           <h3>选修课管理</h3>
+          <div class="header-actions">
+            <el-select
+              v-model="selectedSemester"
+              placeholder="请选择学期"
+              style="width: 200px; margin-right: 10px"
+              @change="loadSubjects"
+            >
+              <el-option
+                v-for="item in semesters"
+                :key="item.id"
+                :label="item.academic_year_name + item.term_name"
+                :value="item.semester_id"
+              />
+            </el-select>
+            <el-input
+              v-model="searchKeyword"
+              placeholder="搜索课程名称/教师"
+              style="width: 200px; margin-right: 10px"
+              clearable
+              :prefix-icon="Search"
+            />
+            <el-button type="primary" :icon="Plus" @click="openAddDialog">
+              添加选修课
+            </el-button>
+          </div>
         </div>
       </template>
 
@@ -323,6 +348,7 @@ const allTeachers = ref([]);
 const teacherList = ref([]);
 const teacherLoading = ref(false);
 const semesters = ref([]);
+const selectedSemester = ref("");
 
 // 学生管理相关
 const showStudentDialog = ref(false);
@@ -380,6 +406,10 @@ const loadSemesters = async () => {
     const response = await adminAPI.getSemesters();
     if (response.status === 200) {
       semesters.value = response.data;
+      if (semesters.value.length > 0) {
+        selectedSemester.value = semesters.value[0].semester_id;
+        loadSubjects();
+      }
     }
   } catch (error) {
     console.error("Failed to load semesters:", error);
@@ -387,9 +417,13 @@ const loadSemesters = async () => {
 };
 
 const loadSubjects = async () => {
+  if (!selectedSemester.value) return;
+
   loading.value = true;
   try {
-    const response = await adminAPI.getElectiveSubjects();
+    const response = await adminAPI.getElectiveSubjects({
+      semester_id: selectedSemester.value,
+    });
     if (response.status === 200) {
       allElectiveSubjects.value = response.data;
     }
@@ -733,7 +767,6 @@ const handleImportStudents = (event) => {
 };
 
 onMounted(() => {
-  loadSubjects();
   loadAllTeachers();
   loadSemesters();
 });
