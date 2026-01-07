@@ -25,9 +25,6 @@
               clearable
               :prefix-icon="Search"
             />
-            <el-button type="primary" :icon="Plus" @click="openAddDialog">
-              添加选修课
-            </el-button>
           </div>
         </div>
       </template>
@@ -255,13 +252,14 @@
     >
       <div class="student-dialog-content">
         <!-- 添加学生区域 -->
+        <!--
         <div class="add-student-section">
           <el-select
             v-model="addStudentId"
             filterable
             remote
             reserve-keyword
-            placeholder="搜索学生姓名或学号添加"
+            placeholder="搜索学生姓名"
             :remote-method="searchStudents"
             :loading="searchStudentLoading"
             style="width: 300px; margin-right: 10px"
@@ -274,7 +272,6 @@
             />
           </el-select>
 
-          <!--
           <el-button
             type="primary"
             @click="handleAddStudent"
@@ -295,8 +292,8 @@
             accept=".xlsx,.xls"
             @change="handleImportStudents"
           />
-          -->
         </div>
+          -->
 
         <!-- 学生列表 -->
         <el-table
@@ -305,12 +302,14 @@
           v-loading="studentLoading"
           border
         >
+          <!--
           <el-table-column
             prop="student_id"
             label="学号"
             width="150"
             show-overflow-tooltip
           />
+          -->
           <el-table-column prop="student_name" label="姓名" width="120" />
           <el-table-column prop="class_name" label="班级" min-width="150">
             <template #default="{ row }">

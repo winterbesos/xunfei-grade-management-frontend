@@ -191,9 +191,20 @@ const fetchData = async () => {
     if (res.status === 200) {
       // 假设API返回结构：{ list: [...], statistics: {...} }
       // 或者是一个数组，我们自己计算统计数据
+      let fetchedData = [];
       if (Array.isArray(res.data)) {
-        tableData.value = res.data;
-        // 简单计算统计数据
+        fetchedData = res.data;
+      } else {
+        fetchedData = res.data.list || [];
+      }
+
+      // 按照班级名字排序
+      tableData.value = fetchedData.sort((a, b) =>
+        (a.class_name || "").localeCompare(b.class_name || ""),
+      );
+
+      // 计算统计数据
+      if (Array.isArray(res.data)) {
         const total = tableData.value.length;
         const sum = tableData.value.reduce(
           (acc, cur) =>
@@ -205,7 +216,6 @@ const fetchData = async () => {
           avg_completion: total > 0 ? sum / total : 0,
         };
       } else {
-        tableData.value = res.data.list || [];
         statistics.value = res.data.statistics || {
           total_classes: tableData.value.length,
           avg_completion: 0,

@@ -230,6 +230,8 @@
                   v-model="approveForm.study_ability"
                   :min="0"
                   :max="10"
+                  :precision="0"
+                  :step="1"
                   size="small"
                 />
               </el-form-item>
@@ -240,6 +242,8 @@
                   v-model="approveForm.logical_thinking"
                   :min="0"
                   :max="10"
+                  :precision="0"
+                  :step="1"
                   size="small"
                 />
               </el-form-item>
@@ -250,6 +254,8 @@
                   v-model="approveForm.creativity"
                   :min="0"
                   :max="10"
+                  :precision="0"
+                  :step="1"
                   size="small"
                 />
               </el-form-item>
@@ -260,6 +266,8 @@
                   v-model="approveForm.teamwork"
                   :min="0"
                   :max="10"
+                  :precision="0"
+                  :step="1"
                   size="small"
                 />
               </el-form-item>
@@ -270,6 +278,8 @@
                   v-model="approveForm.responsibility"
                   :min="0"
                   :max="10"
+                  :precision="0"
+                  :step="1"
                   size="small"
                 />
               </el-form-item>

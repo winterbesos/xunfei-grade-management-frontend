@@ -27,6 +27,14 @@
                 }}</el-tag>
               </template>
             </el-table-column>
+            <el-table-column prop="reject_reason" label="拒绝原因">
+              <template #default="{ row }">
+                <span v-if="row.status === 'rejected'">{{
+                  row.reject_reason || "-"
+                }}</span>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
             <el-table-column label="操作" width="100">
               <template #default="{ row }">
                 <el-button
@@ -58,20 +66,17 @@
             <el-table-column prop="award_name" label="荣誉奖项" />
             <el-table-column label="状态">
               <template #default="{ row }">
-                <el-tooltip
-                  v-if="row.status_code === 'rejected' && row.reject_reason"
-                  class="box-item"
-                  effect="dark"
-                  :content="'拒绝原因: ' + row.reject_reason"
-                  placement="top"
-                >
-                  <el-tag :type="getStatusType(row.status_code)">{{
-                    getStatusText(row.status_code)
-                  }}</el-tag>
-                </el-tooltip>
-                <el-tag v-else :type="getStatusType(row.status_code)">{{
+                <el-tag :type="getStatusType(row.status_code)">{{
                   getStatusText(row.status_code)
                 }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="reject_reason" label="拒绝原因">
+              <template #default="{ row }">
+                <span v-if="row.status_code === 'rejected'">{{
+                  row.reject_reason || "-"
+                }}</span>
+                <span v-else>-</span>
               </template>
             </el-table-column>
             <el-table-column label="操作" width="100">

@@ -118,11 +118,19 @@
 
     <!-- 审核对话框 -->
     <el-dialog v-model="dialogVisible" title="审核意见" width="400px">
-      <el-form>
+      <el-form :model="reviewForm" label-width="80px">
         <el-form-item label="处理结果">
           <el-tag :type="reviewStatus === 'approved' ? 'success' : 'danger'">
             {{ reviewStatus === "approved" ? "通过" : "拒绝" }}
           </el-tag>
+        </el-form-item>
+        <el-form-item label="拒绝原因" v-if="reviewStatus === 'rejected'">
+          <el-input
+            v-model="rejectReason"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入拒绝原因"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -151,7 +159,7 @@ const selectedAwards = ref([]);
 const dialogVisible = ref(false);
 const currentAward = ref(null);
 const reviewStatus = ref("");
-const reviewComment = ref("");
+const rejectReason = ref("");
 
 const loadAwards = async () => {
   loading.value = true;
@@ -227,7 +235,7 @@ const getStatusText = (status) => {
 const handleReview = (row, status) => {
   currentAward.value = row;
   reviewStatus.value = status;
-  reviewComment.value = "";
+  rejectReason.value = "";
   dialogVisible.value = true;
 };
 
@@ -238,6 +246,8 @@ const submitReview = async () => {
   try {
     const response = await teacherAPI.reviewAward(currentAward.value.id, {
       approve: reviewStatus.value === "approved",
+      reject_reason:
+        reviewStatus.value === "rejected" ? rejectReason.value : undefined,
     });
 
     if (response.status === 200) {
