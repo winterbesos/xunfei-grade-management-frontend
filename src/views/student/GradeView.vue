@@ -30,13 +30,6 @@
             :precision="1"
           />
         </el-col>
-        <el-col :span="6">
-          <el-statistic
-            title="总学分"
-            :value="statistics.totalCredits"
-            :precision="1"
-          />
-        </el-col>
       </el-row>
 
       <!-- 筛选条件 -->

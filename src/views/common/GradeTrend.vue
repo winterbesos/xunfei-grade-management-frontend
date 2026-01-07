@@ -26,7 +26,6 @@
 import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
 import * as echarts from "echarts";
 import { studentAPI } from "@/api/student";
-import { useAuthStore } from "@/stores/auth";
 import { ElMessage } from "element-plus";
 import { transformGradeTrendData } from "@/utils/gradeTrendTransformer";
 
@@ -97,9 +96,10 @@ const handleResize = () => {
 };
 
 const computeMaxStandardScore = (subjectDatas) => {
-  const items = subjectDatas.map((s) => s.data).flat();
-  const standardScores = items.map((s) => parseInt(s.standard_score));
-  return Math.max(...standardScores, 100);
+  const items = subjectDatas.map((s) => s.data).flat().filter(item => item !== null);
+  if (items.length === 0) return 100;
+  const standardScores = items.map((s) => parseInt(s.standard_score)).filter(score => !isNaN(score));
+  return standardScores.length > 0 ? Math.max(...standardScores, 100) : 100;
 };
 
 const updateChart = () => {

@@ -176,7 +176,8 @@
                 v-model="subjectForm.study_ability"
                 :min="0"
                 :max="10"
-                :step="0.5"
+                :step="1"
+                :precision="0"
                 style="width: 100%"
               />
             </el-form-item>
@@ -187,7 +188,8 @@
                 v-model="subjectForm.logical_thinking"
                 :min="0"
                 :max="10"
-                :step="0.5"
+                :step="1"
+                :precision="0"
                 style="width: 100%"
               />
             </el-form-item>
@@ -198,7 +200,8 @@
                 v-model="subjectForm.creativity"
                 :min="0"
                 :max="10"
-                :step="0.5"
+                :step="1"
+                :precision="0"
                 style="width: 100%"
               />
             </el-form-item>
@@ -209,7 +212,8 @@
                 v-model="subjectForm.teamwork"
                 :min="0"
                 :max="10"
-                :step="0.5"
+                :step="1"
+                :precision="0"
                 style="width: 100%"
               />
             </el-form-item>
@@ -220,7 +224,8 @@
                 v-model="subjectForm.responsibility"
                 :min="0"
                 :max="10"
-                :step="0.5"
+                :step="1"
+                :precision="0"
                 style="width: 100%"
               />
             </el-form-item>
