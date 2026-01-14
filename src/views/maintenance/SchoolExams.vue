@@ -35,10 +35,17 @@
             {{ formatDate(row.updated_at) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150" align="center" fixed="right">
+        <el-table-column label="操作" width="220" align="center" fixed="right">
           <template #default="{ row }">
             <el-button
               type="primary"
+              size="small"
+              @click="handleViewGrades(row)"
+            >
+              查看成绩
+            </el-button>
+            <el-button
+              type="warning"
               size="small"
               @click="handleResync(row)"
               :loading="resyncLoading === row.exam_id"
@@ -85,6 +92,16 @@ const resyncLoading = ref(null);
 
 const goBack = () => {
   router.back();
+};
+
+const handleViewGrades = (row) => {
+  router.push({
+    name: "maintenanceSchoolExamGrades",
+    params: {
+      schoolId: currentSchoolId.value,
+      examId: row.exam_id,
+    },
+  });
 };
 
 const fetchExams = async () => {

@@ -4,11 +4,8 @@
       <template #header>
         <div class="card-header">
           <div class="header-left">
-            <el-button link @click="$router.back()">
-              <el-icon><ArrowLeft /></el-icon>
-              返回
-            </el-button>
-            <h3>学校详情</h3>
+            <el-button @click="$router.back()" :icon="ArrowLeft" circle />
+            <span class="header-title">学校详情</span>
           </div>
         </div>
       </template>
@@ -145,17 +142,19 @@ const fetchSchoolDetails = async (schoolId) => {
 
 .card-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 10px;
 }
 
-.header-left h3 {
-  margin: 0;
+.header-title {
+  margin-left: 10px;
+  font-weight: 600;
+  font-size: 16px;
 }
 
 .detail-content {

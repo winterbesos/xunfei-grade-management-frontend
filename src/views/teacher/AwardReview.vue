@@ -102,6 +102,14 @@
                 }}</el-tag>
               </template>
             </el-table-column>
+            <el-table-column prop="reject_reason" label="拒绝原因">
+              <template #default="{ row }">
+                <span v-if="row.status === 'rejected'">{{
+                  row.reject_reason || "-"
+                }}</span>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
             <el-table-column label="操作" width="200" fixed="right">
               <template #default>
                 <span class="processed-text">已处理</span>
@@ -118,7 +126,7 @@
 
     <!-- 审核对话框 -->
     <el-dialog v-model="dialogVisible" title="审核意见" width="400px">
-      <el-form :model="reviewForm" label-width="80px">
+      <el-form label-width="80px">
         <el-form-item label="处理结果">
           <el-tag :type="reviewStatus === 'approved' ? 'success' : 'danger'">
             {{ reviewStatus === "approved" ? "通过" : "拒绝" }}

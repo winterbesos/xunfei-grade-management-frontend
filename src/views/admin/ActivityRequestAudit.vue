@@ -41,7 +41,7 @@
         :data="requestList"
         v-loading="loading"
         style="width: 100%"
-        border
+        stripe
       >
         <el-table-column prop="student_name" label="学生姓名" width="120" />
         <el-table-column prop="student_class" label="班级" width="150" />
@@ -70,6 +70,14 @@
             <el-tag :type="getStatusType(row.status_code)">
               {{ getStatusText(row.status_code) }}
             </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="reject_reason" label="拒绝原因">
+          <template #default="{ row }">
+            <span v-if="row.status_code === 'rejected'">{{
+              row.reject_reason || "-"
+            }}</span>
+            <span v-else>-</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="200" fixed="right">

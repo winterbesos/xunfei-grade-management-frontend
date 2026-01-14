@@ -237,4 +237,20 @@ export const maintenanceAPI = {
       method: "post",
     });
   },
+
+  // 获取考试成绩列表
+  async getSchoolExamGrades(schoolId, examId) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/exams/${examId}/grades`,
+      method: "get",
+    });
+  },
+
+  // 获取单个考试详情
+  async getSchoolExamDetails(schoolId, examId) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/exams/${examId}`,
+      method: "get",
+    });
+  },
 };
