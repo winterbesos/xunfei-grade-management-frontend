@@ -49,6 +49,7 @@
               size="small"
               @click="handleResync(row)"
               :loading="resyncLoading === row.exam_id"
+              v-if="row.source === 1"
             >
               重新同步
             </el-button>
