@@ -89,18 +89,8 @@
           min-width="120"
           sortable
         />
-        <el-table-column
-          prop="year_name"
-          label="年级"
-          width="100"
-          sortable
-        />
-        <el-table-column
-          prop="class_name"
-          label="班级"
-          width="100"
-          sortable
-        />
+        <el-table-column prop="year_name" label="年级" width="100" sortable />
+        <el-table-column prop="class_name" label="班级" width="100" sortable />
         <el-table-column
           prop="subject_name"
           label="科目"
@@ -230,7 +220,14 @@
         </el-table-column>
       </el-table>
       <div v-if="importing" class="mt-4">
-        <div class="progress-info mb-2" style="display: flex; justify-content: space-between; align-items: center;">
+        <div
+          class="progress-info mb-2"
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
           <span>导入进度</span>
           <span>{{ currentImportIndex }} / {{ totalImportCount }}</span>
         </div>
@@ -246,7 +243,11 @@
           <el-button @click="importDialogVisible = false" :disabled="importing">
             取消
           </el-button>
-          <el-button type="danger" @click="cancelImportProcess" v-if="importing">
+          <el-button
+            type="danger"
+            @click="cancelImportProcess"
+            v-if="importing"
+          >
             停止导入
           </el-button>
           <el-button
@@ -335,14 +336,16 @@ const filterGrades = () => {
 
   // 科目筛选
   if (selectedSubject.value) {
-    result = result.filter((item) => item.subject_name === selectedSubject.value);
+    result = result.filter(
+      (item) => item.subject_name === selectedSubject.value,
+    );
   }
 
   // 搜索筛选
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
     result = result.filter((item) =>
-      item.student_name.toLowerCase().includes(query)
+      item.student_name.toLowerCase().includes(query),
     );
   }
 
@@ -371,14 +374,14 @@ const handleExport = () => {
 
   exportLoading.value = true;
   try {
-      const dataToExport = filteredGrades.value.map((item) => ({
-        姓名: item.student_name,
-        年级: item.year_name,
-        班级: item.class_name,
-        科目: item.subject_name,
-        试卷名称: item.topic_set_name,
-        原始分: item.score,
-    
+    const dataToExport = filteredGrades.value.map((item) => ({
+      姓名: item.student_name,
+      年级: item.year_name,
+      班级: item.class_name,
+      科目: item.subject_name,
+      试卷名称: item.topic_set_name,
+      原始分: item.score,
+
       标准分: item.standard_score,
       班级排名: item.class_rank,
       年级排名: item.school_rank,
@@ -477,23 +480,30 @@ const submitImport = async () => {
   let failCount = 0;
   const total = totalImportCount.value;
 
-  // Process rows one by one
-  for (let i = 0; i < total; i++) {
-    if (isImportCancelled.value) {
-      ElMessage.info("导入已取消");
-      break;
-    }
+  const CONCURRENCY_LIMIT = 5;
+  const pool = [];
 
-    currentImportIndex.value = i + 1;
-    const row = importData.value[i];
-    // Skip already successful ones if any (though we remove them)
+  // Store results in a temporary Map to avoid frequent reactive updates
+  const resultsMap = new Map(); // index -> { status, error }
+  let completedCount = 0;
+
+  // Flush updates to UI every 100ms
+
+  const updateInterval = setInterval(() => {
+    currentImportIndex.value = completedCount;
+    importProgress.value = Math.floor((completedCount / total) * 100);
+  }, 1000);
+
+  const processRow = async (row, index) => {
+    if (isImportCancelled.value) return;
+
+    // Skip already successful ones
     if (row._status === "success") {
-      importProgress.value = Math.floor(((i + 1) / total) * 100);
-      continue;
+      completedCount++;
+      return;
     }
 
     try {
-      // Prepare request payload
       const payload = {
         year_name: row.year_name,
         class_name: row.class_name,
@@ -508,20 +518,64 @@ const submitImport = async () => {
       };
 
       await adminAPI.addOriginExamGrade(examId, payload);
-      row._status = "success";
-      row._error = "";
+      resultsMap.set(index, { status: "success", error: "" });
       successCount++;
     } catch (error) {
-      row._status = "error";
-      row._error = error.response?.data?.detail || "提交失败";
+      resultsMap.set(index, {
+        status: "error",
+        error: error.response?.data?.detail || "提交失败",
+      });
       failCount++;
+    } finally {
+      completedCount++;
     }
-    importProgress.value = Math.floor(((i + 1) / total) * 100);
+  };
+
+  for (let i = 0; i < total; i++) {
+    if (isImportCancelled.value) {
+      ElMessage.info("导入已取消");
+      break;
+    }
+
+    const row = importData.value[i];
+    const p = processRow(row, i);
+
+    // Attach cleanup to promise
+    const pWithCleanup = p.then(() => {
+      const idx = pool.indexOf(pWithCleanup);
+      if (idx > -1) pool.splice(idx, 1);
+    });
+
+    pool.push(pWithCleanup);
+
+    // If pool size reaches limit, wait for one to finish
+    if (pool.length >= CONCURRENCY_LIMIT) {
+      await Promise.race(pool);
+    }
   }
+
+  // Wait for remaining tasks
+  await Promise.all(pool);
+
+  // Clear interval
+  clearInterval(updateInterval);
+
+  // Final flush: Apply all statuses to rows
+  resultsMap.forEach((result, index) => {
+    const row = importData.value[index];
+    if (row) {
+      row._status = result.status;
+      row._error = result.error;
+    }
+  });
+
+  // Final progress update
+  currentImportIndex.value = completedCount;
+  importProgress.value = Math.floor((completedCount / total) * 100);
 
   // Remove successful rows
   importData.value = importData.value.filter(
-    (item) => item._status !== "success"
+    (item) => item._status !== "success",
   );
 
   importing.value = false;
@@ -538,7 +592,7 @@ const submitImport = async () => {
     fetchGrades(); // Refresh list
   } else {
     ElMessage.warning(
-      `导入完成：成功 ${successCount} 条，失败 ${failCount} 条。请检查失败项并重试。`
+      `导入完成：成功 ${successCount} 条，失败 ${failCount} 条。请检查失败项并重试。`,
     );
     fetchGrades(); // Refresh list to show successful ones
   }
