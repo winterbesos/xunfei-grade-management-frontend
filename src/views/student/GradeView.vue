@@ -69,12 +69,27 @@
             <span>{{ row.academic_year_name }}{{ row.term_name }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="score" label="成绩" width="100" align="center">
+        <el-table-column label="平时成绩" width="100" align="center">
+          <template #default="{ row }">
+            {{ formatReportGrade(row.usual_score, row.grades_type) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="期中成绩" width="100" align="center">
+          <template #default="{ row }">
+            {{ formatReportGrade(row.midterm_score, row.grades_type) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="期末成绩" width="100" align="center">
+          <template #default="{ row }">
+            {{ formatReportGrade(row.finalterm_score, row.grades_type) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="score" label="总成绩" width="100" align="center">
           <template #default="{ row }">
             <span
               :style="{ color: getScoreColor(row.score), fontWeight: 'bold' }"
             >
-              {{ row.score !== null ? row.score : "-" }}
+              {{ formatReportGrade(row.score, row.grades_type) }}
             </span>
           </template>
         </el-table-column>
@@ -111,6 +126,7 @@ import { ref, computed, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 import { studentAPI } from "@/api/student";
 import GradeTrend from "@/views/common/GradeTrend.vue";
+import { formatReportGrade } from "@/utils/grades";
 
 const loading = ref(false);
 const semesters = ref([]);
