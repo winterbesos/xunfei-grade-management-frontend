@@ -322,4 +322,62 @@ export const adminAPI = {
       data: { reject_reason: reason },
     });
   },
+
+  // 获取学期下的考试列表
+  getSemesterExams(semesterId) {
+    return request({
+      url: `/api/admin/semesters/${semesterId}/exams`,
+      method: "get",
+    });
+  },
+
+  // 创建学期考试
+  createSemesterExam(semesterId, data) {
+    return request({
+      url: `/api/admin/semesters/${semesterId}/exams`,
+      method: "post",
+      data,
+    });
+  },
+
+  // 重新同步考试
+  resyncExamEvents(examId) {
+    return request({
+      url: `/api/admin/exams/${examId}/resync-events`,
+      method: "post",
+    });
+  },
+
+  // 获取考试成绩
+  getExamGrades(examId) {
+    return request({
+      url: `/api/admin/exams/${examId}/grades`,
+      method: "get",
+    });
+  },
+
+  // 获取考试详情
+  getExamDetails(examId) {
+    return request({
+      url: `/api/admin/exams/${examId}`,
+      method: "get",
+    });
+  },
+
+  // 删除考试
+  deleteExam(examId) {
+    return request({
+      url: `/api/admin/exams/${examId}`,
+      method: "delete",
+    });
+  },
+
+  // 导入原始成绩
+  addOriginExamGrade(examId, data) {
+    return request({
+      url: `/api/admin/origin-exams/${examId}/grades`,
+      method: "post",
+      data,
+    });
+  },
 };

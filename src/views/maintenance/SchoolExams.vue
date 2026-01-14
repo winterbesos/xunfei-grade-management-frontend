@@ -30,6 +30,11 @@
         <el-table-column prop="exam_name" label="考试名称" min-width="200" />
         <el-table-column prop="exam_type_name" label="考试类型" width="150" />
         <el-table-column prop="semester_name" label="学期" width="200" />
+        <el-table-column prop="source" label="成绩来源" width="120">
+          <template #default="{ row }">
+            {{ row.source === 1 ? '智学网' : '手动维护' }}
+          </template>
+        </el-table-column>
         <el-table-column prop="updated_at" label="最后同步时间" width="180">
           <template #default="{ row }">
             {{ formatDate(row.updated_at) }}

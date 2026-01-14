@@ -52,6 +52,7 @@
               :value="item"
             />
           </el-select>
+          <el-button type="primary" @click="handleExport"> 导出成绩 </el-button>
         </el-space>
       </div>
 
@@ -73,6 +74,11 @@
           label="科目"
           width="150"
           sortable
+        />
+        <el-table-column
+          prop="topic_set_name"
+          label="试卷名称"
+          min-width="150"
         />
         <el-table-column prop="score" label="原始分" width="120" sortable />
         <el-table-column
@@ -104,6 +110,7 @@ import { useRoute, useRouter } from "vue-router";
 import { maintenanceAPI } from "@/api/maintenance";
 import { ElMessage } from "element-plus";
 import { Search, ArrowLeft } from "@element-plus/icons-vue";
+import * as XLSX from "xlsx";
 
 const route = useRoute();
 const router = useRouter();
@@ -186,6 +193,30 @@ const subjectFilters = computed(() => {
 
 const filterSubject = (value, row) => {
   return row.subject_name === value;
+};
+
+const handleExport = () => {
+  if (filteredGrades.value.length === 0) {
+    ElMessage.warning("暂无数据可导出");
+    return;
+  }
+
+  const dataToExport = filteredGrades.value.map((item) => ({
+    姓名: item.student_name,
+    科目: item.subject_name,
+    试卷名称: item.topic_set_name,
+    原始分: item.score,
+    标准分: item.standard_score,
+    班级排名: item.class_rank,
+    年级排名: item.school_rank,
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(dataToExport);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "成绩列表");
+
+  const fileName = `${examDetails.value?.exam_name || "考试"}成绩.xlsx`;
+  XLSX.writeFile(wb, fileName);
 };
 
 onMounted(() => {

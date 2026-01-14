@@ -17,7 +17,6 @@
         <el-table-column prop="semester_name" label="学期名称" min-width="300">
           <template #default="{ row }">
             {{ row.academic_year_name }} {{ row.term_name }}
-            {{ row.semester_name }}
           </template>
         </el-table-column>
         <el-table-column prop="begin_time" label="开始时间" width="200">
@@ -55,8 +54,16 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="220" fixed="right">
+        <el-table-column label="操作" width="280" fixed="right">
           <template #default="{ row }">
+            <el-button
+              type="primary"
+              size="small"
+              link
+              @click="handleViewExams(row)"
+            >
+              考试信息
+            </el-button>
             <el-button
               type="primary"
               size="small"
@@ -169,6 +176,13 @@ const handleSetScoringTime = (row) => {
 const handleScoringCompletion = (row) => {
   router.push({
     name: "AdminScoringCompletion",
+    params: { semesterId: row.semester_id },
+  });
+};
+
+const handleViewExams = (row) => {
+  router.push({
+    name: "AdminSemesterExams",
     params: { semesterId: row.semester_id },
   });
 };

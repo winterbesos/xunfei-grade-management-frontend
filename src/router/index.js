@@ -35,6 +35,18 @@ const routes = [
         meta: { requiresAuth: true, roles: ["admin"] },
       },
       {
+        path: "/admin/semesters/:semesterId/exams",
+        name: "AdminSemesterExams",
+        component: () => import("@/views/admin/SemesterExams.vue"),
+        meta: { requiresAuth: true, roles: ["admin"] },
+      },
+      {
+        path: "/admin/semesters/:semesterId/exams/:examId/grades",
+        name: "AdminSemesterExamGrades",
+        component: () => import("@/views/admin/SemesterExamGrades.vue"),
+        meta: { requiresAuth: true, roles: ["admin"] },
+      },
+      {
         path: "/admin/classes",
         name: "AdminClasses",
         component: () => import("@/views/admin/ClassManagement.vue"),
