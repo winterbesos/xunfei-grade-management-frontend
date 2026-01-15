@@ -130,6 +130,9 @@
       title="导入成绩预览"
       width="90%"
       :close-on-click-modal="false"
+      :close-on-press-escape="!importing"
+      :show-close="!importing"
+      :before-close="handleBeforeClose"
       destroy-on-close
     >
       <div class="mb-4">
@@ -458,6 +461,14 @@ const handleFileChange = (e) => {
     fileInput.value.value = "";
   };
   reader.readAsArrayBuffer(file);
+};
+
+const handleBeforeClose = (done) => {
+  if (importing.value) {
+    ElMessage.warning("正在导入中，请勿关闭窗口");
+    return;
+  }
+  done();
 };
 
 const removeImportRow = (index) => {
