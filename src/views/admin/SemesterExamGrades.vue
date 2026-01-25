@@ -52,6 +52,10 @@
               :value="item"
             />
           </el-select>
+
+          <el-button @click="handleDownloadTemplate" type="info" link>
+            下载导入模板
+          </el-button>
           <el-button
             type="primary"
             @click="handleExport"
@@ -367,6 +371,20 @@ const subjectFilters = computed(() => {
 
 const filterSubject = (value, row) => {
   return row.subject_name === value;
+};
+
+// 下载导入模板
+const handleDownloadTemplate = () => {
+  const headers = ["姓名", "年级", "班级", "科目", "试卷名称", "原始分", "标准分", "班级排名", "年级排名"];
+  const sampleData = [
+    ["张三", "高一", "6班", "语文", "2023-2024学年第一学期考试", "85", "100", "28", "48"],
+  ];
+  const data = [headers, ...sampleData];
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "导入模板");
+  XLSX.writeFile(wb, "考试成绩导入模板.xlsx");
 };
 
 const handleExport = () => {
