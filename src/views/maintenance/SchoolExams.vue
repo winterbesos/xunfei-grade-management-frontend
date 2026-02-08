@@ -12,6 +12,7 @@
       <template #header>
         <div class="card-header">
           <span>考试列表</span>
+          <el-button type="primary" @click="openImportDialog">导入考试ID</el-button>
         </div>
       </template>
 
@@ -67,11 +68,68 @@
         description="暂无考试数据"
       />
     </el-card>
+
+    <!-- 导入考试ID对话框 -->
+    <el-dialog
+      v-model="importDialogVisible"
+      title="导入考试ID"
+      width="500px"
+      @close="resetImportForm"
+    >
+      <el-form
+        ref="importFormRef"
+        :model="importForm"
+        :rules="importRules"
+        label-width="100px"
+      >
+        <el-form-item label="学期" prop="semesterId">
+          <el-select
+            v-model="importForm.semesterId"
+            placeholder="请选择学期"
+            style="width: 100%"
+            v-loading="semesterLoading"
+          >
+            <el-option
+              v-for="s in semesterList"
+              :key="s.semester_id"
+              :label="s.academic_year_name + s.term_name"
+              :value="s.semester_id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="考试ID" prop="examId">
+          <el-input v-model="importForm.examId" placeholder="请输入考试ID" />
+        </el-form-item>
+        <el-form-item label="考试类型" prop="examType">
+          <el-select
+            v-model="importForm.examType"
+            placeholder="请选择考试类型"
+            style="width: 100%"
+          >
+            <el-option label="月考" :value="3" />
+            <el-option label="期中考试" :value="1" />
+            <el-option label="期末考试" :value="2" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="importDialogVisible = false">取消</el-button>
+          <el-button
+            type="primary"
+            @click="handleImportExam"
+            :loading="importLoading"
+          >
+            确定
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { maintenanceAPI } from "@/api/maintenance";
 import { ElMessage, ElMessageBox } from "element-plus";
@@ -95,6 +153,23 @@ const currentSchoolId = computed(() => props.schoolId || route.params.schoolId);
 const loading = ref(false);
 const examList = ref([]);
 const resyncLoading = ref(null);
+
+// 导入考试ID对话框相关
+const importDialogVisible = ref(false);
+const importLoading = ref(false);
+const semesterLoading = ref(false);
+const semesterList = ref([]);
+const importFormRef = ref(null);
+const importForm = reactive({
+  semesterId: null,
+  examId: "",
+  examType: null,
+});
+const importRules = {
+  semesterId: [{ required: true, message: "请选择学期", trigger: "change" }],
+  examId: [{ required: true, message: "请输入考试ID", trigger: "blur" }],
+  examType: [{ required: true, message: "请选择考试类型", trigger: "change" }],
+};
 
 const goBack = () => {
   router.back();
@@ -163,6 +238,77 @@ const handleResync = async (row) => {
   } finally {
     resyncLoading.value = null;
   }
+};
+
+const loadSemesters = async () => {
+  semesterLoading.value = true;
+  try {
+    const res = await maintenanceAPI.getSchoolSemesters(currentSchoolId.value);
+    if (res.status === 200) {
+      if (Array.isArray(res.data)) {
+        semesterList.value = res.data;
+      } else if (res.data && Array.isArray(res.data.list)) {
+        semesterList.value = res.data.list;
+      } else if (res.data && Array.isArray(res.data.semesters)) {
+        semesterList.value = res.data.semesters;
+      } else {
+        semesterList.value = [];
+      }
+    } else {
+      ElMessage.error("获取学期列表失败");
+    }
+  } catch (error) {
+    console.error("Failed to fetch semesters:", error);
+    ElMessage.error("获取学期列表失败");
+  } finally {
+    semesterLoading.value = false;
+  }
+};
+
+const openImportDialog = () => {
+  importDialogVisible.value = true;
+  if (semesterList.value.length === 0) {
+    loadSemesters();
+  }
+};
+
+const resetImportForm = () => {
+  importForm.semesterId = null;
+  importForm.examId = "";
+  importForm.examType = null;
+  if (importFormRef.value) {
+    importFormRef.value.resetFields();
+  }
+};
+
+const handleImportExam = async () => {
+  if (!importFormRef.value) return;
+
+  await importFormRef.value.validate(async (valid) => {
+    if (!valid) return;
+
+    importLoading.value = true;
+    try {
+      const res = await maintenanceAPI.syncSemesterExamGrades(
+        currentSchoolId.value,
+        importForm.semesterId,
+        importForm.examId,
+        importForm.examType,
+      );
+      if (res.status === 200) {
+        ElMessage.success("考试成绩同步任务已提交");
+        importDialogVisible.value = false;
+        fetchExams();
+      } else {
+        ElMessage.error("导入失败");
+      }
+    } catch (error) {
+      console.error("Import exam error:", error);
+      ElMessage.error("导入操作失败");
+    } finally {
+      importLoading.value = false;
+    }
+  });
 };
 
 onMounted(() => {
