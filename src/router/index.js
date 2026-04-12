@@ -303,6 +303,24 @@ const routes = [
         component: () => import("@/views/maintenance/SemesterManagement.vue"),
         meta: { requiresAuth: true, roles: ["maintenance"] },
       },
+      {
+        path: "/maintenance/historical-import",
+        name: "maintenanceHistoricalImport",
+        component: () => import("@/views/maintenance/HistoricalImport.vue"),
+        meta: { requiresAuth: true, roles: ["maintenance"] },
+      },
+      {
+        path: "/maintenance/historical-import/:semesterId/exams",
+        name: "maintenanceHistoricalExams",
+        component: () => import("@/views/maintenance/HistoricalExams.vue"),
+        meta: { requiresAuth: true, roles: ["maintenance"] },
+      },
+      {
+        path: "/maintenance/historical-import/:semesterId/exams/:examId",
+        name: "maintenanceHistoricalExamDetail",
+        component: () => import("@/views/maintenance/HistoricalExamDetail.vue"),
+        meta: { requiresAuth: true, roles: ["maintenance"] },
+      },
     ],
   },
   {

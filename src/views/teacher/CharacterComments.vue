@@ -127,6 +127,24 @@
           </template>
         </el-table-column>
 
+        <el-table-column label="等第" width="120">
+          <template #default="{ row }">
+            <el-select
+              v-model="row.grade"
+              placeholder="请选择"
+              clearable
+              @change="row.modified = true"
+            >
+              <el-option
+                v-for="opt in gradeOptions"
+                :key="opt"
+                :label="opt"
+                :value="opt"
+              />
+            </el-select>
+          </template>
+        </el-table-column>
+
         <el-table-column label="品格评语" min-width="220">
           <template #default="{ row }">
             <el-input
@@ -174,21 +192,8 @@ const fileInput = ref(null);
 
 const gradeOptions = ["A", "B", "C", "D", "E"];
 
-const gradeMap = {
-  A: 5,
-  B: 4,
-  C: 3,
-  D: 2,
-  E: 1,
-};
-
-const scoreMap = {
-  5: "A",
-  4: "B",
-  3: "C",
-  2: "D",
-  1: "E",
-};
+const gradeMap = { A: 5, B: 4, C: 3, D: 2, E: 1 };
+const scoreMap = { 5: "A", 4: "B", 3: "C", 2: "D", 1: "E" };
 
 // 导出 Excel (XLSX)
 const handleExport = () => {
@@ -404,7 +409,7 @@ const handleSaveSingle = async (row) => {
           {
             student_id: row.student_id,
             comment: row.comment,
-            grade: gradeMap[row.grade] || row.grade,
+            grade: gradeMap[row.grade] ?? null,
             abilities: row.abilities,
           },
         ],
@@ -464,7 +469,7 @@ const handleBatchSave = async () => {
           {
             student_id: row.student_id,
             comment: row.comment,
-            grade: gradeMap[row.grade] || row.grade,
+            grade: gradeMap[row.grade] ?? null,
             abilities: row.abilities,
           },
         ],

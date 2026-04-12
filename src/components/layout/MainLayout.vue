@@ -87,6 +87,7 @@
             <el-icon><School /></el-icon>
             <template #title>学校管理</template>
           </el-menu-item>
+
         </template>
       </el-menu>
     </el-aside>

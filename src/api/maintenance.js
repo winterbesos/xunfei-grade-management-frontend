@@ -253,4 +253,65 @@ export const maintenanceAPI = {
       method: "get",
     });
   },
+
+  // ==================== 历史成绩导入 ====================
+
+  getHistoricalSemesters(schoolId) {
+    return request({
+      url: "/api/maintenance/historical/semesters",
+      method: "get",
+      params: schoolId ? { school_id: schoolId } : {},
+    });
+  },
+  createHistoricalSemester(data) {
+    return request({ url: "/api/maintenance/historical/semesters", method: "post", data });
+  },
+  updateHistoricalSemester(semesterId, data) {
+    return request({ url: `/api/maintenance/historical/semesters/${semesterId}`, method: "put", data });
+  },
+  deleteHistoricalSemester(semesterId) {
+    return request({ url: `/api/maintenance/historical/semesters/${semesterId}`, method: "delete" });
+  },
+
+  getHistoricalExams(semesterId) {
+    return request({ url: `/api/maintenance/historical/semesters/${semesterId}/exams`, method: "get" });
+  },
+  createHistoricalExam(semesterId, data) {
+    return request({ url: `/api/maintenance/historical/semesters/${semesterId}/exams`, method: "post", data });
+  },
+  updateHistoricalExam(examId, data) {
+    return request({ url: `/api/maintenance/historical/exams/${examId}`, method: "put", data });
+  },
+  deleteHistoricalExam(examId) {
+    return request({ url: `/api/maintenance/historical/exams/${examId}`, method: "delete" });
+  },
+
+  downloadHistoricalTemplate(examId) {
+    return request({
+      url: `/api/maintenance/historical/exams/${examId}/template`,
+      method: "get",
+      responseType: "blob",
+    });
+  },
+  importHistoricalGrades(examId, formData) {
+    return request({
+      url: `/api/maintenance/historical/exams/${examId}/grades`,
+      method: "post",
+      data: formData,
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+  getHistoricalImportLogs(examId) {
+    return request({ url: `/api/maintenance/historical/exams/${examId}/grade-imports`, method: "get" });
+  },
+  getHistoricalImportLogDetail(logId) {
+    return request({ url: `/api/maintenance/historical/grade-imports/${logId}`, method: "get" });
+  },
+  exportHistoricalImportReport(logId) {
+    return request({
+      url: `/api/maintenance/historical/grade-imports/${logId}/report`,
+      method: "get",
+      responseType: "blob",
+    });
+  },
 };

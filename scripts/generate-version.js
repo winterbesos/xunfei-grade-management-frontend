@@ -21,7 +21,7 @@ try {
 
   // 生成 .env.production 文件
   const envContent = `# API 基础 URL
-VITE_API_BASE_URL=https://grades-api.xsalo.com
+VITE_API_BASE_URL=https://api.hkyugang.cn
 
 VITE_SHOW_VERSION=false
 VITE_SHOW_PASSWORD_LOGIN=false
