@@ -389,12 +389,21 @@ export const adminAPI = {
     });
   },
 
-  // 批量删除原始成绩
+  // 批量删除原始成绩（保留作为底层能力，前端不再调用，v1.2.2）
   batchDeleteOriginGrades(gradeIds) {
     return request({
       url: `/api/admin/origin-grades/batch-delete`,
       method: "post",
       data: { grade_ids: gradeIds },
+    });
+  },
+
+  // 清空指定考试下的全部 OriginGrade（v1.2.2）
+  clearExamOriginGrades(examId) {
+    return request({
+      url: `/api/admin/exams/${encodeURIComponent(examId)}/origin-grades/clear`,
+      method: "post",
+      timeout: 60000, // 大考试可能较慢，前端单独放宽到 60s
     });
   },
 };

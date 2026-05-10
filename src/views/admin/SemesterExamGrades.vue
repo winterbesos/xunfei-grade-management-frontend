@@ -70,6 +70,22 @@
           >
             导入成绩
           </el-button>
+          <el-tooltip
+            :content="notDeletableHint"
+            :disabled="canDelete"
+            placement="top"
+          >
+            <span>
+              <el-button
+                type="danger"
+                :disabled="!canDelete || gradeList.length === 0"
+                :loading="clearing"
+                @click="handleClear"
+              >
+                {{ gradeList.length === 0 ? "无可清空成绩" : `清空（共 ${gradeList.length} 条）` }}
+              </el-button>
+            </span>
+          </el-tooltip>
           <input
             type="file"
             ref="fileInput"
@@ -80,29 +96,6 @@
         </el-space>
       </div>
 
-      <div class="batch-toolbar mb-4">
-        <span class="selected-count">已选 {{ selectedRows.length }} 条</span>
-        <el-tooltip
-          :content="notDeletableHint"
-          :disabled="canDelete"
-          placement="top"
-        >
-          <span>
-            <el-button
-              type="danger"
-              :disabled="!canDelete || selectedRows.length === 0 || selectedRows.length > BATCH_LIMIT"
-              :loading="batchDeleting"
-              @click="handleBatchDelete"
-            >
-              批量删除（已选 {{ selectedRows.length }} 条）
-            </el-button>
-          </span>
-        </el-tooltip>
-        <span v-if="selectedRows.length > BATCH_LIMIT" class="batch-warning">
-          单次最多删除 {{ BATCH_LIMIT }} 条，请减少选中后再操作
-        </span>
-      </div>
-
       <el-table
         ref="tableRef"
         :data="filteredGrades"
@@ -111,9 +104,7 @@
         stripe
         border
         :row-key="(row) => row.grade_id"
-        @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="55" :selectable="(row) => !!row.grade_id && canDelete" />
         <el-table-column
           prop="student_name"
           label="姓名"
@@ -340,8 +331,6 @@ import { ElMessage, ElMessageBox, ElLoading } from "element-plus";
 import { Search, ArrowLeft, Delete } from "@element-plus/icons-vue";
 import * as XLSX from "xlsx";
 
-const BATCH_LIMIT = 200;
-
 const route = useRoute();
 const router = useRouter();
 
@@ -367,9 +356,8 @@ const totalImportCount = ref(0);
 
 // 删除相关
 const tableRef = ref(null);
-const selectedRows = ref([]);
 const singleDeletingId = ref(null);
-const batchDeleting = ref(false);
+const clearing = ref(false);
 
 const examTypeName = computed(() => {
   const t = examDetails.value?.exam_type;
@@ -388,17 +376,6 @@ const singleDeleteTitle = computed(() => {
     ? `${base}\n该考试为${examTypeName.value}成绩，对应内部综合成绩将被重新计算。删除后无法恢复。`
     : `${base}\n删除后无法恢复。`;
 });
-
-const handleSelectionChange = (rows) => {
-  selectedRows.value = rows || [];
-};
-
-const clearTableSelection = () => {
-  if (tableRef.value && typeof tableRef.value.clearSelection === "function") {
-    tableRef.value.clearSelection();
-  }
-  selectedRows.value = [];
-};
 
 const goBack = () => {
   router.back();
@@ -454,8 +431,6 @@ const filterGrades = () => {
   }
 
   filteredGrades.value = result;
-  // 切筛选条件时清空选中（PRD §4.1 reserveSelection=false 行为）
-  clearTableSelection();
 };
 
 const handleSingleDelete = async (row) => {
@@ -475,83 +450,65 @@ const handleSingleDelete = async (row) => {
   }
 };
 
-const handleBatchDelete = async () => {
-  const rows = selectedRows.value;
-  if (rows.length === 0) return;
-  if (rows.length > BATCH_LIMIT) {
-    ElMessage.warning(`单次最多删除 ${BATCH_LIMIT} 条`);
-    return;
-  }
+const handleClear = async () => {
+  if (!canDelete.value) return;
+  const N = gradeList.value.length;
+  if (N === 0) return;
 
-  const ids = rows.map((r) => r.grade_id).filter(Boolean);
-  if (ids.length === 0) {
-    ElMessage.warning("选中行缺少 grade_id");
-    return;
-  }
-  const N = ids.length;
-  // 本页所有行共享同一 exam_type，X = 期中/期末场景下选中条数
   const examType = examDetails.value?.exam_type;
   const X = examType === 1 || examType === 2 ? N : 0;
-  // Y = 受影响 Grade 行数（按学生+学科+学期去重）
   const Y = X > 0
-    ? new Set(rows.map((r) => `${r.student_id}|${r.subject_code}`)).size
+    ? new Set(gradeList.value.map((r) => `${r.student_id}|${r.subject_code}`)).size
     : 0;
 
   const message =
     X > 0
-      ? `确认删除选中的 ${N} 条成绩？\n其中 ${X} 条为期中/期末成绩，将触发 ${Y} 名学生的综合成绩重新计算。\n删除后无法恢复。`
-      : `确认删除选中的 ${N} 条成绩？\n删除后无法恢复。`;
+      ? `确认清空当前考试的全部 ${N} 条成绩？\n其中 ${X} 条为期中/期末成绩，将触发 ${Y} 名学生的综合成绩重新计算。\n删除后无法恢复。`
+      : `确认清空当前考试的全部 ${N} 条成绩？\n删除后无法恢复。`;
 
   try {
-    await ElMessageBox.confirm(message, "批量删除", {
-      confirmButtonText: "确认删除",
+    await ElMessageBox.confirm(message, "清空成绩", {
+      confirmButtonText: "清空",
       confirmButtonClass: "el-button--danger",
       cancelButtonText: "取消",
       type: "warning",
-      dangerouslyUseHTMLString: false,
     });
   } catch {
     return; // 用户取消
   }
 
-  batchDeleting.value = true;
+  clearing.value = true;
   try {
-    const res = await adminAPI.batchDeleteOriginGrades(ids);
+    const res = await adminAPI.clearExamOriginGrades(examId);
     const data = res.data || {};
     const total = data.total || 0;
     const successCount = data.success_count || 0;
     const failCount = data.fail_count || 0;
+    const failedIds = data.failed_grade_ids || [];
 
     if (failCount === 0) {
-      ElMessage.success(`已删除 ${successCount} 条成绩`);
-      clearTableSelection();
+      ElMessage.success(`已清空 ${successCount} 条成绩`);
       await fetchGrades();
     } else if (successCount === 0) {
-      ElMessage.error(`全部 ${total} 条删除失败`);
+      ElMessage.error(`全部 ${total} 条清空失败`);
     } else {
-      const failItems = (data.results || []).filter((r) => r.status === "fail");
-      const failHtml = failItems
-        .slice(0, 30)
-        .map((r) => `<li>${r.grade_id}: ${r.reason || "未知原因"}</li>`)
-        .join("");
-      const more = failItems.length > 30 ? `<p>仅显示前 30 项，共 ${failItems.length} 项失败</p>` : "";
+      const failHtml = failedIds.map((id) => `<li>${id}</li>`).join("");
+      const more = failCount > failedIds.length
+        ? `<p>仅显示前 ${failedIds.length} 项，共 ${failCount} 项失败</p>`
+        : "";
       try {
         await ElMessageBox.alert(
           `<p>成功 ${successCount} 条，失败 ${failCount} 条。</p><ul>${failHtml}</ul>${more}`,
-          "批量删除部分成功",
-          {
-            dangerouslyUseHTMLString: true,
-            confirmButtonText: "知道了",
-          },
+          "清空部分成功",
+          { dangerouslyUseHTMLString: true, confirmButtonText: "知道了" },
         );
       } catch {}
-      clearTableSelection();
       await fetchGrades();
     }
   } catch (e) {
     // axios interceptor 已弹错误 toast
   } finally {
-    batchDeleting.value = false;
+    clearing.value = false;
   }
 };
 
@@ -855,19 +812,4 @@ onMounted(() => {
   margin-bottom: 20px;
 }
 
-.batch-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.batch-toolbar .selected-count {
-  color: var(--el-text-color-regular);
-  font-size: 14px;
-}
-
-.batch-toolbar .batch-warning {
-  color: var(--el-color-danger);
-  font-size: 13px;
-}
 </style>
