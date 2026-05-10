@@ -380,4 +380,21 @@ export const adminAPI = {
       data,
     });
   },
+
+  // 单条删除原始成绩
+  deleteOriginGrade(gradeId) {
+    return request({
+      url: `/api/admin/origin-grades/${encodeURIComponent(gradeId)}`,
+      method: "delete",
+    });
+  },
+
+  // 批量删除原始成绩
+  batchDeleteOriginGrades(gradeIds) {
+    return request({
+      url: `/api/admin/origin-grades/batch-delete`,
+      method: "post",
+      data: { grade_ids: gradeIds },
+    });
+  },
 };

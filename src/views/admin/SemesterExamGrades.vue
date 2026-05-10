@@ -80,13 +80,32 @@
         </el-space>
       </div>
 
+      <div class="batch-toolbar mb-4">
+        <span class="selected-count">已选 {{ selectedRows.length }} 条</span>
+        <el-button
+          type="danger"
+          :disabled="selectedRows.length === 0 || selectedRows.length > BATCH_LIMIT"
+          :loading="batchDeleting"
+          @click="handleBatchDelete"
+        >
+          批量删除（已选 {{ selectedRows.length }} 条）
+        </el-button>
+        <span v-if="selectedRows.length > BATCH_LIMIT" class="batch-warning">
+          单次最多删除 {{ BATCH_LIMIT }} 条，请减少选中后再操作
+        </span>
+      </div>
+
       <el-table
+        ref="tableRef"
         :data="filteredGrades"
         v-loading="loading"
         style="width: 100%"
         stripe
         border
+        :row-key="(row) => row.grade_id"
+        @selection-change="handleSelectionChange"
       >
+        <el-table-column type="selection" width="55" :selectable="(row) => !!row.grade_id" />
         <el-table-column
           prop="student_name"
           label="姓名"
@@ -125,6 +144,29 @@
           width="120"
           sortable
         />
+        <el-table-column label="操作" width="120" align="center" fixed="right">
+          <template #default="{ row }">
+            <el-popconfirm
+              :title="singleDeleteTitle"
+              confirm-button-text="删除"
+              confirm-button-type="danger"
+              cancel-button-text="取消"
+              :width="280"
+              @confirm="handleSingleDelete(row)"
+            >
+              <template #reference>
+                <el-button
+                  type="danger"
+                  link
+                  :disabled="!row.grade_id || singleDeletingId === row.grade_id"
+                  :loading="singleDeletingId === row.grade_id"
+                >
+                  删除
+                </el-button>
+              </template>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
 
@@ -276,9 +318,11 @@
 import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { adminAPI } from "@/api/admin";
-import { ElMessage, ElLoading } from "element-plus";
+import { ElMessage, ElMessageBox, ElLoading } from "element-plus";
 import { Search, ArrowLeft, Delete } from "@element-plus/icons-vue";
 import * as XLSX from "xlsx";
+
+const BATCH_LIMIT = 200;
 
 const route = useRoute();
 const router = useRouter();
@@ -302,6 +346,37 @@ const importProgress = ref(0);
 const isImportCancelled = ref(false);
 const currentImportIndex = ref(0);
 const totalImportCount = ref(0);
+
+// 删除相关
+const tableRef = ref(null);
+const selectedRows = ref([]);
+const singleDeletingId = ref(null);
+const batchDeleting = ref(false);
+
+const examTypeName = computed(() => {
+  const t = examDetails.value?.exam_type;
+  if (t === 1) return "期中";
+  if (t === 2) return "期末";
+  return null;
+});
+
+const singleDeleteTitle = computed(() => {
+  const base = "确认删除该条成绩？";
+  return examTypeName.value
+    ? `${base}\n该考试为${examTypeName.value}成绩，对应内部综合成绩将被重新计算。删除后无法恢复。`
+    : `${base}\n删除后无法恢复。`;
+});
+
+const handleSelectionChange = (rows) => {
+  selectedRows.value = rows || [];
+};
+
+const clearTableSelection = () => {
+  if (tableRef.value && typeof tableRef.value.clearSelection === "function") {
+    tableRef.value.clearSelection();
+  }
+  selectedRows.value = [];
+};
 
 const goBack = () => {
   router.back();
@@ -357,6 +432,105 @@ const filterGrades = () => {
   }
 
   filteredGrades.value = result;
+  // 切筛选条件时清空选中（PRD §4.1 reserveSelection=false 行为）
+  clearTableSelection();
+};
+
+const handleSingleDelete = async (row) => {
+  if (!row.grade_id) {
+    ElMessage.warning("该行缺少 grade_id，无法删除");
+    return;
+  }
+  singleDeletingId.value = row.grade_id;
+  try {
+    await adminAPI.deleteOriginGrade(row.grade_id);
+    ElMessage.success("已删除");
+    await fetchGrades();
+  } catch (e) {
+    // 错误提示由 axios interceptor 统一处理
+  } finally {
+    singleDeletingId.value = null;
+  }
+};
+
+const handleBatchDelete = async () => {
+  const rows = selectedRows.value;
+  if (rows.length === 0) return;
+  if (rows.length > BATCH_LIMIT) {
+    ElMessage.warning(`单次最多删除 ${BATCH_LIMIT} 条`);
+    return;
+  }
+
+  const ids = rows.map((r) => r.grade_id).filter(Boolean);
+  if (ids.length === 0) {
+    ElMessage.warning("选中行缺少 grade_id");
+    return;
+  }
+  const N = ids.length;
+  // 本页所有行共享同一 exam_type，X = 期中/期末场景下选中条数
+  const examType = examDetails.value?.exam_type;
+  const X = examType === 1 || examType === 2 ? N : 0;
+  // Y = 受影响 Grade 行数（按学生+学科+学期去重）
+  const Y = X > 0
+    ? new Set(rows.map((r) => `${r.student_id}|${r.subject_code}`)).size
+    : 0;
+
+  const message =
+    X > 0
+      ? `确认删除选中的 ${N} 条成绩？\n其中 ${X} 条为期中/期末成绩，将触发 ${Y} 名学生的综合成绩重新计算。\n删除后无法恢复。`
+      : `确认删除选中的 ${N} 条成绩？\n删除后无法恢复。`;
+
+  try {
+    await ElMessageBox.confirm(message, "批量删除", {
+      confirmButtonText: "确认删除",
+      confirmButtonClass: "el-button--danger",
+      cancelButtonText: "取消",
+      type: "warning",
+      dangerouslyUseHTMLString: false,
+    });
+  } catch {
+    return; // 用户取消
+  }
+
+  batchDeleting.value = true;
+  try {
+    const res = await adminAPI.batchDeleteOriginGrades(ids);
+    const data = res.data || {};
+    const total = data.total || 0;
+    const successCount = data.success_count || 0;
+    const failCount = data.fail_count || 0;
+
+    if (failCount === 0) {
+      ElMessage.success(`已删除 ${successCount} 条成绩`);
+      clearTableSelection();
+      await fetchGrades();
+    } else if (successCount === 0) {
+      ElMessage.error(`全部 ${total} 条删除失败`);
+    } else {
+      const failItems = (data.results || []).filter((r) => r.status === "fail");
+      const failHtml = failItems
+        .slice(0, 30)
+        .map((r) => `<li>${r.grade_id}: ${r.reason || "未知原因"}</li>`)
+        .join("");
+      const more = failItems.length > 30 ? `<p>仅显示前 30 项，共 ${failItems.length} 项失败</p>` : "";
+      try {
+        await ElMessageBox.alert(
+          `<p>成功 ${successCount} 条，失败 ${failCount} 条。</p><ul>${failHtml}</ul>${more}`,
+          "批量删除部分成功",
+          {
+            dangerouslyUseHTMLString: true,
+            confirmButtonText: "知道了",
+          },
+        );
+      } catch {}
+      clearTableSelection();
+      await fetchGrades();
+    }
+  } catch (e) {
+    // axios interceptor 已弹错误 toast
+  } finally {
+    batchDeleting.value = false;
+  }
 };
 
 // Compute subject options for dropdown
@@ -657,5 +831,21 @@ onMounted(() => {
 
 .mb-4 {
   margin-bottom: 20px;
+}
+
+.batch-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.batch-toolbar .selected-count {
+  color: var(--el-text-color-regular);
+  font-size: 14px;
+}
+
+.batch-toolbar .batch-warning {
+  color: var(--el-color-danger);
+  font-size: 13px;
 }
 </style>
