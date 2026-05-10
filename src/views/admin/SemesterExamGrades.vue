@@ -372,9 +372,10 @@ const notDeletableHint = "智学网同步的考试成绩不可删除";
 
 const singleDeleteTitle = computed(() => {
   const base = "确认删除该条成绩？";
-  return examTypeName.value
-    ? `${base}\n该考试为${examTypeName.value}成绩，对应内部综合成绩将被重新计算。删除后无法恢复。`
-    : `${base}\n删除后无法恢复。`;
+  const recomputeHint = examTypeName.value
+    ? `\n该考试为${examTypeName.value}成绩，对应内部综合成绩将被重新计算。`
+    : "";
+  return `${base}${recomputeHint}\n该考试同学科的班级/年级排名不会自动调整，请视情况手动修正。\n删除后无法恢复。`;
 });
 
 const goBack = () => {
