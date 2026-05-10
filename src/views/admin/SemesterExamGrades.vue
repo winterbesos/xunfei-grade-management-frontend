@@ -82,14 +82,22 @@
 
       <div class="batch-toolbar mb-4">
         <span class="selected-count">已选 {{ selectedRows.length }} 条</span>
-        <el-button
-          type="danger"
-          :disabled="selectedRows.length === 0 || selectedRows.length > BATCH_LIMIT"
-          :loading="batchDeleting"
-          @click="handleBatchDelete"
+        <el-tooltip
+          :content="notDeletableHint"
+          :disabled="canDelete"
+          placement="top"
         >
-          批量删除（已选 {{ selectedRows.length }} 条）
-        </el-button>
+          <span>
+            <el-button
+              type="danger"
+              :disabled="!canDelete || selectedRows.length === 0 || selectedRows.length > BATCH_LIMIT"
+              :loading="batchDeleting"
+              @click="handleBatchDelete"
+            >
+              批量删除（已选 {{ selectedRows.length }} 条）
+            </el-button>
+          </span>
+        </el-tooltip>
         <span v-if="selectedRows.length > BATCH_LIMIT" class="batch-warning">
           单次最多删除 {{ BATCH_LIMIT }} 条，请减少选中后再操作
         </span>
@@ -105,7 +113,7 @@
         :row-key="(row) => row.grade_id"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="55" :selectable="(row) => !!row.grade_id" />
+        <el-table-column type="selection" width="55" :selectable="(row) => !!row.grade_id && canDelete" />
         <el-table-column
           prop="student_name"
           label="姓名"
@@ -146,25 +154,35 @@
         />
         <el-table-column label="操作" width="120" align="center" fixed="right">
           <template #default="{ row }">
-            <el-popconfirm
-              :title="singleDeleteTitle"
-              confirm-button-text="删除"
-              confirm-button-type="danger"
-              cancel-button-text="取消"
-              :width="280"
-              @confirm="handleSingleDelete(row)"
+            <el-tooltip
+              :content="notDeletableHint"
+              :disabled="canDelete"
+              placement="top"
             >
-              <template #reference>
-                <el-button
-                  type="danger"
-                  link
-                  :disabled="!row.grade_id || singleDeletingId === row.grade_id"
-                  :loading="singleDeletingId === row.grade_id"
+              <span>
+                <el-popconfirm
+                  v-if="canDelete"
+                  :title="singleDeleteTitle"
+                  confirm-button-text="删除"
+                  confirm-button-type="danger"
+                  cancel-button-text="取消"
+                  :width="280"
+                  @confirm="handleSingleDelete(row)"
                 >
-                  删除
-                </el-button>
-              </template>
-            </el-popconfirm>
+                  <template #reference>
+                    <el-button
+                      type="danger"
+                      link
+                      :disabled="!row.grade_id || singleDeletingId === row.grade_id"
+                      :loading="singleDeletingId === row.grade_id"
+                    >
+                      删除
+                    </el-button>
+                  </template>
+                </el-popconfirm>
+                <el-button v-else type="danger" link disabled>删除</el-button>
+              </span>
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -359,6 +377,10 @@ const examTypeName = computed(() => {
   if (t === 2) return "期末";
   return null;
 });
+
+// v1.2.1：仅手动录入考试 (source=2) 的成绩可删；智学网同步 (source=1) 不可删
+const canDelete = computed(() => examDetails.value?.source === 2);
+const notDeletableHint = "智学网同步的考试成绩不可删除";
 
 const singleDeleteTitle = computed(() => {
   const base = "确认删除该条成绩？";
