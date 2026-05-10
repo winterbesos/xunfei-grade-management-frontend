@@ -29,9 +29,10 @@
         <el-table-column prop="exam_date" label="考试日期" width="120">
           <template #default="{ row }">{{ formatDate(row.exam_date) }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="160" align="center">
+        <el-table-column label="操作" width="220" align="center">
           <template #default="{ row }">
             <el-button link type="primary" @click="goToDetail(row)">成绩导入</el-button>
+            <el-button link type="primary" @click="goToGrades(row)">查看成绩</el-button>
             <el-popconfirm title="确认删除该考试？仅允许删除无成绩数据的考试。" @confirm="handleDelete(row)">
               <template #reference>
                 <el-button link type="danger">删除</el-button>
@@ -225,6 +226,13 @@ const handleDelete = async (row) => {
 const goToDetail = (row) => {
   router.push({
     name: "maintenanceHistoricalExamDetail",
+    params: { semesterId, examId: row.exam_id },
+  });
+};
+
+const goToGrades = (row) => {
+  router.push({
+    name: "maintenanceHistoricalExamGrades",
     params: { semesterId, examId: row.exam_id },
   });
 };

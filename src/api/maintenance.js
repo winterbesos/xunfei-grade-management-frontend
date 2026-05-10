@@ -314,4 +314,28 @@ export const maintenanceAPI = {
       responseType: "blob",
     });
   },
+
+  // v1.2.4 §10 历史导入成绩列表 / 单条删除 / 清空
+  getHistoricalGradeEntries(examId, params = {}) {
+    return request({
+      url: `/api/maintenance/historical/exams/${encodeURIComponent(examId)}/grade-entries`,
+      method: "get",
+      params,
+    });
+  },
+
+  deleteHistoricalGradeEntry(examId, gradePk) {
+    return request({
+      url: `/api/maintenance/historical/exams/${encodeURIComponent(examId)}/grade-entries/${gradePk}`,
+      method: "delete",
+    });
+  },
+
+  clearHistoricalGradeEntries(examId) {
+    return request({
+      url: `/api/maintenance/historical/exams/${encodeURIComponent(examId)}/grade-entries/clear`,
+      method: "post",
+      timeout: 60000,
+    });
+  },
 };

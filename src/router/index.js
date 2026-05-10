@@ -321,6 +321,12 @@ const routes = [
         component: () => import("@/views/maintenance/HistoricalExamDetail.vue"),
         meta: { requiresAuth: true, roles: ["maintenance"] },
       },
+      {
+        path: "/maintenance/historical-import/:semesterId/exams/:examId/grades",
+        name: "maintenanceHistoricalExamGrades",
+        component: () => import("@/views/maintenance/HistoricalExamGrades.vue"),
+        meta: { requiresAuth: true, roles: ["maintenance"] },
+      },
     ],
   },
   {
