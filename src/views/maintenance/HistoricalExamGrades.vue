@@ -1,6 +1,6 @@
 <template>
-  <div class="historical-exam-grades">
-    <el-breadcrumb separator="/">
+  <div class="historical-exam-grades" :class="{ 'is-embedded': embedded }">
+    <el-breadcrumb v-if="!embedded" separator="/">
       <el-breadcrumb-item :to="{ name: 'maintenanceHistoricalImport' }">历史成绩导入</el-breadcrumb-item>
       <el-breadcrumb-item :to="{ name: 'maintenanceHistoricalExams', params: { semesterId } }">
         {{ meta?.teaching_cycle_name || semesterId }}
@@ -8,8 +8,8 @@
       <el-breadcrumb-item>{{ headerTitle }}</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <el-card style="margin-top: 16px" v-loading="loading">
-      <template #header>
+    <component :is="embedded ? 'div' : 'el-card'" :style="embedded ? '' : 'margin-top: 16px'" v-loading="loading">
+      <template v-if="!embedded" #header>
         <div class="card-header">
           <div class="header-left">
             <el-button :icon="ArrowLeft" circle @click="goBack" />
@@ -91,7 +91,7 @@
           </template>
         </el-table-column>
       </el-table>
-    </el-card>
+    </component>
   </div>
 </template>
 
@@ -103,10 +103,16 @@ import { ArrowLeft, Search } from "@element-plus/icons-vue";
 import { maintenanceAPI } from "@/api/maintenance";
 import dayjs from "dayjs";
 
+const props = defineProps({
+  embedded: { type: Boolean, default: false },
+  examId: { type: String, default: null },
+  semesterId: { type: String, default: null },
+});
+
 const route = useRoute();
 const router = useRouter();
-const semesterId = route.params.semesterId;
-const examId = route.params.examId;
+const semesterId = props.semesterId || route.params.semesterId;
+const examId = props.examId || route.params.examId;
 
 const loading = ref(false);
 const clearing = ref(false);

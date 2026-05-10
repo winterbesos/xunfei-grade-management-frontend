@@ -7,7 +7,10 @@
         {{ selectedSemester?.semester_name }}
       </el-breadcrumb-item>
       <el-breadcrumb-item v-if="currentView === 'exam-detail'">
-        {{ selectedExam?.exam_name }}
+        {{ selectedExam?.exam_name || examLabel(selectedExam) }} - 导入
+      </el-breadcrumb-item>
+      <el-breadcrumb-item v-if="currentView === 'exam-grades'">
+        {{ selectedExam?.exam_name || examLabel(selectedExam) }} - 成绩
       </el-breadcrumb-item>
     </el-breadcrumb>
 
@@ -62,7 +65,7 @@
         <el-table-column label="操作" width="240" align="center">
           <template #default="{ row }">
             <el-button link type="primary" @click="selectExam(row)">查看成绩导入</el-button>
-            <el-button link type="primary" @click="goToGrades(row)">查看成绩</el-button>
+            <el-button link type="primary" @click="selectExamGrades(row)">查看成绩</el-button>
             <el-popconfirm title="确认删除？仅允许删除无成绩数据的考试。" @confirm="deleteExam(row)">
               <template #reference>
                 <el-button link type="danger">删除</el-button>
@@ -128,6 +131,16 @@
           </template>
         </el-table-column>
       </el-table>
+    </div>
+
+    <!-- 成绩列表 (v1.2.4 §10) -->
+    <div v-if="currentView === 'exam-grades'">
+      <HistoricalExamGrades
+        :embedded="true"
+        :exam-id="selectedExam?.exam_id"
+        :semester-id="selectedSemester?.semester_id"
+        :key="selectedExam?.exam_id || ''"
+      />
     </div>
 
     <!-- 新建历史学期 Dialog -->
@@ -208,23 +221,23 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { maintenanceAPI } from "@/api/maintenance";
+import HistoricalExamGrades from "./HistoricalExamGrades.vue";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 
-const router = useRouter();
-const goToGrades = (row) => {
-  if (!selectedSemester.value) return;
-  router.push({
-    name: "maintenanceHistoricalExamGrades",
-    params: {
-      semesterId: selectedSemester.value.semester_id,
-      examId: row.exam_id || row.batch_id,
-    },
-  });
+const examLabel = (row) => {
+  if (!row) return "";
+  const grade = row.grade_name || row.grade_code || "";
+  const subject = row.subject_name || row.subject_code || "";
+  return [grade, subject].filter(Boolean).join(" / ") || "成绩";
+};
+
+const selectExamGrades = (row) => {
+  selectedExam.value = row;
+  currentView.value = "exam-grades";
 };
 
 const props = defineProps({ schoolId: { type: String, required: true } });
