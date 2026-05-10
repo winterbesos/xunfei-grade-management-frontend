@@ -59,9 +59,10 @@
             {{ subjectMap[row.subject_code] || row.subject_code }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="160" align="center">
+        <el-table-column label="操作" width="240" align="center">
           <template #default="{ row }">
             <el-button link type="primary" @click="selectExam(row)">查看成绩导入</el-button>
+            <el-button link type="primary" @click="goToGrades(row)">查看成绩</el-button>
             <el-popconfirm title="确认删除？仅允许删除无成绩数据的考试。" @confirm="deleteExam(row)">
               <template #reference>
                 <el-button link type="danger">删除</el-button>
@@ -207,11 +208,24 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { maintenanceAPI } from "@/api/maintenance";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
+
+const router = useRouter();
+const goToGrades = (row) => {
+  if (!selectedSemester.value) return;
+  router.push({
+    name: "maintenanceHistoricalExamGrades",
+    params: {
+      semesterId: selectedSemester.value.semester_id,
+      examId: row.exam_id || row.batch_id,
+    },
+  });
+};
 
 const props = defineProps({ schoolId: { type: String, required: true } });
 
