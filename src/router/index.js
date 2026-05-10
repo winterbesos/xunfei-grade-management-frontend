@@ -327,6 +327,18 @@ const routes = [
         component: () => import("@/views/maintenance/HistoricalExamGrades.vue"),
         meta: { requiresAuth: true, roles: ["maintenance"] },
       },
+      {
+        path: "/maintenance/grade-search",
+        name: "maintenanceGradeSearch",
+        component: () => import("@/views/maintenance/GradeSearch.vue"),
+        meta: { requiresAuth: true, roles: ["maintenance"] },
+      },
+      {
+        path: "/maintenance/students/:studentId/grades",
+        name: "maintenanceStudentGrades",
+        component: () => import("@/views/maintenance/StudentGrades.vue"),
+        meta: { requiresAuth: true, roles: ["maintenance"] },
+      },
     ],
   },
   {

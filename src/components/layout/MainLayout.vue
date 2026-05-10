@@ -87,7 +87,10 @@
             <el-icon><School /></el-icon>
             <template #title>学校管理</template>
           </el-menu-item>
-
+          <el-menu-item index="/maintenance/grade-search">
+            <el-icon><Search /></el-icon>
+            <template #title>成绩查询</template>
+          </el-menu-item>
         </template>
       </el-menu>
     </el-aside>
@@ -174,6 +177,7 @@ import {
   Fold,
   Expand,
   Reading,
+  Search,
 } from "@element-plus/icons-vue";
 import { useAuthStore } from "@/stores/auth";
 import { useSettingsStore } from "@/stores/settings";

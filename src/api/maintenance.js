@@ -315,6 +315,14 @@ export const maintenanceAPI = {
     });
   },
 
+  // 维护员成绩查询：学生所有成绩
+  getStudentAllGrades(studentId) {
+    return request({
+      url: `/api/maintenance/students/${encodeURIComponent(studentId)}/grades`,
+      method: "get",
+    });
+  },
+
   // v1.2.4 §10 历史导入成绩列表 / 单条删除 / 清空
   getHistoricalGradeEntries(examId, params = {}) {
     return request({
