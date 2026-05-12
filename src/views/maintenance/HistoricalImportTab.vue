@@ -57,6 +57,11 @@
             {{ row.current_equiv_grade_name || '-' }}
           </template>
         </el-table-column>
+        <el-table-column label="届" width="110">
+          <template #default="{ row }">
+            {{ row.graduated_year ? `${row.graduated_year} 届` : '-' }}
+          </template>
+        </el-table-column>
         <el-table-column label="科目" width="120" show-overflow-tooltip>
           <template #default="{ row }">
             {{ subjectMap[row.subject_code] || row.subject_code }}

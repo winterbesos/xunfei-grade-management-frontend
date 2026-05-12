@@ -59,6 +59,11 @@
         <el-table-column prop="student_name" label="姓名" min-width="120" sortable />
         <el-table-column prop="student_id" label="学号" min-width="160" show-overflow-tooltip />
         <el-table-column prop="class_name" label="班级" width="120" />
+        <el-table-column prop="graduated_year" label="届" width="110">
+          <template #default="{ row }">
+            {{ row.graduated_year ? `${row.graduated_year} 届` : "-" }}
+          </template>
+        </el-table-column>
         <el-table-column prop="usual_score" label="平时分" width="90" sortable />
         <el-table-column prop="midterm_score" label="期中" width="90" sortable />
         <el-table-column prop="final_score" label="期末" width="90" sortable />
