@@ -55,6 +55,11 @@
         />
         <el-table-column prop="class_name" label="班级名称" />
         <el-table-column prop="year_name" label="年级" />
+        <el-table-column prop="graduated_year" label="届" width="120">
+          <template #default="{ row }">
+            {{ row.graduated_year ? `${row.graduated_year} 届` : "-" }}
+          </template>
+        </el-table-column>
         <el-table-column prop="student_count" label="学生人数" align="center" />
         <el-table-column
           prop="header_teacher_name"
