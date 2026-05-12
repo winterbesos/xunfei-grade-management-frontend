@@ -93,20 +93,34 @@
           style="width: 100%"
         >
           <el-table-column prop="rank" label="排名" width="80" align="center" />
-          <el-table-column prop="student_id" label="学号" width="200" />
           <el-table-column prop="student_name" label="姓名" min-width="120" />
           <el-table-column prop="class_name" label="班级" min-width="120">
             <template #default="{ row }">
               {{ row.class_name || "-" }}
             </template>
           </el-table-column>
-          <el-table-column prop="score" label="成绩" width="120" sortable />
-          <el-table-column prop="grade_level" label="等级" width="100" align="center">
+          <el-table-column prop="usual_score" label="平时成绩" width="110">
+            <template #default="{ row }">
+              {{ row.usual_score ?? "-" }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="midterm_score" label="期中成绩" width="110">
+            <template #default="{ row }">
+              {{ row.midterm_score ?? "-" }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="final_score" label="期末成绩" width="110">
+            <template #default="{ row }">
+              {{ row.final_score ?? "-" }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="score" label="总成绩" width="110" sortable />
+          <el-table-column prop="grade_level" label="等级" width="90" align="center">
             <template #default="{ row }">
               {{ row.grade_level || "-" }}
             </template>
           </el-table-column>
-          <el-table-column prop="gpa" label="GPA" width="100" sortable />
+          <el-table-column prop="gpa" label="GPA" width="90" sortable />
         </el-table>
 
         <el-empty
@@ -184,10 +198,12 @@ const handleExport = () => {
   }
   const rows = leaderboard.value.items.map((it) => ({
     排名: it.rank,
-    学号: it.student_id,
     姓名: it.student_name,
     班级: it.class_name || "",
-    成绩: it.score,
+    平时成绩: it.usual_score ?? "",
+    期中成绩: it.midterm_score ?? "",
+    期末成绩: it.final_score ?? "",
+    总成绩: it.score,
     等级: it.grade_level || "",
     GPA: it.gpa,
   }));
