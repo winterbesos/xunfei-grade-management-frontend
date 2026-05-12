@@ -125,6 +125,14 @@ export const adminAPI = {
     });
   },
 
+  // 获取本校毕业届列表
+  getGraduatedYears() {
+    return request({
+      url: "/api/admin/graduated-years",
+      method: "get",
+    });
+  },
+
   // 获取学期成绩榜单
   getSemesterLeaderboard(semesterId, params) {
     return request({

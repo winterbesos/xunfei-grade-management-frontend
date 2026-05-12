@@ -12,18 +12,18 @@
 
       <div class="filter-bar">
         <el-form :inline="true">
-          <el-form-item label="年级">
+          <el-form-item label="届">
             <el-select
-              v-model="selectedYearCode"
-              placeholder="请选择年级"
+              v-model="selectedGraduatedYear"
+              placeholder="请选择届"
               style="width: 180px"
               clearable
             >
               <el-option
-                v-for="y in years"
-                :key="y.year_code"
-                :label="y.year_name"
-                :value="y.year_code"
+                v-for="y in graduatedYears"
+                :key="y.graduated_year"
+                :label="y.display_name"
+                :value="y.graduated_year"
               />
             </el-select>
           </el-form-item>
@@ -64,7 +64,7 @@
 
       <el-empty
         v-if="!loading && !hasQueried"
-        description="请选择年级和科目后查询"
+        description="请选择届和科目后查询"
       />
 
       <template v-else>
@@ -77,8 +77,8 @@
           <el-descriptions-item label="学期">
             {{ leaderboard.semester_name }}
           </el-descriptions-item>
-          <el-descriptions-item label="年级">
-            {{ leaderboard.year_name }}
+          <el-descriptions-item label="届">
+            {{ leaderboard.graduated_year }} 届
           </el-descriptions-item>
           <el-descriptions-item label="科目">
             {{ leaderboard.subject_name }}
@@ -140,16 +140,16 @@ const route = useRoute();
 const router = useRouter();
 const semesterId = route.params.semesterId;
 
-const years = ref([]);
+const graduatedYears = ref([]);
 const subjects = ref([]);
-const selectedYearCode = ref("");
+const selectedGraduatedYear = ref("");
 const selectedSubjectCode = ref("");
 const leaderboard = ref(null);
 const loading = ref(false);
 const hasQueried = ref(false);
 
 const canQuery = computed(
-  () => !!selectedYearCode.value && !!selectedSubjectCode.value,
+  () => !!selectedGraduatedYear.value && !!selectedSubjectCode.value,
 );
 const hasData = computed(() => (leaderboard.value?.items?.length || 0) > 0);
 
@@ -158,10 +158,10 @@ const goBack = () => router.back();
 const loadOptions = async () => {
   try {
     const [yearRes, subjectRes] = await Promise.all([
-      adminAPI.getSchoolYears(),
+      adminAPI.getGraduatedYears(),
       adminAPI.getActiveSubjects(),
     ]);
-    if (yearRes.status === 200) years.value = yearRes.data || [];
+    if (yearRes.status === 200) graduatedYears.value = yearRes.data || [];
     if (subjectRes.status === 200) subjects.value = subjectRes.data || [];
   } catch (e) {
     ElMessage.error("加载筛选项失败");
@@ -173,7 +173,7 @@ const loadLeaderboard = async () => {
   loading.value = true;
   try {
     const res = await adminAPI.getSemesterLeaderboard(semesterId, {
-      year_code: selectedYearCode.value,
+      graduated_year: selectedGraduatedYear.value,
       subject_code: selectedSubjectCode.value,
     });
     if (res.status === 200) {
@@ -206,7 +206,7 @@ const handleExport = () => {
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "成绩榜单");
-  const fileName = `${leaderboard.value.semester_name}-${leaderboard.value.year_name}-${leaderboard.value.subject_name}-成绩榜单.xlsx`;
+  const fileName = `${leaderboard.value.semester_name}-${leaderboard.value.graduated_year}届-${leaderboard.value.subject_name}-成绩榜单.xlsx`;
   XLSX.writeFile(wb, fileName);
 };
 
