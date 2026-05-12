@@ -90,6 +90,7 @@
           v-loading="loading"
           stripe
           border
+          empty-text="暂无成绩数据"
           style="width: 100%"
         >
           <el-table-column prop="rank" label="排名" width="80" align="center" />
@@ -120,13 +121,8 @@
               {{ row.grade_level || "-" }}
             </template>
           </el-table-column>
-          <el-table-column prop="gpa" label="GPA" width="90" sortable />
+          <el-table-column prop="gpa" label="绩点" width="90" sortable />
         </el-table>
-
-        <el-empty
-          v-if="!loading && hasQueried && (leaderboard?.items?.length || 0) === 0"
-          description="暂无成绩数据"
-        />
       </template>
     </el-card>
   </div>
