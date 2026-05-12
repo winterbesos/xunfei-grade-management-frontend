@@ -35,6 +35,12 @@ const routes = [
         meta: { requiresAuth: true, roles: ["admin"] },
       },
       {
+        path: "/admin/semesters/:semesterId/leaderboard",
+        name: "AdminSemesterLeaderboard",
+        component: () => import("@/views/admin/SemesterLeaderboard.vue"),
+        meta: { requiresAuth: true, roles: ["admin"] },
+      },
+      {
         path: "/admin/semesters/:semesterId/exams",
         name: "AdminSemesterExams",
         component: () => import("@/views/admin/SemesterExams.vue"),

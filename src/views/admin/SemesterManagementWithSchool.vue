@@ -54,7 +54,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="280" fixed="right">
+        <el-table-column label="操作" width="360" fixed="right">
           <template #default="{ row }">
             <el-button
               type="primary"
@@ -79,6 +79,14 @@
               @click="handleScoringCompletion(row)"
             >
               评分完成情况
+            </el-button>
+            <el-button
+              type="primary"
+              size="small"
+              link
+              @click="handleLeaderboard(row)"
+            >
+              成绩榜单
             </el-button>
           </template>
         </el-table-column>
@@ -183,6 +191,13 @@ const handleScoringCompletion = (row) => {
 const handleViewExams = (row) => {
   router.push({
     name: "AdminSemesterExams",
+    params: { semesterId: row.semester_id },
+  });
+};
+
+const handleLeaderboard = (row) => {
+  router.push({
+    name: "AdminSemesterLeaderboard",
     params: { semesterId: row.semester_id },
   });
 };

@@ -125,6 +125,15 @@ export const adminAPI = {
     });
   },
 
+  // 获取学期成绩榜单
+  getSemesterLeaderboard(semesterId, params) {
+    return request({
+      url: `/api/admin/semesters/${semesterId}/leaderboard`,
+      method: "get",
+      params,
+    });
+  },
+
   // 获取活动列表
   getActivities(params) {
     return request({
