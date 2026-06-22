@@ -315,6 +315,40 @@ export const maintenanceAPI = {
     });
   },
 
+  // ==================== 品格评语导入（按学期 + 班级）====================
+
+  downloadCharacterCommentTemplate(semesterId, classId) {
+    return request({
+      url: `/api/maintenance/semesters/${semesterId}/classes/${classId}/character-comments/template`,
+      method: "get",
+      responseType: "blob",
+    });
+  },
+  importCharacterComments(semesterId, classId, formData) {
+    return request({
+      url: `/api/maintenance/semesters/${semesterId}/classes/${classId}/character-comments/import`,
+      method: "post",
+      data: formData,
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+  getCharacterCommentImportLogs(semesterId, classId) {
+    return request({
+      url: `/api/maintenance/semesters/${semesterId}/classes/${classId}/character-comment-imports`,
+      method: "get",
+    });
+  },
+  getCharacterCommentImportLogDetail(logId) {
+    return request({ url: `/api/maintenance/character-comment-imports/${logId}`, method: "get" });
+  },
+  exportCharacterCommentImportReport(logId) {
+    return request({
+      url: `/api/maintenance/character-comment-imports/${logId}/report`,
+      method: "get",
+      responseType: "blob",
+    });
+  },
+
   // 维护员成绩查询：学生所有成绩
   getStudentAllGrades(studentId) {
     return request({

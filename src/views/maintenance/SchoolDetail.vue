@@ -94,6 +94,12 @@
                 v-if="school.schoolId"
               />
             </el-tab-pane>
+            <el-tab-pane label="品格评语导入" name="character-comment-import">
+              <CharacterCommentImportTab
+                :school-id="school.schoolId"
+                v-if="school.schoolId"
+              />
+            </el-tab-pane>
           </el-tabs>
         </div>
       </div>
@@ -115,6 +121,7 @@ import SchoolSemesters from "./SchoolSemesters.vue";
 import ElectiveSubjectManagement from "./ElectiveSubjectManagement.vue";
 import SchoolExams from "./SchoolExams.vue";
 import HistoricalImportTab from "./HistoricalImportTab.vue";
+import CharacterCommentImportTab from "./CharacterCommentImportTab.vue";
 import { maintenanceAPI } from "@/api/maintenance";
 import { useRoute } from "vue-router";
 import { formatDate } from "@/utils/date";
