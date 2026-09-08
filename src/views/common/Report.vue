@@ -153,6 +153,12 @@ const props = defineProps({
     type: [String, Number],
     default: null,
   },
+  // 直接喂数据，跳过内部请求。批量导出时由调用方统一拉取（含重试），
+  // 再离屏挂载本组件截图，保证导出的排版与页面完全一致。
+  reportData: {
+    type: Object,
+    default: null,
+  },
 });
 
 const route = useRoute();
@@ -207,6 +213,42 @@ const getEffectiveParams = () => {
   };
 };
 
+const applyReportData = (data) => {
+  school.value = {
+    school_id: data.school_id,
+    school_name: data.school_name,
+    semester_id: data.semester_id,
+    semester_name: data.semester_name,
+    term_name: data.term_name,
+    academic_year_name: data.academic_year_name,
+  };
+
+  student.value = {
+    class_id: data.class_id,
+    class_name: data.class_name,
+    year_name: data.year_name,
+    student_id: data.student_id,
+    student_name: data.student_name,
+    student_status_number: data.student_status_number,
+    gender: data.gender,
+    gender_text: data.gender === 1 ? "男" : data.gender === 2 ? "女" : "",
+    enrollment_date: data.enrollment_date,
+    header_teacher: data.header_teacher,
+  };
+
+  totalCredits.value = data.total_credits;
+  averageGpa.value = data.average_gpa;
+  grades.value = data.grades;
+  electiveGrades.value = data.elective_grades;
+  moralComment.value = data.moral_education_comment;
+  abilities.value = data.abilities;
+
+  // 更新图表
+  if (chartRef.value && myChart) {
+    updateChart();
+  }
+};
+
 const loadReportData = async () => {
   const { semesterId, studentId } = getEffectiveParams();
 
@@ -223,46 +265,7 @@ const loadReportData = async () => {
         ElMessage.error("加载学生列表失败");
         return;
       }
-
-      // 应用数据
-      school.value = {
-        school_id: response.data.school_id,
-        school_name: response.data.school_name,
-        semester_id: response.data.semester_id,
-        semester_name: response.data.semester_name,
-        term_name: response.data.term_name,
-        academic_year_name: response.data.academic_year_name,
-      };
-
-      student.value = {
-        class_id: response.data.class_id,
-        class_name: response.data.class_name,
-        year_name: response.data.year_name,
-        student_id: response.data.student_id,
-        student_name: response.data.student_name,
-        student_status_number: response.data.student_status_number,
-        gender: response.data.gender,
-        gender_text:
-          response.data.gender === 1
-            ? "男"
-            : response.data.gender === 2
-              ? "女"
-              : "",
-        enrollment_date: response.data.enrollment_date,
-        header_teacher: response.data.header_teacher,
-      };
-
-      totalCredits.value = response.data.total_credits;
-      averageGpa.value = response.data.average_gpa;
-      grades.value = response.data.grades;
-      electiveGrades.value = response.data.elective_grades;
-      moralComment.value = response.data.moral_education_comment;
-      abilities.value = response.data.abilities;
-
-      // 更新图表
-      if (chartRef.value && myChart) {
-        updateChart();
-      }
+      applyReportData(response.data);
     })
     .catch((error) => {
       console.error("获取成绩报告失败:", error);
@@ -632,7 +635,11 @@ onMounted(() => {
     });
   }
 
-  loadReportData();
+  if (props.reportData) {
+    applyReportData(props.reportData);
+  } else {
+    loadReportData();
+  }
 });
 
 onUnmounted(() => {

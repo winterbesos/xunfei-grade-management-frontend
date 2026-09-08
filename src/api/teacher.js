@@ -118,10 +118,12 @@ export const teacherAPI = {
     });
   },
 
-  getStudentSemesterReport(studentId, semesterId) {
+  // silent: 批量调用时抑制全局错误提示，由调用方汇总失败结果
+  getStudentSemesterReport(studentId, semesterId, { silent = false } = {}) {
     return request({
       url: `/api/teacher/students/${studentId}/semesters/${semesterId}/grades`,
       method: "get",
+      silent,
     });
   },
 

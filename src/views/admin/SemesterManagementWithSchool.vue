@@ -54,7 +54,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="360" fixed="right">
+        <el-table-column label="操作" width="440" fixed="right">
           <template #default="{ row }">
             <el-button
               type="primary"
@@ -87,6 +87,14 @@
               @click="handleLeaderboard(row)"
             >
               成绩榜单
+            </el-button>
+            <el-button
+              type="primary"
+              size="small"
+              link
+              @click="handleReports(row)"
+            >
+              成绩单
             </el-button>
           </template>
         </el-table-column>
@@ -198,6 +206,13 @@ const handleViewExams = (row) => {
 const handleLeaderboard = (row) => {
   router.push({
     name: "AdminSemesterLeaderboard",
+    params: { semesterId: row.semester_id },
+  });
+};
+
+const handleReports = (row) => {
+  router.push({
+    name: "AdminSemesterReports",
     params: { semesterId: row.semester_id },
   });
 };
