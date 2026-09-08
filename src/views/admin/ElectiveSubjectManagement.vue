@@ -29,74 +29,99 @@
         </div>
       </template>
 
-      <!-- 选修课列表 -->
+      <!-- 选修课列表（按分类分组） -->
+      <div v-loading="loading">
+        <el-empty
+          v-if="!loading && groupedElectiveSubjects.length === 0"
+          description="暂无选修课"
+        />
+        <el-collapse v-else v-model="activeCategories">
+          <el-collapse-item
+            v-for="group in groupedElectiveSubjects"
+            :key="group.category"
+            :name="group.category"
+          >
+            <template #title>
+              <span class="category-title">{{ group.category }}</span>
+              <el-tag size="small" type="info" class="category-count">
+                {{ group.subjects.length }} 门
+              </el-tag>
+            </template>
+            <el-table :data="group.subjects" style="width: 100%">
+              <el-table-column prop="id" label="ID" width="80" />
 
-      <el-table
-        :data="filteredElectiveSubjects"
-        style="width: 100%"
-        v-loading="loading"
-      >
-        <el-table-column prop="id" label="ID" width="80" />
-
-        <el-table-column prop="name" label="课程名称" min-width="180" />
-        <el-table-column prop="semester_name" label="学期" width="200" />
-        <el-table-column prop="teacher_name" label="任课教师" width="100" />
-        <el-table-column label="学时" width="80" align="center">
-          <template #default="{ row }">
-            {{
-              row.hours !== null && row.hours !== undefined ? row.hours : "—"
-            }}
-          </template>
-        </el-table-column>
-        <el-table-column label="学习" width="70" align="center">
-          <template #default="{ row }">
-            {{ row.abilities?.study_ability || 0 }}
-          </template>
-        </el-table-column>
-        <el-table-column label="逻辑" width="70" align="center">
-          <template #default="{ row }">
-            {{ row.abilities?.logical_thinking || 0 }}
-          </template>
-        </el-table-column>
-        <el-table-column label="创新" width="70" align="center">
-          <template #default="{ row }">
-            {{ row.abilities?.creativity || 0 }}
-          </template>
-        </el-table-column>
-        <el-table-column label="团队" width="70" align="center">
-          <template #default="{ row }">
-            {{ row.abilities?.teamwork || 0 }}
-          </template>
-        </el-table-column>
-        <el-table-column label="责任" width="70" align="center">
-          <template #default="{ row }">
-            {{ row.abilities?.responsibility || 0 }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="160" fixed="right">
-          <template #default="{ row }">
-            <el-button
-              size="small"
-              type="warning"
-              @click="openStudentDialog(row)"
-            >
-              学生管理
-            </el-button>
-            <el-button size="small" type="primary" @click="editSubject(row)">
-              编辑
-            </el-button>
-            <!--
-            <el-button
-              size="small"
-              :type="row.enabled ? 'danger' : 'success'"
-              @click="toggleStatus(row)"
-            >
-              {{ row.enabled ? "禁用" : "启用" }}
-            </el-button>
-            -->
-          </template>
-        </el-table-column>
-      </el-table>
+              <el-table-column prop="name" label="课程名称" min-width="180" />
+              <el-table-column prop="semester_name" label="学期" width="200" />
+              <el-table-column
+                prop="teacher_name"
+                label="任课教师"
+                width="100"
+              />
+              <el-table-column label="学时" width="80" align="center">
+                <template #default="{ row }">
+                  {{
+                    row.hours !== null && row.hours !== undefined
+                      ? row.hours
+                      : "—"
+                  }}
+                </template>
+              </el-table-column>
+              <el-table-column label="学习" width="70" align="center">
+                <template #default="{ row }">
+                  {{ row.abilities?.study_ability || 0 }}
+                </template>
+              </el-table-column>
+              <el-table-column label="逻辑" width="70" align="center">
+                <template #default="{ row }">
+                  {{ row.abilities?.logical_thinking || 0 }}
+                </template>
+              </el-table-column>
+              <el-table-column label="创新" width="70" align="center">
+                <template #default="{ row }">
+                  {{ row.abilities?.creativity || 0 }}
+                </template>
+              </el-table-column>
+              <el-table-column label="团队" width="70" align="center">
+                <template #default="{ row }">
+                  {{ row.abilities?.teamwork || 0 }}
+                </template>
+              </el-table-column>
+              <el-table-column label="责任" width="70" align="center">
+                <template #default="{ row }">
+                  {{ row.abilities?.responsibility || 0 }}
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" width="160" fixed="right">
+                <template #default="{ row }">
+                  <el-button
+                    size="small"
+                    type="warning"
+                    @click="openStudentDialog(row)"
+                  >
+                    学生管理
+                  </el-button>
+                  <el-button
+                    size="small"
+                    type="primary"
+                    @click="editSubject(row)"
+                  >
+                    编辑
+                  </el-button>
+                  <!--
+                  <el-button
+                    size="small"
+                    :type="row.enabled ? 'danger' : 'success'"
+                    @click="toggleStatus(row)"
+                  >
+                    {{ row.enabled ? "禁用" : "启用" }}
+                  </el-button>
+                  -->
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-collapse-item>
+        </el-collapse>
+      </div>
     </el-card>
 
     <!-- 添加/编辑选修课对话框 -->
@@ -336,7 +361,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from "vue";
+import { ref, reactive, onMounted, computed, watch } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Plus, Search } from "@element-plus/icons-vue";
 import { adminAPI } from "@/api/admin";
@@ -353,6 +378,10 @@ const teacherList = ref([]);
 const teacherLoading = ref(false);
 const semesters = ref([]);
 const selectedSemester = ref("");
+
+// 分类分组相关
+const UNCATEGORIZED = "未分类";
+const activeCategories = ref([]);
 
 // 学生管理相关
 const showStudentDialog = ref(false);
@@ -403,6 +432,36 @@ const filteredElectiveSubjects = computed(() => {
         subject.teacher_name.toLowerCase().includes(keyword)),
   );
 });
+
+// 按分类分组，未分类的课程排在最后
+const groupedElectiveSubjects = computed(() => {
+  const groups = new Map();
+  filteredElectiveSubjects.value.forEach((subject) => {
+    const category = subject.category || UNCATEGORIZED;
+    if (!groups.has(category)) {
+      groups.set(category, []);
+    }
+    groups.get(category).push(subject);
+  });
+
+  return Array.from(groups, ([category, subjects]) => ({
+    category,
+    subjects,
+  })).sort((a, b) => {
+    if (a.category === UNCATEGORIZED) return 1;
+    if (b.category === UNCATEGORIZED) return -1;
+    return a.category.localeCompare(b.category, "zh-CN");
+  });
+});
+
+// 分组变化时默认全部展开
+watch(
+  groupedElectiveSubjects,
+  (groups) => {
+    activeCategories.value = groups.map((group) => group.category);
+  },
+  { immediate: true },
+);
 
 // 方法
 const loadSemesters = async () => {
@@ -789,5 +848,14 @@ onMounted(() => {
 
 .search-section {
   margin-bottom: 20px;
+}
+
+.category-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.category-count {
+  margin-left: 8px;
 }
 </style>
