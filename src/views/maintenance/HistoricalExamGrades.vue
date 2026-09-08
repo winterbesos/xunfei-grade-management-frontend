@@ -107,6 +107,8 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { ArrowLeft, Search } from "@element-plus/icons-vue";
 import { maintenanceAPI } from "@/api/maintenance";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 const props = defineProps({
   embedded: { type: Boolean, default: false },
@@ -137,7 +139,7 @@ const headerTitle = computed(() => {
   return parts.join(" · ") || "成绩列表";
 });
 
-const formatDateTime = (dt) => (dt ? dayjs(dt).format("YYYY-MM-DD HH:mm") : "-");
+const formatDateTime = (dt) => (dt ? dayjs.utc(dt).local().format("YYYY-MM-DD HH:mm") : "-");
 
 const fetchEntries = async () => {
   loading.value = true;

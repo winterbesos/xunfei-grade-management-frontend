@@ -122,6 +122,8 @@ import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { maintenanceAPI } from "@/api/maintenance";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 const route = useRoute();
 const semesterId = route.params.semesterId;
@@ -140,7 +142,7 @@ const logDetail = ref([]);
 
 const statusType = (s) => ({ success: "success", skip: "warning", fail: "danger" }[s] || "info");
 const statusLabel = (s) => ({ success: "成功", skip: "跳过", fail: "失败" }[s] || s);
-const formatDateTime = (dt) => (dt ? dayjs(dt).format("YYYY-MM-DD HH:mm:ss") : "-");
+const formatDateTime = (dt) => (dt ? dayjs.utc(dt).local().format("YYYY-MM-DD HH:mm:ss") : "-");
 
 const fetchExamInfo = async () => {
   try {
