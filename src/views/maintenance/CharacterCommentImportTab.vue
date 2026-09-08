@@ -13,7 +13,7 @@
           <el-option
             v-for="s in semesters"
             :key="s.semester_id"
-            :label="s.semester_name"
+            :label="semesterLabel(s)"
             :value="s.semester_id"
           />
         </el-select>
@@ -29,7 +29,7 @@
           <el-option
             v-for="c in classes"
             :key="c.class_id"
-            :label="`${c.year_name || c.year_code} ${c.class_name}`"
+            :label="classLabel(c)"
             :value="c.class_id"
           />
         </el-select>
@@ -134,6 +134,14 @@ const logDetailVisible = ref(false);
 const logDetailLoading = ref(false);
 const logDetail = ref([]);
 
+const semesterLabel = (s) =>
+  [s.academic_year_name, s.term_name, s.semester_name].filter(Boolean).join(" ");
+const classLabel = (c) => {
+  // graduated_year 有效（非空/非 0）时用"届"，否则退回当前年级，避免显示"0届"
+  const valid = c.graduated_year && String(c.graduated_year) !== "0";
+  const prefix = valid ? `${c.graduated_year}届 ` : c.year_name ? `${c.year_name} ` : "";
+  return prefix + c.class_name;
+};
 const formatDateTime = (dt) => (dt ? dayjs.utc(dt).local().format("YYYY-MM-DD HH:mm") : "-");
 const statusType = (s) => ({ success: "success", skip: "warning", fail: "danger" }[s] || "info");
 const statusLabel = (s) => ({ success: "成功", skip: "跳过", fail: "失败" }[s] || s);
@@ -144,6 +152,7 @@ const fetchSemestersAndClasses = async () => {
       maintenanceAPI.getSchoolSemesters(props.schoolId),
       maintenanceAPI.getSchoolClasses(props.schoolId),
     ]);
+    // 支持历史学期：列出该校全部学期（含历史）
     semesters.value = semRes.data || [];
     classes.value = clsRes.data || [];
   } catch {
