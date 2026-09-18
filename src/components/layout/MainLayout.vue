@@ -27,6 +27,10 @@
             <el-icon><User /></el-icon>
             <template #title>班级管理</template>
           </el-menu-item>
+          <el-menu-item index="/admin/student-grades">
+            <el-icon><Search /></el-icon>
+            <template #title>学生成绩查询</template>
+          </el-menu-item>
           <el-menu-item index="/admin/subjects">
             <el-icon><Reading /></el-icon>
             <template #title>科目管理</template>

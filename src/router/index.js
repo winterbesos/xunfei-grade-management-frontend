@@ -77,6 +77,12 @@ const routes = [
         meta: { requiresAuth: true, roles: ["admin"] },
       },
       {
+        path: "/admin/student-grades",
+        name: "AdminStudentGradeQuery",
+        component: () => import("@/views/admin/StudentGradeQuery.vue"),
+        meta: { requiresAuth: true, roles: ["admin"] },
+      },
+      {
         path: "/admin/settings",
         name: "AdminSettings",
         component: () => import("@/views/admin/SystemSettings.vue"),

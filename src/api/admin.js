@@ -177,6 +177,14 @@ export const adminAPI = {
     });
   },
 
+  // 学生成绩查询（按届 + 班级）
+  getStudentQueryOptions() {
+    return request({ url: "/api/admin/student-query/options", method: "get" });
+  },
+  queryStudents(params) {
+    return request({ url: "/api/admin/student-query/students", method: "get", params });
+  },
+
   // 学籍卡 Word 模板：本校是否启用 / 生成 docx
   getStatusCardTemplate() {
     return request({ url: "/api/admin/status-card-template", method: "get" });
