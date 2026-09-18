@@ -349,6 +349,42 @@ export const maintenanceAPI = {
     });
   },
 
+  // ==================== 平时成绩导入（按学期 + 年级）====================
+
+  getUsualScoreImportOptions(schoolId, semesterId) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/semesters/${semesterId}/usual-scores/options`,
+      method: "get",
+    });
+  },
+  downloadUsualScoreTemplate(schoolId, semesterId, gradeCode, subjectCodes) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/semesters/${semesterId}/usual-scores/template`,
+      method: "get",
+      params: { grade_code: gradeCode, subject_codes: subjectCodes.join(",") },
+      responseType: "blob",
+    });
+  },
+  parseUsualScoreFile(schoolId, semesterId, gradeCode, formData) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/semesters/${semesterId}/usual-scores/parse`,
+      method: "post",
+      params: { grade_code: gradeCode },
+      data: formData,
+      headers: { "Content-Type": "multipart/form-data" },
+      timeout: 60000,
+    });
+  },
+  importUsualScoreBatch(schoolId, semesterId, data) {
+    return request({
+      url: `/api/maintenance/schools/${schoolId}/semesters/${semesterId}/usual-scores/batch`,
+      method: "post",
+      data,
+      timeout: 60000,
+      silent: true,
+    });
+  },
+
   // 维护员成绩查询：学生所有成绩
   getStudentAllGrades(studentId) {
     return request({

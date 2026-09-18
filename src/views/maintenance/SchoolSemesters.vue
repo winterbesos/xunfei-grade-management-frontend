@@ -43,10 +43,13 @@
             {{ formatDate(row.end_time) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="140" align="center" fixed="right">
+        <el-table-column label="操作" width="240" align="center" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="openSyncDialog(row)">
               同步考试成绩
+            </el-button>
+            <el-button size="small" @click="openUsualImportDialog(row)">
+              平时成绩导入
             </el-button>
           </template>
         </el-table-column>
@@ -99,6 +102,12 @@
         </span>
       </template>
     </el-dialog>
+
+    <UsualScoreImportDialog
+      v-model="usualImportVisible"
+      :school-id="currentSchoolId"
+      :semester="usualImportSemester"
+    />
   </div>
 </template>
 
@@ -108,6 +117,7 @@ import { useRoute, useRouter } from "vue-router";
 import { maintenanceAPI } from "@/api/maintenance";
 import { ElMessage } from "element-plus";
 import { formatDate } from "@/utils/date";
+import UsualScoreImportDialog from "./UsualScoreImportDialog.vue";
 
 const props = defineProps({
   embedded: {
@@ -139,6 +149,14 @@ const syncForm = reactive({
 const syncRules = {
   examId: [{ required: true, message: "请输入考试ID", trigger: "blur" }],
   examType: [{ required: true, message: "请选择考试类型", trigger: "change" }], // Add rule for examType
+};
+
+// 平时成绩导入
+const usualImportVisible = ref(false);
+const usualImportSemester = ref(null);
+const openUsualImportDialog = (semester) => {
+  usualImportSemester.value = semester;
+  usualImportVisible.value = true;
 };
 
 const goBack = () => {
