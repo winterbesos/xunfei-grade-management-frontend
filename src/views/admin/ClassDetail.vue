@@ -148,15 +148,17 @@
     <el-dialog
       v-model="statusCardDialogVisible"
       title="学籍卡"
-      width="1000px"
+      :width="wordStatusCard ? '1100px' : '1000px'"
+      top="5vh"
       destroy-on-close
       append-to-body
     >
-      <div class="dialog-center">
-        <StatusCard
-          v-if="statusCardDialogVisible"
-          :student-id="currentStudentId"
-        />
+      <WordStatusCard
+        v-if="statusCardDialogVisible && wordStatusCard"
+        :student-id="currentStudentId"
+      />
+      <div v-else-if="statusCardDialogVisible" class="dialog-center">
+        <StatusCard :student-id="currentStudentId" />
       </div>
     </el-dialog>
 
@@ -186,6 +188,7 @@ import { ElMessage } from "element-plus";
 import { ArrowLeft } from "@element-plus/icons-vue";
 import ReportProof from "@/views/common/ReportProof.vue";
 import StatusCard from "@/views/common/StatusCard.vue";
+import WordStatusCard from "@/views/common/WordStatusCard.vue";
 import GradeTrend from "@/views/common/GradeTrend.vue";
 
 const route = useRoute();
@@ -199,6 +202,17 @@ const proofDialogVisible = ref(false);
 const statusCardDialogVisible = ref(false);
 const gradeTrendDialogVisible = ref(false);
 const currentStudentId = ref(null);
+// 本校配置了 Word 学籍卡模板时，学籍卡改为预览 Word
+const wordStatusCard = ref(false);
+
+const fetchStatusCardTemplate = async () => {
+  try {
+    const res = await adminAPI.getStatusCardTemplate();
+    wordStatusCard.value = !!res.data?.word_status_card;
+  } catch {
+    wordStatusCard.value = false;
+  }
+};
 
 const fetchClassDetail = async () => {
   const id = route.params.id;
@@ -243,6 +257,7 @@ const handleViewYearReport = (row) => {
 
 onMounted(() => {
   fetchClassDetail();
+  fetchStatusCardTemplate();
 });
 </script>
 

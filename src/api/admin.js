@@ -177,6 +177,19 @@ export const adminAPI = {
     });
   },
 
+  // 学籍卡 Word 模板：本校是否启用 / 生成 docx
+  getStatusCardTemplate() {
+    return request({ url: "/api/admin/status-card-template", method: "get" });
+  },
+  getStudentStatusCardDocx(studentId) {
+    return request({
+      url: `/api/admin/students/${studentId}/status-card.docx`,
+      method: "get",
+      responseType: "blob",
+      timeout: 60000,
+    });
+  },
+
   getStudentStatusCard(studentId) {
     return request({
       url: `/api/teacher/students/${studentId}/status_card`,
