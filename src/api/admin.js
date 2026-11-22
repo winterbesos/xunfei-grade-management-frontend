@@ -184,6 +184,10 @@ export const adminAPI = {
   queryStudents(params) {
     return request({ url: "/api/admin/student-query/students", method: "get", params });
   },
+  // 学生有成绩单的学期（有成绩记录的学期），按时间从新到旧
+  getStudentReportSemesters(studentId) {
+    return request({ url: `/api/admin/students/${studentId}/report-semesters`, method: "get" });
+  },
 
   // 学籍卡 Word 模板：本校是否启用 / 生成 docx
   getStatusCardTemplate() {
