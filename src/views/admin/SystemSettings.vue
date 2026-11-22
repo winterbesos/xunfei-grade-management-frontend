@@ -20,6 +20,17 @@
           />
         </el-form-item>
 
+        <el-form-item label="成绩单等级">
+          <el-radio-group v-model="form.reportLevelMode">
+            <el-radio value="score">按分数</el-radio>
+            <el-radio value="rank">按排名</el-radio>
+          </el-radio-group>
+          <div class="form-tip">
+            成绩单“学期总评”后的等级列。按分数：总评 90 分以上为 A，80 以上为 B，70 以上为 C，60 以上为 D，其余为 E；
+            按排名：按总评在本年级同科目中的名次占人数比例，每 5% 一档，分为 A1~A3、B1~B6、C1~C6、D1~D4、E
+          </div>
+        </el-form-item>
+
         <el-form-item label="主题颜色">
           <el-color-picker
             v-model="form.themeColor"
@@ -54,6 +65,7 @@ const loading = ref(false);
 
 const form = ref({
   reportSignature: "",
+  reportLevelMode: "score",
   themeColor: "#409EFF",
 });
 
@@ -64,6 +76,7 @@ const loadSchoolInfo = async () => {
       if (response.status === 200) {
         form.value = {
           reportSignature: response.data.signature,
+          reportLevelMode: response.data.report_level_mode || "score",
           themeColor: response.data.theme_color || "#409EFF",
         };
       }
@@ -91,6 +104,7 @@ const handleSave = async () => {
     .updateSchoolInfo({
       signature: form.value.reportSignature,
       theme_color: form.value.themeColor,
+      report_level_mode: form.value.reportLevelMode,
     })
     .then((response) => {
       if (response.status === 200) {
@@ -117,6 +131,13 @@ const handleSave = async () => {
 <style scoped>
 .system-settings {
   padding: 20px;
+}
+
+.form-tip {
+  width: 100%;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--el-text-color-secondary);
 }
 
 .card-header {
