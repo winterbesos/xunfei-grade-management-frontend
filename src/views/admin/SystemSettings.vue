@@ -20,14 +20,23 @@
           />
         </el-form-item>
 
-        <el-form-item label="成绩单等级">
-          <el-radio-group v-model="form.reportLevelMode">
+        <el-form-item label="成绩单等级列">
+          <el-checkbox-group v-model="form.reportLevelColumns">
+            <el-checkbox value="midterm">期中等级</el-checkbox>
+            <el-checkbox value="final">期末等级</el-checkbox>
+            <el-checkbox value="score">总评等级</el-checkbox>
+          </el-checkbox-group>
+          <div class="form-tip">勾选的等级列显示在成绩单对应成绩的后面，不勾选则不显示</div>
+        </el-form-item>
+
+        <el-form-item label="等级计算方式">
+          <el-radio-group v-model="form.reportLevelMode" :disabled="form.reportLevelColumns.length === 0">
             <el-radio value="score">按分数</el-radio>
             <el-radio value="rank">按排名</el-radio>
           </el-radio-group>
           <div class="form-tip">
-            成绩单“学期总评”后的等级列。按分数：总评 90 分以上为 A，80 以上为 B，70 以上为 C，60 以上为 D，其余为 E；
-            按排名：按总评在本年级同科目中的名次占人数比例，每 5% 一档，分为 A1~A3、B1~B6、C1~C6、D1~D4、E
+            三个等级列使用同一种方式。按分数：90 分以上为 A，80 以上为 B，70 以上为 C，60 以上为 D，其余为 E；
+            按排名：按该项成绩在本学期本年级同科目中的名次占人数比例，每 5% 一档，分为 A1~A3、B1~B6、C1~C6、D1~D4、E
           </div>
         </el-form-item>
 
@@ -66,6 +75,7 @@ const loading = ref(false);
 const form = ref({
   reportSignature: "",
   reportLevelMode: "score",
+  reportLevelColumns: [],
   themeColor: "#409EFF",
 });
 
@@ -77,6 +87,7 @@ const loadSchoolInfo = async () => {
         form.value = {
           reportSignature: response.data.signature,
           reportLevelMode: response.data.report_level_mode || "score",
+          reportLevelColumns: response.data.report_level_columns || [],
           themeColor: response.data.theme_color || "#409EFF",
         };
       }
@@ -105,6 +116,7 @@ const handleSave = async () => {
       signature: form.value.reportSignature,
       theme_color: form.value.themeColor,
       report_level_mode: form.value.reportLevelMode,
+      report_level_columns: form.value.reportLevelColumns,
     })
     .then((response) => {
       if (response.status === 200) {

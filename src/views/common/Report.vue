@@ -55,18 +55,20 @@
           <!-- 总学分/平均绩点 行 -->
           <tr>
             <th class="bold-text">总学分</th>
-            <th colspan="2">{{ totalCredits }}</th>
-            <th class="bold-text" colspan="2">平均绩点</th>
-            <th colspan="2">{{ averageGpa }}</th>
+            <th :colspan="summarySpans[0]">{{ totalCredits }}</th>
+            <th class="bold-text" :colspan="summarySpans[1]">平均绩点</th>
+            <th :colspan="summarySpans[2]">{{ averageGpa }}</th>
           </tr>
           <!-- 表头 -->
           <tr>
             <th>课程名</th>
             <th>期中成绩</th>
+            <th v-if="showLevel('midterm')">期中等级</th>
             <th>期末成绩</th>
+            <th v-if="showLevel('final')">期末等级</th>
             <th>平时成绩</th>
             <th>学期总评</th>
-            <th>等级</th>
+            <th v-if="showLevel('score')">总评等级</th>
             <th>学时学分</th>
           </tr>
         </thead>
@@ -76,12 +78,14 @@
             <td>
               {{ formatReportGrade(item.midterm_score, item.grades_type) }}
             </td>
+            <td v-if="showLevel('midterm')">{{ item.report_midterm_level ?? "" }}</td>
             <td>
               {{ formatReportGrade(item.finalterm_score, item.grades_type) }}
             </td>
+            <td v-if="showLevel('final')">{{ item.report_final_level ?? "" }}</td>
             <td>{{ formatReportGrade(item.usual_score, item.grades_type) }}</td>
             <td>{{ formatReportGrade(item.score, item.grades_type) }}</td>
-            <td>{{ item.report_level ?? "" }}</td>
+            <td v-if="showLevel('score')">{{ item.report_level ?? "" }}</td>
             <td>{{ item.credits }}</td>
           </tr>
         </tbody>
@@ -187,6 +191,17 @@ const student = ref({
   header_teacher: "",
 });
 
+// 学校配置显示的等级列：midterm-期中等级，final-期末等级，score-总评等级
+const levelColumns = ref([]);
+const showLevel = (column) => levelColumns.value.includes(column);
+// 「总学分 / 平均绩点」行按成绩表的列数分配 colspan：6 列基础列 + 显示的等级列
+const summarySpans = computed(() => {
+  const rest = 6 + levelColumns.value.length - 1; // 去掉「总学分」标签占的一列
+  const label = rest >= 6 ? 2 : 1;
+  const credits = Math.ceil((rest - label) / 2);
+  return [credits, label, rest - label - credits];
+});
+
 const totalCredits = ref("0");
 const averageGpa = ref("0.0");
 
@@ -216,6 +231,7 @@ const getEffectiveParams = () => {
 };
 
 const applyReportData = (data) => {
+  levelColumns.value = data.level_columns || [];
   school.value = {
     school_id: data.school_id,
     school_name: data.school_name,
