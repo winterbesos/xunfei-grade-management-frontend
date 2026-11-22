@@ -66,6 +66,7 @@
             <th>期末成绩</th>
             <th>平时成绩</th>
             <th>学期总评</th>
+            <th>等级</th>
             <th>学时学分</th>
           </tr>
         </thead>
@@ -80,6 +81,7 @@
             </td>
             <td>{{ formatReportGrade(item.usual_score, item.grades_type) }}</td>
             <td>{{ formatReportGrade(item.score, item.grades_type) }}</td>
+            <td>{{ item.report_level ?? "" }}</td>
             <td>{{ item.credits }}</td>
           </tr>
         </tbody>
