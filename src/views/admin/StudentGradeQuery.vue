@@ -62,6 +62,7 @@
         </el-table-column>
         <el-table-column label="操作" align="center" min-width="300">
           <template #default="{ row }">
+            <el-button type="info" link @click="handleViewReport(row)">成绩单</el-button>
             <el-button v-if="isHighSchool(row)" type="primary" link @click="handleViewProof(row)">
               成绩证明
             </el-button>
@@ -85,6 +86,50 @@
         />
       </div>
     </el-card>
+
+    <el-dialog
+      v-model="reportDialogVisible"
+      :title="reportDialogTitle"
+      width="900px"
+      top="5vh"
+      destroy-on-close
+      append-to-body
+    >
+      <template v-if="!reportSemester">
+        <el-table
+          :data="reportSemesters"
+          v-loading="reportSemestersLoading"
+          stripe
+          class="semester-table"
+          @row-click="selectReportSemester"
+        >
+          <el-table-column label="学期" min-width="200">
+            <template #default="{ row }">{{ semesterLabel(row) }}</template>
+          </el-table-column>
+          <el-table-column prop="semester_name" label="教学周期" min-width="160" />
+          <el-table-column label="操作" width="120" align="center">
+            <template #default="{ row }">
+              <el-button type="primary" link @click.stop="selectReportSemester(row)">查看成绩单</el-button>
+            </template>
+          </el-table-column>
+          <template #empty>
+            <el-empty v-if="!reportSemestersLoading" description="该学生还没有成绩单" />
+          </template>
+        </el-table>
+      </template>
+      <template v-else>
+        <div class="report-nav">
+          <el-button link :icon="ArrowLeft" @click="reportSemester = null">返回学期列表</el-button>
+        </div>
+        <div class="dialog-center">
+          <Report
+            :key="reportSemester.semester_id"
+            :student-id="currentStudentId"
+            :semester-id="reportSemester.semester_id"
+          />
+        </div>
+      </template>
+    </el-dialog>
 
     <el-dialog
       v-model="proofDialogVisible"
@@ -132,7 +177,9 @@
 import { ref, reactive, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
+import { ArrowLeft } from "@element-plus/icons-vue";
 import { adminAPI } from "@/api/admin";
+import Report from "@/views/common/Report.vue";
 import ReportProof from "@/views/common/ReportProof.vue";
 import StatusCard from "@/views/common/StatusCard.vue";
 import WordStatusCard from "@/views/common/WordStatusCard.vue";
@@ -155,6 +202,19 @@ const proofDialogVisible = ref(false);
 const statusCardDialogVisible = ref(false);
 const gradeTrendDialogVisible = ref(false);
 const currentStudentId = ref(null);
+
+// 成绩单：先列出有成绩单的学期，点击学期后显示该学期成绩单
+const reportDialogVisible = ref(false);
+const reportStudentName = ref("");
+const reportSemesters = ref([]);
+const reportSemestersLoading = ref(false);
+const reportSemester = ref(null);
+const semesterLabel = (s) => [s.academic_year_name, s.term_name].filter(Boolean).join(" ") || s.semester_name;
+const reportDialogTitle = computed(() =>
+  reportSemester.value
+    ? `${reportStudentName.value} · ${semesterLabel(reportSemester.value)} 成绩单`
+    : `${reportStudentName.value} · 成绩单`,
+);
 
 const classOptions = computed(() =>
   filters.graduated_year ? classes.value.filter((c) => c.graduated_year === filters.graduated_year) : classes.value,
@@ -210,6 +270,28 @@ const handleSearch = async () => {
   }
 };
 
+const handleViewReport = async (row) => {
+  currentStudentId.value = row.user_id;
+  reportStudentName.value = row.user_name;
+  reportSemester.value = null;
+  reportSemesters.value = [];
+  reportDialogVisible.value = true;
+  reportSemestersLoading.value = true;
+  try {
+    const res = await adminAPI.getStudentReportSemesters(row.user_id);
+    // 弹窗打开期间又点了别的学生时，丢弃过期的结果
+    if (currentStudentId.value === row.user_id) reportSemesters.value = res.data || [];
+  } catch {
+    // 错误提示由 request 拦截器统一展示
+  } finally {
+    reportSemestersLoading.value = false;
+  }
+};
+
+const selectReportSemester = (semester) => {
+  reportSemester.value = semester;
+};
+
 const handleViewProof = (row) => {
   currentStudentId.value = row.user_id;
   proofDialogVisible.value = true;
@@ -247,6 +329,14 @@ onMounted(loadOptions);
   display: flex;
   justify-content: flex-end;
   margin-top: 16px;
+}
+
+.semester-table :deep(.el-table__row) {
+  cursor: pointer;
+}
+
+.report-nav {
+  margin-bottom: 12px;
 }
 
 .dialog-center {
