@@ -1,6 +1,24 @@
 import axios from "axios";
 import { ElMessage } from "element-plus";
 
+// 后端错误 detail 可能是字符串，也可能是 FastAPI 422 的校验错误数组，统一转成可读文本
+// labels 用于把字段名映射为中文，如 { score: "原始分" }
+export const formatErrorDetail = (detail, labels = {}) => {
+  if (!detail) return "";
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) {
+    return detail
+      .map((item) => {
+        const field = item?.loc?.[item.loc.length - 1];
+        const msg = String(item?.msg ?? "").replace(/^Value error,\s*/, "");
+        const name = labels[field] ?? field;
+        return name && name !== "body" ? `${name}${msg}` : msg;
+      })
+      .join("；");
+  }
+  return JSON.stringify(detail);
+};
+
 // 创建 axios 实例
 const request = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
@@ -37,7 +55,7 @@ request.interceptors.response.use(
     if (response && response.status >= 400 && response.status < 500) {
       if (!silent) {
         ElMessage({
-          message: response.data.detail || "Error",
+          message: formatErrorDetail(response.data?.detail) || "Error",
           type: "error",
           duration: 5000,
         });
@@ -52,7 +70,9 @@ request.interceptors.response.use(
 
       // 静默模式保留原始 error，调用方要靠 response.status / detail 归类失败原因
       if (silent) return Promise.reject(error);
-      return Promise.reject(new Error(response.data.detail || "Error"));
+      return Promise.reject(
+        new Error(formatErrorDetail(response.data?.detail) || "Error"),
+      );
     } else {
       if (!silent) {
         ElMessage({

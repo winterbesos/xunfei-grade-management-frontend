@@ -330,6 +330,15 @@ import { adminAPI } from "@/api/admin";
 import { ElMessage, ElMessageBox, ElLoading } from "element-plus";
 import { Search, ArrowLeft, Delete } from "@element-plus/icons-vue";
 import * as XLSX from "xlsx";
+import { formatErrorDetail } from "@/utils/request";
+
+// 导入失败提示里把后端字段名换成表头上的叫法
+const IMPORT_FIELD_LABELS = {
+  score: "原始分",
+  standard_score: "标准分",
+  class_rank: "班级排名",
+  school_rank: "年级排名",
+};
 
 const route = useRoute();
 const router = useRouter();
@@ -700,13 +709,17 @@ const submitImport = async () => {
         student_id: "",
       };
 
-      await adminAPI.addOriginExamGrade(examId, payload);
+      // 静默：逐行弹错会刷屏，错误写进该行状态，结束后统一汇总
+      await adminAPI.addOriginExamGrade(examId, payload, { silent: true });
       resultsMap.set(index, { status: "success", error: "" });
       successCount++;
     } catch (error) {
       resultsMap.set(index, {
         status: "error",
-        error: error.response?.data?.detail || "提交失败",
+        error:
+          formatErrorDetail(error.response?.data?.detail, IMPORT_FIELD_LABELS) ||
+          error.message ||
+          "提交失败",
       });
       failCount++;
     } finally {

@@ -415,11 +415,12 @@ export const adminAPI = {
   },
 
   // 导入原始成绩
-  addOriginExamGrade(examId, data) {
+  addOriginExamGrade(examId, data, config = {}) {
     return request({
       url: `/api/admin/origin-exams/${examId}/grades`,
       method: "post",
       data,
+      ...config,
     });
   },
 
